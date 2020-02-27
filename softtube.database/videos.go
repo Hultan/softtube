@@ -57,10 +57,9 @@ func (v VideosTable) Insert(videoID string, channelID string, title string, dura
 	// Open database
 	connectionString := getConnectionString(v.Path)
 	db, err := sql.Open(driverName, connectionString)
-	db.
 	if err != nil {
 		return err
-	}	
+	}
 	defer db.Close()
 
 	now := time.Now().UTC().Format(dateLayout) // Added
