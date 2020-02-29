@@ -17,7 +17,7 @@ type youtube struct {
 }
 
 // Get the duration of a youtube video
-func (y youtube) getDuration(config *Config, videoID string) {
+func (y youtube) getDuration(db *database.Database, config *Config, videoID string) {
 	// youtube-dl --get-duration -- '%s'
 	command := fmt.Sprintf(videoDurationCommand, videoID)
 	cmdOutput, err := exec.Command("/bin/bash", "-c", command).Output()
@@ -26,8 +26,7 @@ func (y youtube) getDuration(config *Config, videoID string) {
 		log.Fatal(err)
 	}
 	// Save duration in the database
-	databaseVideo := database.VideosTable{Path: config.Paths.Database}
-	databaseVideo.UpdateDuration(videoID, string(cmdOutput))
+	db.Videos.UpdateDuration(videoID, string(cmdOutput))
 	// TODO : Fix logging
 }
 

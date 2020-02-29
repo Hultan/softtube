@@ -10,7 +10,7 @@ import (
 
 // VideosTable : VideosTable in the SoftTube database
 type VideosTable struct {
-	Path string
+	Database *sql.DB
 }
 
 // VideosRecord : A single video in the SubscriptionTable
@@ -25,16 +25,13 @@ const sqlStatementUpdateDuration = "UPDATE Videos SET duration=?1 WHERE video_id
 
 // Exists : Does a video already exist in the database?
 func (v VideosTable) Exists(videoID string) (bool, error) {
-	// Open database
-	connectionString := getConnectionString(v.Path)
-	db, err := sql.Open(driverName, connectionString)
-	if err != nil {
-		return false, err
+	// Check that database is opened
+	if v.Database == nil {
+		return false, errors.New("database not opened")
 	}
-	defer db.Close()
 
 	// Execute select query
-	rows, err := db.Query(sqlStatementVideoExists, videoID)
+	rows, err := v.Database.Query(sqlStatementVideoExists, videoID)
 	if err != nil {
 		return false, err
 	}
@@ -54,38 +51,34 @@ func (v VideosTable) Exists(videoID string) (bool, error) {
 
 // Insert : Insert a new video into the database
 func (v VideosTable) Insert(videoID string, channelID string, title string, duration string, published time.Time) error {
-	// Open database
-	connectionString := getConnectionString(v.Path)
-	db, err := sql.Open(driverName, connectionString)
-	if err != nil {
-		return err
+	// Check that database is opened
+	if v.Database == nil {
+		return errors.New("database not opened")
 	}
-	defer db.Close()
 
 	now := time.Now().UTC().Format(dateLayout) // Added
 
 	// Execute insert statement
-	_, err = db.Exec(sqlStatementInsertVideo, videoID, channelID, title, duration, published, now)
+	_, err := v.Database.Exec(sqlStatementInsertVideo, videoID, channelID, title, duration, published, now)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 // UpdateDuration : Update duration for a video
 func (v VideosTable) UpdateDuration(videoID string, duration string) error {
-	// Open database
-	connectionString := getConnectionString(v.Path)
-	db, err := sql.Open(driverName, connectionString)
-	if err != nil {
-		return err
+	// Check that database is opened
+	if v.Database == nil {
+		return errors.New("database not opened")
 	}
-	defer db.Close()
 
 	// Execute insert statement
-	_, err = db.Exec(sqlStatementUpdateDuration, videoID, duration)
+	_, err := v.Database.Exec(sqlStatementUpdateDuration, videoID, duration)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

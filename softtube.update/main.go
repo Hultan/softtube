@@ -26,8 +26,8 @@ func main() {
 	log.logStart(config)
 
 	// Create the database object, and get all subscriptions
-	databaseSubscription := database.SubscriptionTable{Path: config.Paths.Database}
-	subs, err := databaseSubscription.GetAll()
+	db := database.New(config.Paths.Database)
+	subs, err := db.Subscriptions.GetAll()
 
 	// Handle errors
 	if err != nil {
@@ -60,7 +60,7 @@ func main() {
 			// Start goroutine to update subscription
 			go func() {
 				defer waitGroup.Done()
-				update(&log, config, &sub.Entity)
+				update(&db, &log, config, &sub.Entity)
 			}()
 		}
 	}
@@ -72,7 +72,7 @@ func main() {
 	log.logFinished()
 }
 
-func update(log *Log, config *Config, subscription *entities.Subscription) {
+func update(db *database.Database, log *Log, config *Config, subscription *entities.Subscription) {
 	log.logFormat("Updating channel '", subscription.Name, "'.")
 
 	youtube := new(youtube)
@@ -84,13 +84,12 @@ func update(log *Log, config *Config, subscription *entities.Subscription) {
 	feed := new(Feed)
 	feed.parse(rss)
 	videos := feed.getVideos()
-	databaseVideo := database.VideosTable{Path: config.Paths.Database}
 	var waitGroup sync.WaitGroup
 
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]
 		// Check if the video already exists in the database
-		exists, err := databaseVideo.Exists(video.ID)
+		exists, err := db.Videos.Exists(video.ID)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -101,12 +100,12 @@ func update(log *Log, config *Config, subscription *entities.Subscription) {
 			go func() {
 				defer waitGroup.Done()
 				// Insert the video in the database
-				databaseVideo.Insert(video.ID, video.ChannelID, video.Title, "", video.Published)
+				db.Videos.Insert(video.ID, video.ChannelID, video.Title, "", video.Published)
 			}()
 			go func() {
 				// Get duration
 				defer waitGroup.Done()
-				youtube.getDuration(config, video.ID)
+				youtube.getDuration(db, config, video.ID)
 			}()
 			go func() {
 				// Get thumbnail

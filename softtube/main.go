@@ -1,29 +1,29 @@
 package main
 
-//const dateFormat = "RFC3339"
+import (
+	"fmt"
+
+	database "github.com/hultan/softtube/softtube.database"
+	_ "github.com/mattn/go-sqlite3"
+)
 
 func main() {
+	testCreateDatabase()
+}
 
-	// database.Connect()
+func testCreateDatabase() {
+	db := database.New("/home/per/temp/test.db")
+	//database := database.Database{Path: "/home/per/temp/test.db"}
+	err := db.OpenDatabase()
+	if err != nil {
+		panic(err)
+	}
+	defer db.CloseDatabase()
 
-	// v, err := database.GetVersion()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	version, err := db.Version.GetVersion()
+	if err != nil {
+		panic(err)
+	}
 
-	// fmt.Println("Version : " + strconv.FormatInt(int64(v.Major), 10))
-
-	// d, err := database.GetDate()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println("Date : " + d.Format(time.RFC3339))
-
-	// c, err := database.GetChannelID()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println("Channel Id : " + c)
+	fmt.Println("Major : ", version.Major)
 }

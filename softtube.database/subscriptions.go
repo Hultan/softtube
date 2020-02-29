@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	entities "github.com/hultan/softtube/softtube.entities"
@@ -9,7 +10,7 @@ import (
 
 // SubscriptionTable : SubscriptionTable in the SoftTube database
 type SubscriptionTable struct {
-	Path string
+	Database *sql.DB
 }
 
 // SubscriptionRecord : A single subscription in the SubscriptionTable
@@ -22,15 +23,12 @@ const sqlStatementGetAllSubscriptions = "select channel_id, channel_name, freque
 
 // GetAll : Returns all subscriptions
 func (s SubscriptionTable) GetAll() ([]SubscriptionRecord, error) {
-	// Open database
-	connectionString := getConnectionString(s.Path)
-	db, err := sql.Open(driverName, connectionString)
-	if err != nil {
-		return []SubscriptionRecord{}, err
+	// Check that database is opened
+	if s.Database == nil {
+		return nil, errors.New("database not opened")
 	}
-	defer db.Close()
 
-	rows, err := db.Query(sqlStatementGetAllSubscriptions)
+	rows, err := s.Database.Query(sqlStatementGetAllSubscriptions)
 	if err != nil {
 		return []SubscriptionRecord{}, err
 	}
