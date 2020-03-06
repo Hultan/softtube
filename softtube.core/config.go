@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"encoding/json"
@@ -7,13 +7,23 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strings"
 )
 
 // Config for the SoftTube program
 type Config struct {
+	Connection struct {
+		Server   string `json:"server"`
+		Port     int    `json:"port"`
+		Database string `json:"database"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+	} `json:"connection"`
 	Paths struct {
+		Backup     string `json:"backup"`
 		Log        string `json:"log"`
 		Database   string `json:"database"`
+		YoutubeDL  string `json:"youtube-dl"`
 		Thumbnails string `json:"thumbnails"`
 		Videos     string `json:"videos"`
 	} `json:"paths"`
@@ -25,13 +35,13 @@ type Config struct {
 }
 
 // Load : Loads a SoftTube configuration file
-func (config *Config) Load() error {
+func (config *Config) Load(mode string) error {
 	// Get the path to the config file
-	path := getConfigPath()
+	path := getConfigPath(mode)
 
 	// Make sure the file exists
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		errorMessage := fmt.Sprintf("settings file is missing (%s)", configPath)
+		errorMessage := fmt.Sprintf("settings file is missing (%s)", constConfigPath)
 		return errors.New(errorMessage)
 	}
 
@@ -52,9 +62,9 @@ func (config *Config) Load() error {
 }
 
 // Save : Saves a SoftTube configuration file
-func (config *Config) Save() {
+func (config *Config) Save(mode string) {
 	// Get the path to the config file
-	path := getConfigPath()
+	path := getConfigPath(mode)
 
 	// Open config file
 	configFile, err := os.OpenFile(path, os.O_TRUNC|os.O_WRONLY, 0644)
@@ -79,11 +89,23 @@ func (config *Config) Save() {
 	configFile.Write(data)
 }
 
-func getConfigPath() string {
+// Get path to the config file
+// Mode = "test" returns test config path
+// otherwise returns normal config path
+func getConfigPath(mode string) string {
 	home := getHomeDirectory()
+
+	var configPath string
+	if strings.ToLower(mode) == "test" {
+		configPath = constConfigPathTest
+	} else {
+		configPath = constConfigPath
+	}
+
 	return path.Join(home, configPath)
 }
 
+// Get current users home directory
 func getHomeDirectory() string {
 	u, err := user.Current()
 	if err != nil {

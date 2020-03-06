@@ -1,12 +1,12 @@
 package main
 
-const configPath string = "/.config/softtube/softtube.config"
+const constVideoDurationCommand = "%s --get-duration -- '%s'"
 
-const videoDurationCommand = "youtube-dl --get-duration -- '%s'"
+const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'"
+const constThumbnailLocation string = "%s/%s.jpg"
 
-const thumbnailCommand string = "youtube-dl --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'"
-const thumbnailPath string = "%s/%s.jpg"
+const constSubscriptionRSSURL = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
 
-const subscriptionRSSURL = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
+const constDateLayout = "2006-01-02T15:04:05-07:00"
 
-const dateLayout = "2006-01-02T15:04:05-07:00"
+const constMaxLogFileSize = 500000

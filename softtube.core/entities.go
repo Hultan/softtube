@@ -1,10 +1,15 @@
-package entities
+package core
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 // Version : Represents the SoftTube database version
 type Version struct {
-	Major int
+	Major    int
+	Minor    int
+	Revision int
 }
 
 // Log : Represents a SoftTube log entry
@@ -19,18 +24,17 @@ type Subscription struct {
 	ID          string
 	Name        string
 	Frequency   int
-	LastChecked time.Time
-	NextUpdate  int
+	LastChecked sql.NullTime
+	NextUpdate  sql.NullInt32
 }
 
 // Video : Represents a YouTube video in SoftTube
 type Video struct {
-	ID         string
-	ChannelID  string
-	Title      string
-	Added      time.Time
-	Published  time.Time
-	Duration   string
-	Downloaded bool
-	Watched    bool
+	ID             string
+	SubscriptionID string
+	Title          string
+	Added          time.Time
+	Published      time.Time
+	Duration       sql.NullString
+	Status         int
 }

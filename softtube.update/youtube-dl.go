@@ -6,47 +6,61 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 	"os/exec"
-
-	database "github.com/hultan/softtube/softtube.database"
+	"path"
+	"strings"
 )
 
 type youtube struct {
 }
 
 // Get the duration of a youtube video
-func (y youtube) getDuration(db *database.Database, config *Config, videoID string) {
+func (y youtube) getDuration(videoID string, logger Log) error {
 	// youtube-dl --get-duration -- '%s'
-	command := fmt.Sprintf(videoDurationCommand, videoID)
-	cmdOutput, err := exec.Command("/bin/bash", "-c", command).Output()
-	// TODO : Fix error handling
+	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		msg := fmt.Sprintf("Command : %s", command)
+		logger.log(msg)
+		msg = fmt.Sprintf("Output : %s", output)
+		logger.log(msg)
+		logger.logError(err)
+		return err
 	}
 	// Save duration in the database
-	db.Videos.UpdateDuration(videoID, string(cmdOutput))
-	// TODO : Fix logging
+	db.Videos.UpdateDuration(videoID, strings.Trim(string(output), " \n"))
+	return nil
 }
 
 // Get the thumbnail of a youtube video
-func (y youtube) getThumbnail(config *Config, videoID string) {
+func (y youtube) getThumbnail(videoID, thumbnailPath string, logger Log) error {
 	// %s/%s.jpg
-	path := fmt.Sprintf(thumbnailPath, config.Paths.Thumbnails, videoID)
-	// youtube-dl --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'
-	command := fmt.Sprintf(thumbnailCommand, path, videoID)
-	_, err := exec.Command("/bin/bash", "-c", command).Output()
-	// TODO : Fix error handling
-	if err != nil {
-		log.Fatal(err)
+	thumbPath := fmt.Sprintf(constThumbnailLocation, thumbnailPath, videoID)
+
+	// Don't download thumbnail if it already exists
+	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+		// youtube-dl --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'
+		command := fmt.Sprintf(constThumbnailCommand, y.getYoutubePath(), thumbPath, videoID)
+		cmd := exec.Command("/bin/bash", "-c", command)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			msg := fmt.Sprintf("Command : %s", command)
+			logger.log(msg)
+			msg = fmt.Sprintf("Output : %s", output)
+			logger.log(msg)
+			logger.logError(err)
+			return err
+		}
 	}
-	// TODO : Fix logging
+	return nil
 }
 
 // Get the subscription RSS to a string.
 func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
-	url := fmt.Sprintf(subscriptionRSSURL, channelID)
+	url := fmt.Sprintf(constSubscriptionRSSURL, channelID)
 	// Get the xml from the URL
 	response, err := http.Get(url)
 	if err != nil {
@@ -60,4 +74,8 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 	xml := buf.String()
 
 	return xml, nil
+}
+
+func (y youtube) getYoutubePath() string {
+	return path.Join(config.Paths.YoutubeDL, "youtube-dl")
 }

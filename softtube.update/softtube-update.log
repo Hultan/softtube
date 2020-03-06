@@ -1,0 +1,378 @@
+2020/03/05 18:27:43 ------------------
+2020/03/05 18:27:43 - update started -
+2020/03/05 18:27:43 ------------------
+2020/03/05 18:27:43 
+2020/03/05 18:27:43 Settings:
+2020/03/05 18:27:43 ---------
+2020/03/05 18:27:43 CONNECTION:
+2020/03/05 18:27:43 	Server 			:  192.168.1.3
+2020/03/05 18:27:43 	Port 			:  3306
+2020/03/05 18:27:43 	Database 		:  softtube
+2020/03/05 18:27:43 	Username 		:  per
+2020/03/05 18:27:43 PATHS:
+2020/03/05 18:27:43 	Backup path		:  /home/per/backup
+2020/03/05 18:27:43 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:27:43 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:27:43 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:27:43 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:27:43 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:27:43 INTERVALS:
+2020/03/05 18:27:43 	High 			:  1800
+2020/03/05 18:27:43 	Medium 			:  7200
+2020/03/05 18:27:43 	Low 			:  14400
+2020/03/05 18:27:43 ---------
+2020/03/05 18:27:43 
+2020/03/05 18:27:43 Loaded  430  subscriptions.
+2020/03/05 18:27:43 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:27:43 
+2020/03/05 18:27:43 -------------------
+2020/03/05 18:27:43 - update finished -
+2020/03/05 18:27:43 -------------------
+2020/03/05 18:27:43 
+2020/03/05 18:27:46 ------------------
+2020/03/05 18:27:46 - update started -
+2020/03/05 18:27:46 ------------------
+2020/03/05 18:27:46 
+2020/03/05 18:27:46 Settings:
+2020/03/05 18:27:46 ---------
+2020/03/05 18:27:46 CONNECTION:
+2020/03/05 18:27:46 	Server 			:  192.168.1.3
+2020/03/05 18:27:46 	Port 			:  3306
+2020/03/05 18:27:46 	Database 		:  softtube
+2020/03/05 18:27:46 	Username 		:  per
+2020/03/05 18:27:46 PATHS:
+2020/03/05 18:27:46 	Backup path		:  /home/per/backup
+2020/03/05 18:27:46 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:27:46 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:27:46 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:27:46 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:27:46 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:27:46 INTERVALS:
+2020/03/05 18:27:46 	High 			:  1800
+2020/03/05 18:27:46 	Medium 			:  7200
+2020/03/05 18:27:46 	Low 			:  14400
+2020/03/05 18:27:46 ---------
+2020/03/05 18:27:46 
+2020/03/05 18:27:46 Loaded  430  subscriptions.
+2020/03/05 18:27:46 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:27:46 
+2020/03/05 18:27:46 -------------------
+2020/03/05 18:27:46 - update finished -
+2020/03/05 18:27:46 -------------------
+2020/03/05 18:27:46 
+2020/03/05 18:28:23 ------------------
+2020/03/05 18:28:23 - update started -
+2020/03/05 18:28:23 ------------------
+2020/03/05 18:28:23 
+2020/03/05 18:28:23 Settings:
+2020/03/05 18:28:23 ---------
+2020/03/05 18:28:23 CONNECTION:
+2020/03/05 18:28:23 	Server 			:  192.168.1.3
+2020/03/05 18:28:23 	Port 			:  3306
+2020/03/05 18:28:23 	Database 		:  softtube
+2020/03/05 18:28:23 	Username 		:  per
+2020/03/05 18:28:23 PATHS:
+2020/03/05 18:28:23 	Backup path		:  /home/per/backup
+2020/03/05 18:28:23 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:23 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:23 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:23 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:23 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:23 INTERVALS:
+2020/03/05 18:28:23 	High 			:  1800
+2020/03/05 18:28:23 	Medium 			:  7200
+2020/03/05 18:28:23 	Low 			:  14400
+2020/03/05 18:28:23 ---------
+2020/03/05 18:28:23 
+2020/03/05 18:28:23 Loaded  430  subscriptions.
+2020/03/05 18:28:23 softtube-update needs to update  4  (of  430  subscriptions).
+2020/03/05 18:28:23 Updating channel ' WatchMojo.com '.
+2020/03/05 18:28:23 Updating channel ' Marzia '.
+2020/03/05 18:28:23 Updating channel ' Aussie Gamer 17 '.
+2020/03/05 18:28:23 Updating channel ' Tibees '.
+2020/03/05 18:28:24 
+2020/03/05 18:28:24 -------------------
+2020/03/05 18:28:24 - update finished -
+2020/03/05 18:28:24 -------------------
+2020/03/05 18:28:24 
+2020/03/05 18:28:26 ------------------
+2020/03/05 18:28:26 - update started -
+2020/03/05 18:28:26 ------------------
+2020/03/05 18:28:26 
+2020/03/05 18:28:26 Settings:
+2020/03/05 18:28:26 ---------
+2020/03/05 18:28:26 CONNECTION:
+2020/03/05 18:28:26 	Server 			:  192.168.1.3
+2020/03/05 18:28:26 	Port 			:  3306
+2020/03/05 18:28:26 	Database 		:  softtube
+2020/03/05 18:28:26 	Username 		:  per
+2020/03/05 18:28:26 PATHS:
+2020/03/05 18:28:26 	Backup path		:  /home/per/backup
+2020/03/05 18:28:26 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:26 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:26 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:26 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:26 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:26 INTERVALS:
+2020/03/05 18:28:26 	High 			:  1800
+2020/03/05 18:28:26 	Medium 			:  7200
+2020/03/05 18:28:26 	Low 			:  14400
+2020/03/05 18:28:26 ---------
+2020/03/05 18:28:26 
+2020/03/05 18:28:26 Loaded  430  subscriptions.
+2020/03/05 18:28:26 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:26 
+2020/03/05 18:28:26 -------------------
+2020/03/05 18:28:26 - update finished -
+2020/03/05 18:28:26 -------------------
+2020/03/05 18:28:26 
+2020/03/05 18:28:27 ------------------
+2020/03/05 18:28:27 - update started -
+2020/03/05 18:28:27 ------------------
+2020/03/05 18:28:27 
+2020/03/05 18:28:27 Settings:
+2020/03/05 18:28:27 ---------
+2020/03/05 18:28:27 CONNECTION:
+2020/03/05 18:28:27 	Server 			:  192.168.1.3
+2020/03/05 18:28:27 	Port 			:  3306
+2020/03/05 18:28:27 	Database 		:  softtube
+2020/03/05 18:28:27 	Username 		:  per
+2020/03/05 18:28:27 PATHS:
+2020/03/05 18:28:27 	Backup path		:  /home/per/backup
+2020/03/05 18:28:27 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:27 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:27 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:27 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:27 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:27 INTERVALS:
+2020/03/05 18:28:27 	High 			:  1800
+2020/03/05 18:28:27 	Medium 			:  7200
+2020/03/05 18:28:27 	Low 			:  14400
+2020/03/05 18:28:27 ---------
+2020/03/05 18:28:27 
+2020/03/05 18:28:27 Loaded  430  subscriptions.
+2020/03/05 18:28:27 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:27 
+2020/03/05 18:28:27 -------------------
+2020/03/05 18:28:27 - update finished -
+2020/03/05 18:28:27 -------------------
+2020/03/05 18:28:27 
+2020/03/05 18:28:29 ------------------
+2020/03/05 18:28:29 - update started -
+2020/03/05 18:28:29 ------------------
+2020/03/05 18:28:29 
+2020/03/05 18:28:29 Settings:
+2020/03/05 18:28:29 ---------
+2020/03/05 18:28:29 CONNECTION:
+2020/03/05 18:28:29 	Server 			:  192.168.1.3
+2020/03/05 18:28:29 	Port 			:  3306
+2020/03/05 18:28:29 	Database 		:  softtube
+2020/03/05 18:28:29 	Username 		:  per
+2020/03/05 18:28:29 PATHS:
+2020/03/05 18:28:29 	Backup path		:  /home/per/backup
+2020/03/05 18:28:29 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:29 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:29 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:29 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:29 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:29 INTERVALS:
+2020/03/05 18:28:29 	High 			:  1800
+2020/03/05 18:28:29 	Medium 			:  7200
+2020/03/05 18:28:29 	Low 			:  14400
+2020/03/05 18:28:29 ---------
+2020/03/05 18:28:29 
+2020/03/05 18:28:29 Loaded  430  subscriptions.
+2020/03/05 18:28:29 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:29 
+2020/03/05 18:28:29 -------------------
+2020/03/05 18:28:29 - update finished -
+2020/03/05 18:28:29 -------------------
+2020/03/05 18:28:29 
+2020/03/05 18:28:31 ------------------
+2020/03/05 18:28:31 - update started -
+2020/03/05 18:28:31 ------------------
+2020/03/05 18:28:31 
+2020/03/05 18:28:31 Settings:
+2020/03/05 18:28:31 ---------
+2020/03/05 18:28:31 CONNECTION:
+2020/03/05 18:28:31 	Server 			:  192.168.1.3
+2020/03/05 18:28:31 	Port 			:  3306
+2020/03/05 18:28:31 	Database 		:  softtube
+2020/03/05 18:28:31 	Username 		:  per
+2020/03/05 18:28:31 PATHS:
+2020/03/05 18:28:31 	Backup path		:  /home/per/backup
+2020/03/05 18:28:31 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:31 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:31 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:31 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:31 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:31 INTERVALS:
+2020/03/05 18:28:31 	High 			:  1800
+2020/03/05 18:28:31 	Medium 			:  7200
+2020/03/05 18:28:31 	Low 			:  14400
+2020/03/05 18:28:31 ---------
+2020/03/05 18:28:31 
+2020/03/05 18:28:31 Loaded  430  subscriptions.
+2020/03/05 18:28:31 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:31 
+2020/03/05 18:28:31 -------------------
+2020/03/05 18:28:31 - update finished -
+2020/03/05 18:28:31 -------------------
+2020/03/05 18:28:31 
+2020/03/05 18:28:32 ------------------
+2020/03/05 18:28:32 - update started -
+2020/03/05 18:28:32 ------------------
+2020/03/05 18:28:32 
+2020/03/05 18:28:32 Settings:
+2020/03/05 18:28:32 ---------
+2020/03/05 18:28:32 CONNECTION:
+2020/03/05 18:28:32 	Server 			:  192.168.1.3
+2020/03/05 18:28:32 	Port 			:  3306
+2020/03/05 18:28:32 	Database 		:  softtube
+2020/03/05 18:28:32 	Username 		:  per
+2020/03/05 18:28:32 PATHS:
+2020/03/05 18:28:32 	Backup path		:  /home/per/backup
+2020/03/05 18:28:32 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:32 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:32 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:32 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:32 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:32 INTERVALS:
+2020/03/05 18:28:32 	High 			:  1800
+2020/03/05 18:28:32 	Medium 			:  7200
+2020/03/05 18:28:32 	Low 			:  14400
+2020/03/05 18:28:32 ---------
+2020/03/05 18:28:32 
+2020/03/05 18:28:32 Loaded  430  subscriptions.
+2020/03/05 18:28:32 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:32 
+2020/03/05 18:28:32 -------------------
+2020/03/05 18:28:32 - update finished -
+2020/03/05 18:28:32 -------------------
+2020/03/05 18:28:32 
+2020/03/05 18:28:39 ------------------
+2020/03/05 18:28:39 - update started -
+2020/03/05 18:28:39 ------------------
+2020/03/05 18:28:39 
+2020/03/05 18:28:39 Settings:
+2020/03/05 18:28:39 ---------
+2020/03/05 18:28:39 CONNECTION:
+2020/03/05 18:28:39 	Server 			:  192.168.1.3
+2020/03/05 18:28:39 	Port 			:  3306
+2020/03/05 18:28:39 	Database 		:  softtube
+2020/03/05 18:28:39 	Username 		:  per
+2020/03/05 18:28:39 PATHS:
+2020/03/05 18:28:39 	Backup path		:  /home/per/backup
+2020/03/05 18:28:39 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:39 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:39 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:39 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:39 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:39 INTERVALS:
+2020/03/05 18:28:39 	High 			:  1800
+2020/03/05 18:28:39 	Medium 			:  7200
+2020/03/05 18:28:39 	Low 			:  14400
+2020/03/05 18:28:39 ---------
+2020/03/05 18:28:39 
+2020/03/05 18:28:39 Loaded  430  subscriptions.
+2020/03/05 18:28:39 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:39 
+2020/03/05 18:28:39 -------------------
+2020/03/05 18:28:39 - update finished -
+2020/03/05 18:28:39 -------------------
+2020/03/05 18:28:39 
+2020/03/05 18:28:40 ------------------
+2020/03/05 18:28:40 - update started -
+2020/03/05 18:28:40 ------------------
+2020/03/05 18:28:40 
+2020/03/05 18:28:40 Settings:
+2020/03/05 18:28:40 ---------
+2020/03/05 18:28:40 CONNECTION:
+2020/03/05 18:28:40 	Server 			:  192.168.1.3
+2020/03/05 18:28:40 	Port 			:  3306
+2020/03/05 18:28:40 	Database 		:  softtube
+2020/03/05 18:28:40 	Username 		:  per
+2020/03/05 18:28:40 PATHS:
+2020/03/05 18:28:40 	Backup path		:  /home/per/backup
+2020/03/05 18:28:40 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:28:40 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:28:40 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:28:40 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:28:40 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:28:40 INTERVALS:
+2020/03/05 18:28:40 	High 			:  1800
+2020/03/05 18:28:40 	Medium 			:  7200
+2020/03/05 18:28:40 	Low 			:  14400
+2020/03/05 18:28:40 ---------
+2020/03/05 18:28:40 
+2020/03/05 18:28:40 Loaded  430  subscriptions.
+2020/03/05 18:28:40 softtube-update needs to update  0  (of  430  subscriptions).
+2020/03/05 18:28:40 
+2020/03/05 18:28:40 -------------------
+2020/03/05 18:28:40 - update finished -
+2020/03/05 18:28:40 -------------------
+2020/03/05 18:28:40 
+2020/03/05 18:29:29 ------------------
+2020/03/05 18:29:29 - update started -
+2020/03/05 18:29:29 ------------------
+2020/03/05 18:29:29 
+2020/03/05 18:29:29 Settings:
+2020/03/05 18:29:29 ---------
+2020/03/05 18:29:29 CONNECTION:
+2020/03/05 18:29:29 	Server 			:  192.168.1.3
+2020/03/05 18:29:29 	Port 			:  3306
+2020/03/05 18:29:29 	Database 		:  softtube
+2020/03/05 18:29:29 	Username 		:  per
+2020/03/05 18:29:29 PATHS:
+2020/03/05 18:29:29 	Backup path		:  /home/per/backup
+2020/03/05 18:29:29 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 18:29:29 	Database path		:  /home/per/temp/test.db
+2020/03/05 18:29:29 	Youtube-dl path		:  /usr/bin
+2020/03/05 18:29:29 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 18:29:29 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 18:29:29 INTERVALS:
+2020/03/05 18:29:29 	High 			:  1800
+2020/03/05 18:29:29 	Medium 			:  7200
+2020/03/05 18:29:29 	Low 			:  14400
+2020/03/05 18:29:29 ---------
+2020/03/05 18:29:29 
+2020/03/05 18:29:29 Loaded  430  subscriptions.
+2020/03/05 18:29:29 softtube-update needs to update  1  (of  430  subscriptions).
+2020/03/05 18:29:29 Updating channel ' WatchMojo.com '.
+2020/03/05 18:29:30 New video for channel 'WatchMojo.com' : 'Top 10 Dumb Decisions Made In Superhero Movies'
+2020/03/05 18:29:30 Inserted video 'Top 10 Dumb Decisions Made In Superhero Movies' in database : Success!
+2020/03/05 18:29:32 Downloaded thumbnail for video 'Top 10 Dumb Decisions Made In Superhero Movies': Success!
+2020/03/05 19:02:44 ------------------
+2020/03/05 19:02:44 - update started -
+2020/03/05 19:02:44 ------------------
+2020/03/05 19:02:44 
+2020/03/05 19:02:44 Settings:
+2020/03/05 19:02:44 ---------
+2020/03/05 19:02:44 CONNECTION:
+2020/03/05 19:02:44 	Server 			:  192.168.1.3
+2020/03/05 19:02:44 	Port 			:  3306
+2020/03/05 19:02:44 	Database 		:  softtube
+2020/03/05 19:02:44 	Username 		:  per
+2020/03/05 19:02:44 PATHS:
+2020/03/05 19:02:44 	Backup path		:  /home/per/backup
+2020/03/05 19:02:44 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log
+2020/03/05 19:02:44 	Database path		:  /home/per/temp/test.db
+2020/03/05 19:02:44 	Youtube-dl path		:  /usr/bin
+2020/03/05 19:02:44 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/05 19:02:44 	Thumbnails path		:  /home/per/Videos/youtube/thumbnails
+2020/03/05 19:02:44 INTERVALS:
+2020/03/05 19:02:44 	High 			:  1800
+2020/03/05 19:02:44 	Medium 			:  7200
+2020/03/05 19:02:44 	Low 			:  14400
+2020/03/05 19:02:44 ---------
+2020/03/05 19:02:44 
+2020/03/05 19:02:44 Loaded  430  subscriptions.
+2020/03/05 19:02:44 softtube-update needs to update  3  (of  430  subscriptions).
+2020/03/05 19:02:44 Updating channel ' GaLm '.
+2020/03/05 19:02:44 Updating channel ' CouchWarrior '.
+2020/03/05 19:02:44 Updating channel ' Craft Computing '.
+2020/03/05 19:02:45 
+2020/03/05 19:02:45 -------------------
+2020/03/05 19:02:45 - update finished -
+2020/03/05 19:02:45 -------------------
+2020/03/05 19:02:45 

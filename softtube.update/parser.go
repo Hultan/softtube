@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	entities "github.com/hultan/softtube/softtube.entities"
+	core "github.com/hultan/softtube/softtube.core"
 )
 
 // Feed : A subscription RSS feed
@@ -27,14 +27,14 @@ func (f *Feed) parse(rss string) {
 	xml.Unmarshal(bytes, &f)
 }
 
-func (f Feed) getVideos() []entities.Video {
-	var videoList []entities.Video
+func (f Feed) getVideos() []core.Video {
+	var videoList []core.Video
 	for i := 0; i < len(f.Entries); i++ {
-		var video entities.Video
+		var video core.Video
 		video.ID = f.Entries[i].ID
-		video.ChannelID = f.ChannelID
+		video.SubscriptionID = f.ChannelID
 		video.Title = f.Entries[i].Title
-		publishedDate, err := time.Parse(dateLayout, f.Entries[i].Published)
+		publishedDate, err := time.Parse(constDateLayout, f.Entries[i].Published)
 		if err != nil {
 			// TODO : Handle errors
 			fmt.Println(err.Error())

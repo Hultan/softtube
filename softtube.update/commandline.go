@@ -6,23 +6,19 @@ import (
 	"os"
 )
 
-func processCommandLineArgs(config *Config) error {
+func processCommandLineArgs() error {
 	// Get the command line args (without program name)
 	args := os.Args[1:]
 
 	// Loop through the arguments
 	for i := 0; i < len(args); i++ {
 		switch args[i] {
-		// We have a log path
-		case "-log":
-			config.Paths.Log = args[i+1]
-			i++
-
-		// We have a database path
-		case "-data":
-			config.Paths.Database = args[i+1]
-			i++
-
+		// We have a request for version
+		case "--version":
+			fmt.Println("SoftTube Update Tool")
+			fmt.Println("--------------------")
+			fmt.Println("softtube.update ", applicationVersion)
+			os.Exit(0)
 		// Invalid command line arg
 		default:
 			return errors.New("invalid command line arg : " + args[i])
@@ -34,6 +30,6 @@ func processCommandLineArgs(config *Config) error {
 
 func invalidCommandLineArg(err error) {
 	fmt.Println(err)
-	fmt.Println("Usage : softtube.update [-log path] [-data path]")
+	fmt.Println("Usage : softtube.update [--version]")
 	os.Exit(0)
 }

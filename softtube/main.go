@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	database "github.com/hultan/softtube/softtube.database"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
+	core "github.com/hultan/softtube/softtube.core"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
 }
 
 func testCreateDatabase() {
-	db := database.New("/home/per/temp/test.db")
+	db := core.New("192.168.1.3", 3306, "softtube", "per", "KnaskimGjwQ6M!")
 	//database := database.Database{Path: "/home/per/temp/test.db"}
 	err := db.OpenDatabase()
 	if err != nil {
@@ -25,5 +25,6 @@ func testCreateDatabase() {
 		panic(err)
 	}
 
-	fmt.Println("Major : ", version.Major)
+	versionNumber := fmt.Sprintf("Version : %v.%v.%v", version.Major, version.Minor, version.Revision)
+	fmt.Println(versionNumber)
 }
