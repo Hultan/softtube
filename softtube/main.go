@@ -1,30 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"os/exec"
 
 	_ "github.com/go-sql-driver/mysql"
-	core "github.com/hultan/softtube/softtube.core"
 )
 
 func main() {
-	testCreateDatabase()
+	playVideo()
 }
 
-func testCreateDatabase() {
-	db := core.New("192.168.1.3", 3306, "softtube", "per", "KnaskimGjwQ6M!")
-	//database := database.Database{Path: "/home/per/temp/test.db"}
-	err := db.OpenDatabase()
+// Get the duration of a youtube video
+func playVideo() {
+	// youtube-dl --get-duration -- '%s'
+	command := "smplayer smb://192.168.1.3/softtube/test.mkv"
+	cmd := exec.Command("/bin/bash", "-c", command)
+	_, err := cmd.CombinedOutput()
 	if err != nil {
-		panic(err)
+		return
 	}
-	defer db.CloseDatabase()
-
-	version, err := db.Version.GetVersion()
-	if err != nil {
-		panic(err)
-	}
-
-	versionNumber := fmt.Sprintf("Version : %v.%v.%v", version.Major, version.Minor, version.Revision)
-	fmt.Println(versionNumber)
 }
