@@ -15,17 +15,22 @@ type Log struct {
 }
 
 func getLogFileSize(path string) (int64, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return 0, err
+	if _, err := os.Stat(path); err == nil {
+		// log file exists
+		file, err := os.Open(path)
+		if err != nil {
+			return 0, err
+		}
+		fInfo, err := file.Stat()
+		if err != nil {
+			return 0, err
+		}
+		return fInfo.Size(), nil
 	}
-	fInfo, err := file.Stat()
-	if err != nil {
-		return 0, err
-	}
-	return fInfo.Size(), nil
 
+	return 0, nil
 }
+
 func createAndOpenLog(path string) Log {
 	// Get log file size
 	size, _ := getLogFileSize(path)
