@@ -29,7 +29,7 @@ func main() {
 	config.Load("main")
 
 	// Setup logging
-	logger = createAndOpenLog(config.Paths.Log)
+	logger = createAndOpenLog(config.Update.Log)
 	defer logger.close()
 
 	// Start updating the softtube database
@@ -158,7 +158,7 @@ func updateSubscription(subscription *core.Subscription) {
 			go func() {
 				// Get thumbnail
 				defer waitGroup.Done()
-				err := youtube.getThumbnail(video.ID, config.Paths.Thumbnails, logger)
+				err := youtube.getThumbnail(video.ID, config.Update.Thumbnails, logger)
 				if err != nil {
 					message = fmt.Sprintf("Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error())
 					logger.log(message)

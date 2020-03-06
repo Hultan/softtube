@@ -11,17 +11,17 @@
         // MySql password for the user above
         "password" : "pwd"
     },
-    "paths" : {
+    "backup" : {
         // Path where softtube.backup will store database backups
-        "backup" : "/home/per/backup",
+        "path" : "/home/per/backup"
+    },
+    "update" : {
         // Path to the log file for softtube.update
         "log" : "/home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log",
         // Optional path to youtube-dl. In most cases "" will be fine.
         "youtube-dl" : "/usr/bin",
         // Path to thumbnail files
-        "thumbnails" : "/home/per/Videos/youtube/thumbnails",
-        // Path to downloaded videos
-        "videos" : "/home/per/Videos/youtube/videos"
+        "thumbnails" : "/home/per/Videos/youtube/thumbnails"
     },
     "intervals" : {
         // interval for subscription updates (in seconds)

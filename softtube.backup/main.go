@@ -18,8 +18,8 @@ func main() {
 	config := new(core.Config)
 	config.Load("main")
 
-	backup("softtube", config.Paths.Backup)
-	backup("softtubeTEST", config.Paths.Backup)
+	backup("softtube", config.Backup.Path)
+	backup("softtubeTEST", config.Backup.Path)
 }
 
 // Backs up a mysql database

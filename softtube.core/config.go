@@ -19,13 +19,14 @@ type Config struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	} `json:"connection"`
-	Paths struct {
-		Backup     string `json:"backup"`
+	Backup struct {
+		Path string `json:"path"`
+	} `json:"backup"`
+	Update struct {
 		Log        string `json:"log"`
 		YoutubeDL  string `json:"youtube-dl"`
 		Thumbnails string `json:"thumbnails"`
-		Videos     string `json:"videos"`
-	} `json:"paths"`
+	} `json:"update"`
 	Intervals struct {
 		High   int `json:"high"`
 		Medium int `json:"medium"`
