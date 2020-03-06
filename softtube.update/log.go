@@ -79,7 +79,6 @@ func (l Log) logStart(config *core.Config) {
 	log.Println("PATHS:")
 	log.Println("	Backup path		: ", config.Paths.Backup)
 	log.Println("	Log path 		: ", config.Paths.Log)
-	log.Println("	Database path		: ", config.Paths.Database)
 	log.Println("	Youtube-dl path		: ", config.Paths.YoutubeDL)
 	log.Println("	Videos path		: ", config.Paths.Videos)
 	log.Println("	Thumbnails path		: ", config.Paths.Thumbnails)

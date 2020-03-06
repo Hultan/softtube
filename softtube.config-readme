@@ -1,0 +1,32 @@
+{
+    "connection" : {
+        // MySql server that has the softtube database
+        "server" : "192.168.1.3",
+        // MySql server port number
+        "port" : 3306,
+        // MySql database name
+        "database" : "softtube",
+        // MySql user name
+        "username" : "user",
+        // MySql password for the user above
+        "password" : "pwd"
+    },
+    "paths" : {
+        // Path where softtube.backup will store database backups
+        "backup" : "/home/per/backup",
+        // Path to the log file for softtube.update
+        "log" : "/home/per/go/src/github.com/hultan/softtube/softtube.update/softtube-update.log",
+        // Optional path to youtube-dl. In most cases "" will be fine.
+        "youtube-dl" : "/usr/bin",
+        // Path to thumbnail files
+        "thumbnails" : "/home/per/Videos/youtube/thumbnails",
+        // Path to downloaded videos
+        "videos" : "/home/per/Videos/youtube/videos"
+    },
+    "intervals" : {
+        // interval for subscription updates (in seconds)
+        "high" : 1800,
+        "medium" : 7200,
+        "low" : 14400
+    }
+}

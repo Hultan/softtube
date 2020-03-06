@@ -22,7 +22,6 @@ type Config struct {
 	Paths struct {
 		Backup     string `json:"backup"`
 		Log        string `json:"log"`
-		Database   string `json:"database"`
 		YoutubeDL  string `json:"youtube-dl"`
 		Thumbnails string `json:"thumbnails"`
 		Videos     string `json:"videos"`
