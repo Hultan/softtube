@@ -11,23 +11,25 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+
+	core "github.com/hultan/softtube/softtube.core"
 )
 
 type youtube struct {
 }
 
 // Get the duration of a youtube video
-func (y youtube) getDuration(videoID string, logger Log) error {
+func (y youtube) getDuration(videoID string, logger core.Logger) error {
 	// youtube-dl --get-duration -- '%s'
 	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		msg := fmt.Sprintf("Command : %s", command)
-		logger.log(msg)
+		logger.Log(msg)
 		msg = fmt.Sprintf("Output : %s", output)
-		logger.log(msg)
-		logger.logError(err)
+		logger.Log(msg)
+		logger.LogError(err)
 		return err
 	}
 	// Save duration in the database
@@ -36,7 +38,7 @@ func (y youtube) getDuration(videoID string, logger Log) error {
 }
 
 // Get the thumbnail of a youtube video
-func (y youtube) getThumbnail(videoID, thumbnailPath string, logger Log) error {
+func (y youtube) getThumbnail(videoID, thumbnailPath string, logger core.Logger) error {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, thumbnailPath, videoID)
 
@@ -48,10 +50,10 @@ func (y youtube) getThumbnail(videoID, thumbnailPath string, logger Log) error {
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			msg := fmt.Sprintf("Command : %s", command)
-			logger.log(msg)
+			logger.Log(msg)
 			msg = fmt.Sprintf("Output : %s", output)
-			logger.log(msg)
-			logger.logError(err)
+			logger.Log(msg)
+			logger.LogError(err)
 			return err
 		}
 	}

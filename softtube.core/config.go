@@ -27,6 +27,10 @@ type Config struct {
 		YoutubeDL  string `json:"youtube-dl"`
 		Thumbnails string `json:"thumbnails"`
 	} `json:"update"`
+	Client struct {
+		Log    string `json:"log"`
+		Videos string `json:"videos"`
+	} `json:"client"`
 	Intervals struct {
 		High   int `json:"high"`
 		Medium int `json:"medium"`

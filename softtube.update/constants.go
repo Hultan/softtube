@@ -8,5 +8,3 @@ const constThumbnailLocation string = "%s/%s.jpg"
 const constSubscriptionRSSURL = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
 
 const constDateLayout = "2006-01-02T15:04:05-07:00"
-
-const constMaxLogFileSize = 500000

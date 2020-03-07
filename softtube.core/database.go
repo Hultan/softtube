@@ -19,6 +19,7 @@ type Database struct {
 	Subscriptions    SubscriptionTable
 	Videos           VideosTable
 	Version          VersionTable
+	Session          SessionTable
 }
 
 // New : Creates a new database object
@@ -39,6 +40,8 @@ func (d *Database) OpenDatabase() error {
 	d.Subscriptions = SubscriptionTable{Connection: conn}
 	d.Videos = VideosTable{Connection: conn}
 	d.Version = VersionTable{Connection: conn}
+	d.Session = SessionTable{Connection: conn}
+
 	return nil
 }
 

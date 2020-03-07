@@ -12,7 +12,7 @@ const applicationVersion string = "1.00"
 const maxUpdates = 50
 
 var (
-	logger Log
+	logger core.Logger
 	config *core.Config
 	db     core.Database
 )
@@ -29,12 +29,12 @@ func main() {
 	config.Load("main")
 
 	// Setup logging
-	logger = createAndOpenLog(config.Update.Log)
-	defer logger.close()
+	logger = core.NewLog(config.Update.Log)
+	defer logger.Close()
 
 	// Start updating the softtube database
-	logger.logStart(config)
-	defer logger.logFinished()
+	logger.LogStart(config, "softtube update")
+	defer logger.LogFinished("softtube update")
 
 	conn := config.Connection
 
@@ -46,11 +46,11 @@ func main() {
 
 	// Handle errors
 	if err != nil {
-		logger.log(err.Error())
+		logger.Log(err.Error())
 	}
 
 	// Log result
-	logger.logFormat("Loaded ", len(subs), " subscriptions.")
+	logger.LogFormat("Loaded ", len(subs), " subscriptions.")
 
 	// Check how many subscriptions that needs update
 	subsThatNeedsUpdate := 0
@@ -66,7 +66,7 @@ func main() {
 		subsThatNeedsUpdate = maxUpdates
 	}
 
-	logger.logFormat("softtube-update needs to update ", subsThatNeedsUpdate, " (of ", len(subs), " subscriptions).")
+	logger.LogFormat("softtube-update needs to update ", subsThatNeedsUpdate, " (of ", len(subs), " subscriptions).")
 
 	// Create a waitgroup to sync the goroutines
 	var waitGroup sync.WaitGroup
@@ -79,7 +79,7 @@ func main() {
 
 		if sub.NeedsUpdate() {
 			if count > maxUpdates {
-				logger.log("Max number of updates reached!")
+				logger.Log("Max number of updates reached!")
 				break
 			}
 			count++
@@ -97,14 +97,14 @@ func main() {
 }
 
 func updateSubscription(subscription *core.Subscription) {
-	logger.logFormat("Updating channel '", subscription.Name, "'.")
+	logger.LogFormat("Updating channel '", subscription.Name, "'.")
 
 	// Download the subscription RSS
 	youtube := new(youtube)
 	rss, err := youtube.getSubscriptionRSS(subscription.ID)
 	if err != nil {
 		errorMessage := fmt.Sprintf("Error updating %s : %s", subscription.ID, err.Error())
-		logger.log(errorMessage)
+		logger.Log(errorMessage)
 	}
 
 	// Parse the RSS
@@ -128,18 +128,18 @@ func updateSubscription(subscription *core.Subscription) {
 
 		if !exists {
 			message := fmt.Sprintf("New video for channel '%s' : '%s'", subscription.Name, video.Title)
-			logger.log(message)
+			logger.Log(message)
 
 			// Insert the video in the database
 			// This must be executed before getDuration()
 			err := db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
 			if err != nil {
 				message = fmt.Sprintf("Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error())
-				logger.log(message)
+				logger.Log(message)
 				return
 			}
 			message = fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
-			logger.log(message)
+			logger.Log(message)
 
 			waitGroup.Add(2)
 
@@ -149,11 +149,11 @@ func updateSubscription(subscription *core.Subscription) {
 				err := youtube.getDuration(video.ID, logger)
 				if err != nil {
 					message = fmt.Sprintf("Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error())
-					logger.log(message)
+					logger.Log(message)
 					return
 				}
 				message = fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
-				logger.log(message)
+				logger.Log(message)
 			}()
 			go func() {
 				// Get thumbnail
@@ -161,11 +161,11 @@ func updateSubscription(subscription *core.Subscription) {
 				err := youtube.getThumbnail(video.ID, config.Update.Thumbnails, logger)
 				if err != nil {
 					message = fmt.Sprintf("Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error())
-					logger.log(message)
+					logger.Log(message)
 					return
 				}
 				message = fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
-				logger.log(message)
+				logger.Log(message)
 			}()
 		}
 	}
@@ -173,7 +173,7 @@ func updateSubscription(subscription *core.Subscription) {
 	// Mark subscription as updated
 	interval, err := getInterval(subscription.Frequency)
 	if err != nil {
-		logger.logError(err)
+		logger.LogError(err)
 	}
 	db.Subscriptions.UpdateLastChecked(subscription, interval)
 
