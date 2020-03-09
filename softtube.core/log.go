@@ -79,10 +79,12 @@ func (l Logger) LogStart(config *Config, application string) {
 
 // LogFinished : Write end of log message
 func (l Logger) LogFinished(application string) {
+	msg := fmt.Sprintf("- %s finished -", application)
+
 	log.Println("")
-	log.Println("-------------------")
-	log.Println("- update finished -")
-	log.Println("-------------------")
+	log.Println(strings.Repeat("-", len(msg)))
+	log.Println(msg)
+	log.Println(strings.Repeat("-", len(msg)))
 	log.Println("")
 }
 

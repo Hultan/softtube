@@ -9,17 +9,18 @@ import (
 
 // Database : A connection to the SoftTube database
 type Database struct {
-	Connection       *sql.DB
-	ConnectionString string
-	Server           string
-	Port             int
-	Database         string
-	Username         string
-	Password         string
-	Subscriptions    SubscriptionTable
-	Videos           VideosTable
-	Version          VersionTable
-	Session          SessionTable
+	Connection        *sql.DB
+	SessionIdentifier SessionIdentifier
+	ConnectionString  string
+	Server            string
+	Port              int
+	Database          string
+	Username          string
+	Password          string
+	Subscriptions     SubscriptionTable
+	Videos            VideosTable
+	Version           VersionTable
+	Session           SessionTable
 }
 
 // New : Creates a new database object

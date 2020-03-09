@@ -1,62 +1,578 @@
-2020/03/07 13:17:28 ---------------------------
-2020/03/07 13:17:28 - softtube client started -
-2020/03/07 13:17:28 ---------------------------
-2020/03/07 13:17:28 
-2020/03/07 13:17:28 Settings:
-2020/03/07 13:17:28 ---------
-2020/03/07 13:17:28 CONNECTION:
-2020/03/07 13:17:28 	Server 			:  192.168.1.3
-2020/03/07 13:17:28 	Port 			:  3306
-2020/03/07 13:17:28 	Database 		:  softtube
-2020/03/07 13:17:28 	Username 		:  per
-2020/03/07 13:17:28 BACKUP:
-2020/03/07 13:17:28 	Path			:  /home/per/backup
-2020/03/07 13:17:28 UPDATE:
-2020/03/07 13:17:28 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
-2020/03/07 13:17:28 	Youtube-dl path	:  /usr/bin
-2020/03/07 13:17:28 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
-2020/03/07 13:17:28 CLIENT:
-2020/03/07 13:17:28 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
-2020/03/07 13:17:28 	Videos path		:  /home/per/Videos/youtube/videos
-2020/03/07 13:17:28 INTERVALS:
-2020/03/07 13:17:28 	High 			:  1800
-2020/03/07 13:17:28 	Medium 			:  7200
-2020/03/07 13:17:28 	Low 			:  14400
-2020/03/07 13:17:28 ---------
-2020/03/07 13:17:28 
-2020/03/07 13:17:28 
-2020/03/07 13:17:28 -------------------
-2020/03/07 13:17:28 - update finished -
-2020/03/07 13:17:28 -------------------
-2020/03/07 13:17:28 
-2020/03/07 13:17:51 ---------------------------
-2020/03/07 13:17:51 - softtube client started -
-2020/03/07 13:17:51 ---------------------------
-2020/03/07 13:17:51 
-2020/03/07 13:17:51 Settings:
-2020/03/07 13:17:51 ---------
-2020/03/07 13:17:51 CONNECTION:
-2020/03/07 13:17:51 	Server 			:  192.168.1.3
-2020/03/07 13:17:51 	Port 			:  3306
-2020/03/07 13:17:51 	Database 		:  softtube
-2020/03/07 13:17:51 	Username 		:  per
-2020/03/07 13:17:51 BACKUP:
-2020/03/07 13:17:51 	Path			:  /home/per/backup
-2020/03/07 13:17:51 UPDATE:
-2020/03/07 13:17:51 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
-2020/03/07 13:17:51 	Youtube-dl path	:  /usr/bin
-2020/03/07 13:17:51 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
-2020/03/07 13:17:51 CLIENT:
-2020/03/07 13:17:51 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
-2020/03/07 13:17:51 	Videos path		:  /home/per/Videos/youtube/videos
-2020/03/07 13:17:51 INTERVALS:
-2020/03/07 13:17:51 	High 			:  1800
-2020/03/07 13:17:51 	Medium 			:  7200
-2020/03/07 13:17:51 	Low 			:  14400
-2020/03/07 13:17:51 ---------
-2020/03/07 13:17:51 
-2020/03/07 13:17:51 
-2020/03/07 13:17:51 -------------------
-2020/03/07 13:17:51 - update finished -
-2020/03/07 13:17:51 -------------------
-2020/03/07 13:17:51 
+2020/03/08 17:38:07 ---------------------------
+2020/03/08 17:38:07 - softtube client started -
+2020/03/08 17:38:07 ---------------------------
+2020/03/08 17:38:07 
+2020/03/08 17:38:07 Settings:
+2020/03/08 17:38:07 ---------
+2020/03/08 17:38:07 CONNECTION:
+2020/03/08 17:38:07 	Server 			:  192.168.1.3
+2020/03/08 17:38:07 	Port 			:  3306
+2020/03/08 17:38:07 	Database 		:  softtube
+2020/03/08 17:38:07 	Username 		:  per
+2020/03/08 17:38:07 BACKUP:
+2020/03/08 17:38:07 	Path			:  /home/per/backup
+2020/03/08 17:38:07 UPDATE:
+2020/03/08 17:38:07 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 17:38:07 	Youtube-dl path	:  /usr/bin
+2020/03/08 17:38:07 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 17:38:07 CLIENT:
+2020/03/08 17:38:07 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 17:38:07 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 17:38:07 INTERVALS:
+2020/03/08 17:38:07 	High 			:  1800
+2020/03/08 17:38:07 	Medium 			:  7200
+2020/03/08 17:38:07 	Low 			:  14400
+2020/03/08 17:38:07 ---------
+2020/03/08 17:38:07 
+2020/03/08 17:38:07 Session started : BOHR
+2020/03/08 17:38:07 SoftTube client startup
+2020/03/08 17:38:09 SoftTube client shutdown
+2020/03/08 17:38:09 
+2020/03/08 17:38:09 ----------------------------
+2020/03/08 17:38:09 - softtube client finished -
+2020/03/08 17:38:09 ----------------------------
+2020/03/08 17:38:09 
+2020/03/08 17:38:09 
+2020/03/08 18:05:03 ---------------------------
+2020/03/08 18:05:03 - softtube client started -
+2020/03/08 18:05:03 ---------------------------
+2020/03/08 18:05:03 
+2020/03/08 18:05:03 Settings:
+2020/03/08 18:05:03 ---------
+2020/03/08 18:05:03 CONNECTION:
+2020/03/08 18:05:03 	Server 			:  192.168.1.3
+2020/03/08 18:05:03 	Port 			:  3306
+2020/03/08 18:05:03 	Database 		:  softtube
+2020/03/08 18:05:03 	Username 		:  per
+2020/03/08 18:05:03 BACKUP:
+2020/03/08 18:05:03 	Path			:  /home/per/backup
+2020/03/08 18:05:03 UPDATE:
+2020/03/08 18:05:03 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 18:05:03 	Youtube-dl path	:  /usr/bin
+2020/03/08 18:05:03 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 18:05:03 CLIENT:
+2020/03/08 18:05:03 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 18:05:03 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 18:05:03 INTERVALS:
+2020/03/08 18:05:03 	High 			:  1800
+2020/03/08 18:05:03 	Medium 			:  7200
+2020/03/08 18:05:03 	Low 			:  14400
+2020/03/08 18:05:03 ---------
+2020/03/08 18:05:03 
+2020/03/08 18:05:03 Session started : BOHR
+2020/03/08 18:05:03 SoftTube client startup
+2020/03/08 18:05:13 SoftTube client shutdown
+2020/03/08 18:05:13 
+2020/03/08 18:05:13 ----------------------------
+2020/03/08 18:05:13 - softtube client finished -
+2020/03/08 18:05:13 ----------------------------
+2020/03/08 18:05:13 
+2020/03/08 18:39:30 ---------------------------
+2020/03/08 18:39:30 - softtube client started -
+2020/03/08 18:39:30 ---------------------------
+2020/03/08 18:39:30 
+2020/03/08 18:39:30 Settings:
+2020/03/08 18:39:30 ---------
+2020/03/08 18:39:30 CONNECTION:
+2020/03/08 18:39:30 	Server 			:  192.168.1.3
+2020/03/08 18:39:30 	Port 			:  3306
+2020/03/08 18:39:30 	Database 		:  softtube
+2020/03/08 18:39:30 	Username 		:  per
+2020/03/08 18:39:30 BACKUP:
+2020/03/08 18:39:30 	Path			:  /home/per/backup
+2020/03/08 18:39:30 UPDATE:
+2020/03/08 18:39:30 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 18:39:30 	Youtube-dl path	:  /usr/bin
+2020/03/08 18:39:30 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 18:39:30 CLIENT:
+2020/03/08 18:39:30 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 18:39:30 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 18:39:30 INTERVALS:
+2020/03/08 18:39:30 	High 			:  1800
+2020/03/08 18:39:30 	Medium 			:  7200
+2020/03/08 18:39:30 	Low 			:  14400
+2020/03/08 18:39:30 ---------
+2020/03/08 18:39:30 
+2020/03/08 18:39:30 Session started : BOHR
+2020/03/08 18:39:30 SoftTube client startup
+2020/03/08 18:40:05 unrecognized class name 'GtkRadioToolButton'
+2020/03/08 18:42:44 ---------------------------
+2020/03/08 18:42:44 - softtube client started -
+2020/03/08 18:42:44 ---------------------------
+2020/03/08 18:42:44 
+2020/03/08 18:42:44 Settings:
+2020/03/08 18:42:44 ---------
+2020/03/08 18:42:44 CONNECTION:
+2020/03/08 18:42:44 	Server 			:  192.168.1.3
+2020/03/08 18:42:44 	Port 			:  3306
+2020/03/08 18:42:44 	Database 		:  softtube
+2020/03/08 18:42:44 	Username 		:  per
+2020/03/08 18:42:44 BACKUP:
+2020/03/08 18:42:44 	Path			:  /home/per/backup
+2020/03/08 18:42:44 UPDATE:
+2020/03/08 18:42:44 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 18:42:44 	Youtube-dl path	:  /usr/bin
+2020/03/08 18:42:44 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 18:42:44 CLIENT:
+2020/03/08 18:42:44 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 18:42:44 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 18:42:44 INTERVALS:
+2020/03/08 18:42:44 	High 			:  1800
+2020/03/08 18:42:44 	Medium 			:  7200
+2020/03/08 18:42:44 	Low 			:  14400
+2020/03/08 18:42:44 ---------
+2020/03/08 18:42:44 
+2020/03/08 18:42:44 Session started : BOHR
+2020/03/08 18:42:44 SoftTube client startup
+2020/03/08 18:46:09 ---------------------------
+2020/03/08 18:46:09 - softtube client started -
+2020/03/08 18:46:09 ---------------------------
+2020/03/08 18:46:09 
+2020/03/08 18:46:09 Settings:
+2020/03/08 18:46:09 ---------
+2020/03/08 18:46:09 CONNECTION:
+2020/03/08 18:46:09 	Server 			:  192.168.1.3
+2020/03/08 18:46:09 	Port 			:  3306
+2020/03/08 18:46:09 	Database 		:  softtube
+2020/03/08 18:46:09 	Username 		:  per
+2020/03/08 18:46:09 BACKUP:
+2020/03/08 18:46:09 	Path			:  /home/per/backup
+2020/03/08 18:46:09 UPDATE:
+2020/03/08 18:46:09 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 18:46:09 	Youtube-dl path	:  /usr/bin
+2020/03/08 18:46:09 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 18:46:09 CLIENT:
+2020/03/08 18:46:09 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 18:46:09 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 18:46:09 INTERVALS:
+2020/03/08 18:46:09 	High 			:  1800
+2020/03/08 18:46:09 	Medium 			:  7200
+2020/03/08 18:46:09 	Low 			:  14400
+2020/03/08 18:46:09 ---------
+2020/03/08 18:46:09 
+2020/03/08 18:46:09 Session started : BOHR
+2020/03/08 18:46:09 SoftTube client startup
+2020/03/08 18:46:10 unrecognized class name 'GtkRadioToolButton'
+2020/03/08 18:58:06 ---------------------------
+2020/03/08 18:58:06 - softtube client started -
+2020/03/08 18:58:06 ---------------------------
+2020/03/08 18:58:06 
+2020/03/08 18:58:06 Settings:
+2020/03/08 18:58:06 ---------
+2020/03/08 18:58:06 CONNECTION:
+2020/03/08 18:58:06 	Server 			:  192.168.1.3
+2020/03/08 18:58:06 	Port 			:  3306
+2020/03/08 18:58:06 	Database 		:  softtube
+2020/03/08 18:58:06 	Username 		:  per
+2020/03/08 18:58:06 BACKUP:
+2020/03/08 18:58:06 	Path			:  /home/per/backup
+2020/03/08 18:58:06 UPDATE:
+2020/03/08 18:58:06 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 18:58:06 	Youtube-dl path	:  /usr/bin
+2020/03/08 18:58:06 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 18:58:06 CLIENT:
+2020/03/08 18:58:06 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 18:58:06 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 18:58:06 INTERVALS:
+2020/03/08 18:58:06 	High 			:  1800
+2020/03/08 18:58:06 	Medium 			:  7200
+2020/03/08 18:58:06 	Low 			:  14400
+2020/03/08 18:58:06 ---------
+2020/03/08 18:58:06 
+2020/03/08 18:58:06 Session started : BOHR
+2020/03/08 18:58:06 SoftTube client startup
+2020/03/08 18:58:06 object 'toolbar_refresh' not found
+2020/03/08 18:58:58 ---------------------------
+2020/03/08 18:58:58 - softtube client started -
+2020/03/08 18:58:58 ---------------------------
+2020/03/08 18:58:58 
+2020/03/08 18:58:58 Settings:
+2020/03/08 18:58:58 ---------
+2020/03/08 18:58:58 CONNECTION:
+2020/03/08 18:58:58 	Server 			:  192.168.1.3
+2020/03/08 18:58:58 	Port 			:  3306
+2020/03/08 18:58:58 	Database 		:  softtube
+2020/03/08 18:58:58 	Username 		:  per
+2020/03/08 18:58:58 BACKUP:
+2020/03/08 18:58:58 	Path			:  /home/per/backup
+2020/03/08 18:58:58 UPDATE:
+2020/03/08 18:58:58 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 18:58:58 	Youtube-dl path	:  /usr/bin
+2020/03/08 18:58:58 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 18:58:58 CLIENT:
+2020/03/08 18:58:58 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 18:58:58 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 18:58:58 INTERVALS:
+2020/03/08 18:58:58 	High 			:  1800
+2020/03/08 18:58:58 	Medium 			:  7200
+2020/03/08 18:58:58 	Low 			:  14400
+2020/03/08 18:58:58 ---------
+2020/03/08 18:58:58 
+2020/03/08 18:58:58 Session started : BOHR
+2020/03/08 18:58:58 SoftTube client startup
+2020/03/08 18:59:09 SoftTube client shutdown
+2020/03/08 18:59:09 
+2020/03/08 18:59:09 ----------------------------
+2020/03/08 18:59:09 - softtube client finished -
+2020/03/08 18:59:09 ----------------------------
+2020/03/08 18:59:09 
+2020/03/08 19:00:02 ---------------------------
+2020/03/08 19:00:02 - softtube client started -
+2020/03/08 19:00:02 ---------------------------
+2020/03/08 19:00:02 
+2020/03/08 19:00:02 Settings:
+2020/03/08 19:00:02 ---------
+2020/03/08 19:00:02 CONNECTION:
+2020/03/08 19:00:02 	Server 			:  192.168.1.3
+2020/03/08 19:00:02 	Port 			:  3306
+2020/03/08 19:00:02 	Database 		:  softtube
+2020/03/08 19:00:02 	Username 		:  per
+2020/03/08 19:00:02 BACKUP:
+2020/03/08 19:00:02 	Path			:  /home/per/backup
+2020/03/08 19:00:02 UPDATE:
+2020/03/08 19:00:02 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:00:02 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:00:02 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:00:02 CLIENT:
+2020/03/08 19:00:02 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:00:02 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:00:02 INTERVALS:
+2020/03/08 19:00:02 	High 			:  1800
+2020/03/08 19:00:02 	Medium 			:  7200
+2020/03/08 19:00:02 	Low 			:  14400
+2020/03/08 19:00:02 ---------
+2020/03/08 19:00:02 
+2020/03/08 19:00:02 Session started : BOHR
+2020/03/08 19:00:02 SoftTube client startup
+2020/03/08 19:00:16 SoftTube client shutdown
+2020/03/08 19:00:16 
+2020/03/08 19:00:16 ----------------------------
+2020/03/08 19:00:16 - softtube client finished -
+2020/03/08 19:00:16 ----------------------------
+2020/03/08 19:00:16 
+2020/03/08 19:03:59 ---------------------------
+2020/03/08 19:03:59 - softtube client started -
+2020/03/08 19:03:59 ---------------------------
+2020/03/08 19:03:59 
+2020/03/08 19:03:59 Settings:
+2020/03/08 19:03:59 ---------
+2020/03/08 19:03:59 CONNECTION:
+2020/03/08 19:03:59 	Server 			:  192.168.1.3
+2020/03/08 19:03:59 	Port 			:  3306
+2020/03/08 19:03:59 	Database 		:  softtube
+2020/03/08 19:03:59 	Username 		:  per
+2020/03/08 19:03:59 BACKUP:
+2020/03/08 19:03:59 	Path			:  /home/per/backup
+2020/03/08 19:03:59 UPDATE:
+2020/03/08 19:03:59 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:03:59 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:03:59 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:03:59 CLIENT:
+2020/03/08 19:03:59 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:03:59 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:03:59 INTERVALS:
+2020/03/08 19:03:59 	High 			:  1800
+2020/03/08 19:03:59 	Medium 			:  7200
+2020/03/08 19:03:59 	Low 			:  14400
+2020/03/08 19:03:59 ---------
+2020/03/08 19:03:59 
+2020/03/08 19:03:59 Session started : BOHR
+2020/03/08 19:04:00 SoftTube client startup
+2020/03/08 19:06:09 SoftTube client shutdown
+2020/03/08 19:06:09 
+2020/03/08 19:06:09 ----------------------------
+2020/03/08 19:06:09 - softtube client finished -
+2020/03/08 19:06:09 ----------------------------
+2020/03/08 19:06:09 
+2020/03/08 19:15:31 ---------------------------
+2020/03/08 19:15:31 - softtube client started -
+2020/03/08 19:15:31 ---------------------------
+2020/03/08 19:15:31 
+2020/03/08 19:15:31 Settings:
+2020/03/08 19:15:31 ---------
+2020/03/08 19:15:31 CONNECTION:
+2020/03/08 19:15:31 	Server 			:  192.168.1.3
+2020/03/08 19:15:31 	Port 			:  3306
+2020/03/08 19:15:31 	Database 		:  softtube
+2020/03/08 19:15:31 	Username 		:  per
+2020/03/08 19:15:31 BACKUP:
+2020/03/08 19:15:31 	Path			:  /home/per/backup
+2020/03/08 19:15:31 UPDATE:
+2020/03/08 19:15:31 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:15:31 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:15:31 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:15:31 CLIENT:
+2020/03/08 19:15:31 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:15:31 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:15:31 INTERVALS:
+2020/03/08 19:15:31 	High 			:  1800
+2020/03/08 19:15:31 	Medium 			:  7200
+2020/03/08 19:15:31 	Low 			:  14400
+2020/03/08 19:15:31 ---------
+2020/03/08 19:15:31 
+2020/03/08 19:15:31 Session started : BOHR
+2020/03/08 19:15:31 SoftTube client startup
+2020/03/08 19:16:15 SoftTube client shutdown
+2020/03/08 19:16:15 
+2020/03/08 19:16:15 ----------------------------
+2020/03/08 19:16:15 - softtube client finished -
+2020/03/08 19:16:15 ----------------------------
+2020/03/08 19:16:15 
+2020/03/08 19:35:28 ---------------------------
+2020/03/08 19:35:28 - softtube client started -
+2020/03/08 19:35:28 ---------------------------
+2020/03/08 19:35:28 
+2020/03/08 19:35:28 Settings:
+2020/03/08 19:35:28 ---------
+2020/03/08 19:35:28 CONNECTION:
+2020/03/08 19:35:28 	Server 			:  192.168.1.3
+2020/03/08 19:35:28 	Port 			:  3306
+2020/03/08 19:35:28 	Database 		:  softtube
+2020/03/08 19:35:28 	Username 		:  per
+2020/03/08 19:35:28 BACKUP:
+2020/03/08 19:35:28 	Path			:  /home/per/backup
+2020/03/08 19:35:28 UPDATE:
+2020/03/08 19:35:28 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:35:28 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:35:28 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:35:28 CLIENT:
+2020/03/08 19:35:28 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:35:28 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:35:28 INTERVALS:
+2020/03/08 19:35:28 	High 			:  1800
+2020/03/08 19:35:28 	Medium 			:  7200
+2020/03/08 19:35:28 	Low 			:  14400
+2020/03/08 19:35:28 ---------
+2020/03/08 19:35:28 
+2020/03/08 19:35:28 Session started : BOHR
+2020/03/08 19:35:28 SoftTube client startup
+2020/03/08 19:36:03 ---------------------------
+2020/03/08 19:36:03 - softtube client started -
+2020/03/08 19:36:03 ---------------------------
+2020/03/08 19:36:03 
+2020/03/08 19:36:03 Settings:
+2020/03/08 19:36:03 ---------
+2020/03/08 19:36:03 CONNECTION:
+2020/03/08 19:36:03 	Server 			:  192.168.1.3
+2020/03/08 19:36:03 	Port 			:  3306
+2020/03/08 19:36:03 	Database 		:  softtube
+2020/03/08 19:36:03 	Username 		:  per
+2020/03/08 19:36:03 BACKUP:
+2020/03/08 19:36:03 	Path			:  /home/per/backup
+2020/03/08 19:36:03 UPDATE:
+2020/03/08 19:36:03 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:36:03 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:36:03 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:36:03 CLIENT:
+2020/03/08 19:36:03 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:36:03 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:36:03 INTERVALS:
+2020/03/08 19:36:03 	High 			:  1800
+2020/03/08 19:36:03 	Medium 			:  7200
+2020/03/08 19:36:03 	Low 			:  14400
+2020/03/08 19:36:03 ---------
+2020/03/08 19:36:03 
+2020/03/08 19:36:03 Session started : BOHR
+2020/03/08 19:36:03 SoftTube client startup
+2020/03/08 19:36:48 ---------------------------
+2020/03/08 19:36:48 - softtube client started -
+2020/03/08 19:36:48 ---------------------------
+2020/03/08 19:36:48 
+2020/03/08 19:36:48 Settings:
+2020/03/08 19:36:48 ---------
+2020/03/08 19:36:48 CONNECTION:
+2020/03/08 19:36:48 	Server 			:  192.168.1.3
+2020/03/08 19:36:48 	Port 			:  3306
+2020/03/08 19:36:48 	Database 		:  softtube
+2020/03/08 19:36:48 	Username 		:  per
+2020/03/08 19:36:48 BACKUP:
+2020/03/08 19:36:48 	Path			:  /home/per/backup
+2020/03/08 19:36:48 UPDATE:
+2020/03/08 19:36:48 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:36:48 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:36:48 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:36:48 CLIENT:
+2020/03/08 19:36:48 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:36:48 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:36:48 INTERVALS:
+2020/03/08 19:36:48 	High 			:  1800
+2020/03/08 19:36:48 	Medium 			:  7200
+2020/03/08 19:36:48 	Low 			:  14400
+2020/03/08 19:36:48 ---------
+2020/03/08 19:36:48 
+2020/03/08 19:36:48 Session started : BOHR
+2020/03/08 19:36:48 SoftTube client startup
+2020/03/08 19:42:27 ---------------------------
+2020/03/08 19:42:27 - softtube client started -
+2020/03/08 19:42:27 ---------------------------
+2020/03/08 19:42:27 
+2020/03/08 19:42:27 Settings:
+2020/03/08 19:42:27 ---------
+2020/03/08 19:42:27 CONNECTION:
+2020/03/08 19:42:27 	Server 			:  192.168.1.3
+2020/03/08 19:42:27 	Port 			:  3306
+2020/03/08 19:42:27 	Database 		:  softtube
+2020/03/08 19:42:27 	Username 		:  per
+2020/03/08 19:42:27 BACKUP:
+2020/03/08 19:42:27 	Path			:  /home/per/backup
+2020/03/08 19:42:27 UPDATE:
+2020/03/08 19:42:27 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:42:27 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:42:27 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:42:27 CLIENT:
+2020/03/08 19:42:27 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:42:27 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:42:27 INTERVALS:
+2020/03/08 19:42:27 	High 			:  1800
+2020/03/08 19:42:27 	Medium 			:  7200
+2020/03/08 19:42:27 	Low 			:  14400
+2020/03/08 19:42:27 ---------
+2020/03/08 19:42:27 
+2020/03/08 19:42:27 Session started : BOHR
+2020/03/08 19:42:27 SoftTube client startup
+2020/03/08 19:42:41 ---------------------------
+2020/03/08 19:42:41 - softtube client started -
+2020/03/08 19:42:41 ---------------------------
+2020/03/08 19:42:41 
+2020/03/08 19:42:41 Settings:
+2020/03/08 19:42:41 ---------
+2020/03/08 19:42:41 CONNECTION:
+2020/03/08 19:42:41 	Server 			:  192.168.1.3
+2020/03/08 19:42:41 	Port 			:  3306
+2020/03/08 19:42:41 	Database 		:  softtube
+2020/03/08 19:42:41 	Username 		:  per
+2020/03/08 19:42:41 BACKUP:
+2020/03/08 19:42:41 	Path			:  /home/per/backup
+2020/03/08 19:42:41 UPDATE:
+2020/03/08 19:42:41 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:42:41 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:42:41 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:42:41 CLIENT:
+2020/03/08 19:42:41 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:42:41 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:42:41 INTERVALS:
+2020/03/08 19:42:41 	High 			:  1800
+2020/03/08 19:42:41 	Medium 			:  7200
+2020/03/08 19:42:41 	Low 			:  14400
+2020/03/08 19:42:41 ---------
+2020/03/08 19:42:41 
+2020/03/08 19:42:41 Session started : BOHR
+2020/03/08 19:42:41 SoftTube client startup
+2020/03/08 19:43:20 ---------------------------
+2020/03/08 19:43:20 - softtube client started -
+2020/03/08 19:43:20 ---------------------------
+2020/03/08 19:43:20 
+2020/03/08 19:43:20 Settings:
+2020/03/08 19:43:20 ---------
+2020/03/08 19:43:20 CONNECTION:
+2020/03/08 19:43:20 	Server 			:  192.168.1.3
+2020/03/08 19:43:20 	Port 			:  3306
+2020/03/08 19:43:20 	Database 		:  softtube
+2020/03/08 19:43:20 	Username 		:  per
+2020/03/08 19:43:20 BACKUP:
+2020/03/08 19:43:20 	Path			:  /home/per/backup
+2020/03/08 19:43:20 UPDATE:
+2020/03/08 19:43:20 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:43:20 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:43:20 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:43:20 CLIENT:
+2020/03/08 19:43:20 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:43:20 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:43:20 INTERVALS:
+2020/03/08 19:43:20 	High 			:  1800
+2020/03/08 19:43:20 	Medium 			:  7200
+2020/03/08 19:43:20 	Low 			:  14400
+2020/03/08 19:43:20 ---------
+2020/03/08 19:43:20 
+2020/03/08 19:43:20 Session started : BOHR
+2020/03/08 19:43:20 SoftTube client startup
+2020/03/08 19:44:14 ---------------------------
+2020/03/08 19:44:14 - softtube client started -
+2020/03/08 19:44:14 ---------------------------
+2020/03/08 19:44:14 
+2020/03/08 19:44:14 Settings:
+2020/03/08 19:44:14 ---------
+2020/03/08 19:44:14 CONNECTION:
+2020/03/08 19:44:14 	Server 			:  192.168.1.3
+2020/03/08 19:44:14 	Port 			:  3306
+2020/03/08 19:44:14 	Database 		:  softtube
+2020/03/08 19:44:14 	Username 		:  per
+2020/03/08 19:44:14 BACKUP:
+2020/03/08 19:44:14 	Path			:  /home/per/backup
+2020/03/08 19:44:14 UPDATE:
+2020/03/08 19:44:14 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:44:14 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:44:14 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:44:14 CLIENT:
+2020/03/08 19:44:14 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:44:14 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:44:14 INTERVALS:
+2020/03/08 19:44:14 	High 			:  1800
+2020/03/08 19:44:14 	Medium 			:  7200
+2020/03/08 19:44:14 	Low 			:  14400
+2020/03/08 19:44:14 ---------
+2020/03/08 19:44:14 
+2020/03/08 19:44:14 Session started : BOHR
+2020/03/08 19:44:14 SoftTube client startup
+2020/03/08 19:48:07 ---------------------------
+2020/03/08 19:48:07 - softtube client started -
+2020/03/08 19:48:07 ---------------------------
+2020/03/08 19:48:07 
+2020/03/08 19:48:07 Settings:
+2020/03/08 19:48:07 ---------
+2020/03/08 19:48:07 CONNECTION:
+2020/03/08 19:48:07 	Server 			:  192.168.1.3
+2020/03/08 19:48:07 	Port 			:  3306
+2020/03/08 19:48:07 	Database 		:  softtube
+2020/03/08 19:48:07 	Username 		:  per
+2020/03/08 19:48:07 BACKUP:
+2020/03/08 19:48:07 	Path			:  /home/per/backup
+2020/03/08 19:48:07 UPDATE:
+2020/03/08 19:48:07 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:48:07 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:48:07 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:48:07 CLIENT:
+2020/03/08 19:48:07 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:48:07 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:48:07 INTERVALS:
+2020/03/08 19:48:07 	High 			:  1800
+2020/03/08 19:48:07 	Medium 			:  7200
+2020/03/08 19:48:07 	Low 			:  14400
+2020/03/08 19:48:07 ---------
+2020/03/08 19:48:07 
+2020/03/08 19:48:07 Session started : BOHR
+2020/03/08 19:48:07 SoftTube client startup
+2020/03/08 19:48:14 SoftTube client shutdown
+2020/03/08 19:48:14 
+2020/03/08 19:48:14 ----------------------------
+2020/03/08 19:48:14 - softtube client finished -
+2020/03/08 19:48:14 ----------------------------
+2020/03/08 19:48:14 
+2020/03/08 19:53:14 ---------------------------
+2020/03/08 19:53:14 - softtube client started -
+2020/03/08 19:53:14 ---------------------------
+2020/03/08 19:53:14 
+2020/03/08 19:53:14 Settings:
+2020/03/08 19:53:14 ---------
+2020/03/08 19:53:14 CONNECTION:
+2020/03/08 19:53:14 	Server 			:  192.168.1.3
+2020/03/08 19:53:14 	Port 			:  3306
+2020/03/08 19:53:14 	Database 		:  softtube
+2020/03/08 19:53:14 	Username 		:  per
+2020/03/08 19:53:14 BACKUP:
+2020/03/08 19:53:14 	Path			:  /home/per/backup
+2020/03/08 19:53:14 UPDATE:
+2020/03/08 19:53:14 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube.update/update.log
+2020/03/08 19:53:14 	Youtube-dl path	:  /usr/bin
+2020/03/08 19:53:14 	Thumbnails path	:  /home/per/Videos/youtube/thumbnails
+2020/03/08 19:53:14 CLIENT:
+2020/03/08 19:53:14 	Log path 		:  /home/per/go/src/github.com/hultan/softtube/softtube/client.log
+2020/03/08 19:53:14 	Videos path		:  /home/per/Videos/youtube/videos
+2020/03/08 19:53:14 INTERVALS:
+2020/03/08 19:53:14 	High 			:  1800
+2020/03/08 19:53:14 	Medium 			:  7200
+2020/03/08 19:53:14 	Low 			:  14400
+2020/03/08 19:53:14 ---------
+2020/03/08 19:53:14 
+2020/03/08 19:53:14 Session started : BOHR
+2020/03/08 19:53:14 SoftTube client startup

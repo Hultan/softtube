@@ -14,8 +14,8 @@ type VideosTable struct {
 
 const sqlStatementVideoExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
 const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status FROM Videos WHERE id=?"
-const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added, status) 
-								VALUES (?, ?, ?, ?, ?, ?, 0);`
+const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added) 
+								VALUES (?, ?, ?, ?, ?, ?);`
 const sqlStatementUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
 const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=?"
 

@@ -26,6 +26,8 @@ func CreateSession(db Database) (SessionIdentifier, error) {
 		return s, err
 	}
 
+	db.SessionIdentifier = s
+
 	return s, nil
 }
 

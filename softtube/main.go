@@ -29,14 +29,7 @@ func main() {
 	// Create a SoftTube session
 	createSession()
 
-	// Create a new application.
-	softtube = new(SoftTube)
-	err := softtube.StartApplication()
-	if err != nil {
-		logger.Log("Failed to start application!")
-		logger.LogError(err)
-	}
-
+	startApplication()
 }
 
 func loadConfig() {
@@ -47,12 +40,12 @@ func loadConfig() {
 
 func setupLogging() {
 	// Setup logging
-	logger = core.NewLog(config.Client.Log)
-	defer logger.Close()
-
-	// Log start and finish
+	path := config.Client.Log
+	if path == "" {
+		panic(fmt.Sprintf("Invalid log file path : %s", path))
+	}
+	logger = core.NewLog(path)
 	logger.LogStart(config, "softtube client")
-	defer logger.LogFinished("softtube client")
 }
 
 func openDatabase() core.Database {
@@ -71,4 +64,15 @@ func createSession() {
 	}
 
 	logger.Log(fmt.Sprintf("Session started : %s", session.Name))
+}
+
+func startApplication() {
+	// Create a new application.
+	softtube = new(SoftTube)
+	err := softtube.StartApplication()
+	if err != nil {
+		logger.Log("Failed to start application!")
+		logger.LogError(err)
+		panic(err)
+	}
 }
