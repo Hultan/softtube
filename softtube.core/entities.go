@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+// Download : Represents a download request
+type Download struct {
+	ID string
+}
+
 // Version : Represents the SoftTube database version
 type Version struct {
 	Major    int
@@ -30,11 +35,12 @@ type Subscription struct {
 
 // Video : Represents a YouTube video in SoftTube
 type Video struct {
-	ID             string
-	SubscriptionID string
-	Title          string
-	Added          time.Time
-	Published      time.Time
-	Duration       sql.NullString
-	Status         int
+	ID               string
+	SubscriptionID   string
+	SubscriptionName string
+	Title            string
+	Added            time.Time
+	Published        time.Time
+	Duration         sql.NullString
+	Status           int
 }

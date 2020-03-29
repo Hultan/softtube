@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"path"
 	"sync"
 
 	core "github.com/hultan/softtube/softtube.core"
@@ -29,7 +30,7 @@ func main() {
 	config.Load("main")
 
 	// Setup logging
-	logger = core.NewLog(config.Update.Log)
+	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Update))
 	defer logger.Close()
 
 	// Start updating the softtube database
@@ -37,9 +38,16 @@ func main() {
 	defer logger.LogFinished("softtube update")
 
 	conn := config.Connection
+	crypt := core.Crypt{}
+	password, err := crypt.Decrypt(conn.Password)
+	if err != nil {
+		logger.Log("Failed to decrypt MySQL password!")
+		logger.LogError(err)
+		panic(err)
+	}
 
 	// Create the database object, and get all subscriptions
-	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, conn.Password)
+	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	db.OpenDatabase()
 	defer db.CloseDatabase()
 	subs, err := db.Subscriptions.GetAll()
@@ -158,7 +166,7 @@ func updateSubscription(subscription *core.Subscription) {
 			go func() {
 				// Get thumbnail
 				defer waitGroup.Done()
-				err := youtube.getThumbnail(video.ID, config.Update.Thumbnails, logger)
+				err := youtube.getThumbnail(video.ID, config.ServerPaths.Thumbnails, logger)
 				if err != nil {
 					message = fmt.Sprintf("Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error())
 					logger.Log(message)

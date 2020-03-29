@@ -9,18 +9,17 @@ import (
 
 // Database : A connection to the SoftTube database
 type Database struct {
-	Connection        *sql.DB
-	SessionIdentifier SessionIdentifier
-	ConnectionString  string
-	Server            string
-	Port              int
-	Database          string
-	Username          string
-	Password          string
-	Subscriptions     SubscriptionTable
-	Videos            VideosTable
-	Version           VersionTable
-	Session           SessionTable
+	Connection       *sql.DB
+	ConnectionString string
+	Server           string
+	Port             int
+	Database         string
+	Username         string
+	Password         string
+	Subscriptions    SubscriptionTable
+	Videos           VideosTable
+	Version          VersionTable
+	Download         DownloadTable
 }
 
 // New : Creates a new database object
@@ -41,7 +40,7 @@ func (d *Database) OpenDatabase() error {
 	d.Subscriptions = SubscriptionTable{Connection: conn}
 	d.Videos = VideosTable{Connection: conn}
 	d.Version = VersionTable{Connection: conn}
-	d.Session = SessionTable{Connection: conn}
+	d.Download = DownloadTable{Connection: conn}
 
 	return nil
 }

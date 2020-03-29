@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"path"
 
 	_ "github.com/go-sql-driver/mysql"
 	core "github.com/hultan/softtube/softtube.core"
@@ -11,7 +11,6 @@ var (
 	logger   core.Logger
 	config   *core.Config
 	db       core.Database
-	session  core.SessionIdentifier
 	softtube *SoftTube
 )
 
@@ -20,16 +19,14 @@ func main() {
 	loadConfig()
 
 	// Setup the client logging
-	setupLogging()
+	startLogging()
+	defer stopLogging()
 
 	// Open the SoftTube database
 	openDatabase()
 	defer db.CloseDatabase()
 
-	// Create a SoftTube session
-	createSession()
-
-	startApplication()
+	startApplication(&db)
 }
 
 func loadConfig() {
@@ -38,41 +35,59 @@ func loadConfig() {
 	config.Load("main")
 }
 
-func setupLogging() {
-	// Setup logging
-	path := config.Client.Log
-	if path == "" {
-		panic(fmt.Sprintf("Invalid log file path : %s", path))
-	}
-	logger = core.NewLog(path)
+func startLogging() {
+	// Start logging
+	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
 	logger.LogStart(config, "softtube client")
+}
+
+func stopLogging() {
+	// Close log file
+	logger.LogFinished("softtube client")
+	logger.Close()
 }
 
 func openDatabase() core.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
-	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, conn.Password)
+	crypt := core.Crypt{}
+	password, err := crypt.Decrypt(conn.Password)
+	if err != nil {
+		logger.Log("Failed to decrypt MySQL password!")
+		logger.LogError(err)
+		panic(err)
+	}
+
+	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	db.OpenDatabase()
 	return db
 }
 
-func createSession() {
-	// Create session
-	session, err := core.CreateSession(db)
-	if err != nil {
-		panic(err)
-	}
-
-	logger.Log(fmt.Sprintf("Session started : %s", session.Name))
-}
-
-func startApplication() {
+func startApplication(db *core.Database) {
 	// Create a new application.
 	softtube = new(SoftTube)
-	err := softtube.StartApplication()
+	err := softtube.StartApplication(db)
 	if err != nil {
 		logger.Log("Failed to start application!")
 		logger.LogError(err)
 		panic(err)
 	}
 }
+
+// func playVideo() {
+// 	command := "smplayer smb://192.168.1.3/softtube/test.mkv"
+// 	cmd := exec.Command("/bin/bash", "-c", command)
+// 	_, err := cmd.CombinedOutput()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
+
+// func downloadVideo() {
+// 	command := "nano smb://192.168.1.3/softtube/download/test.download"
+// 	cmd := exec.Command("/bin/bash", "-c", command)
+// 	_, err := cmd.CombinedOutput()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }

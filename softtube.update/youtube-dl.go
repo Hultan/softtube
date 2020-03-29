@@ -79,5 +79,5 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 }
 
 func (y youtube) getYoutubePath() string {
-	return path.Join(config.Update.YoutubeDL, "youtube-dl")
+	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
 }

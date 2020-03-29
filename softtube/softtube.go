@@ -7,72 +7,70 @@ import (
 
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	core "github.com/hultan/softtube/softtube.core"
 )
 
 // SoftTube : The SoftTube application object
 type SoftTube struct {
-	Application *gtk.Application
-	Toolbar     Toolbar
+	Toolbar   Toolbar
+	VideoList VideoList
 }
 
 // StartApplication : Starts the SoftTube application
-func (s SoftTube) StartApplication() error {
+func (s SoftTube) StartApplication(db *core.Database) error {
+	logger.Log("SoftTube client startup")
+	defer logger.Log("SoftTube client shutdown")
 
-	// Create a new application.
-	application, err := gtk.ApplicationNew(constAppID, glib.APPLICATION_FLAGS_NONE)
+	gtk.Init(nil)
+
+	// Get the GtkBuilder UI definition in the glade file.
+	path, err := getGladePath()
 	if err != nil {
-		return err
+		logger.LogError(err)
+		panic(err)
 	}
-	s.Application = application
 
-	// Connect function to application startup event, this is not required.
-	application.Connect("startup", func() {
-		logger.Log("SoftTube client startup")
+	builder, err := gtk.BuilderNewFromFile(path)
+	if err != nil {
+		// panic for any errors.
+		logger.LogError(err)
+		panic(err)
+	}
+
+	win, err := getWindow(builder, "main_window")
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+	win.SetTitle("SoftTube!")
+	win.Maximize()
+	win.Connect("destroy", func() {
+		gtk.MainQuit()
 	})
 
-	// Connect function to application shutdown event, this is not required.
-	application.Connect("shutdown", func() {
-		logger.Log("SoftTube client shutdown")
-		logger.LogFinished("softtube client")
-		logger.Close()
-	})
+	// Load toolbar
+	s.Toolbar = Toolbar{}
+	err = s.Toolbar.Load(builder)
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+	s.Toolbar.SetupEvents()
 
-	// Connect function to application activate event
-	application.Connect("activate", func() {
-		// Get the GtkBuilder UI definition in the glade file.
-		path, err := getGladePath()
-		if err != nil {
-			logger.LogError(err)
-			panic(err)
-		}
-		builder, err := gtk.BuilderNewFromFile(path)
-		if err != nil {
-			// panic for any errors.
-			logger.LogError(err)
-			panic(err)
-		}
+	// Load video list
+	s.VideoList = VideoList{}
+	err = s.VideoList.Load(builder)
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+	s.VideoList.SetupColumns()
+	s.VideoList.SetupEvents()
+	s.VideoList.Fill(db)
 
-		win, err := getWindow(builder, "main_window")
-		if err != nil {
-			logger.LogError(err)
-			panic(err)
-		}
-
-		toolbar := Toolbar{}
-		err = toolbar.Load(builder)
-		if err != nil {
-			logger.LogError(err)
-			panic(err)
-		}
-		toolbar.SetupEvents()
-
-		// Show the Window and all of its components.
-		win.Show()
-		application.AddWindow(win)
-	})
-
-	// Launch the application
-	os.Exit(application.Run(os.Args))
+	// Show the Window and all of its components.
+	win.ShowAll()
+	gtk.Main()
 
 	return nil
 }

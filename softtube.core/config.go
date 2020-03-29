@@ -19,18 +19,24 @@ type Config struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	} `json:"connection"`
-	Backup struct {
-		Path string `json:"path"`
-	} `json:"backup"`
-	Update struct {
+	ServerPaths struct {
 		Log        string `json:"log"`
+		Backup     string `json:"backup"`
 		YoutubeDL  string `json:"youtube-dl"`
 		Thumbnails string `json:"thumbnails"`
-	} `json:"update"`
-	Client struct {
-		Log    string `json:"log"`
-		Videos string `json:"videos"`
-	} `json:"client"`
+		Videos     string `json:"videos"`
+	} `json:"server-paths"`
+	ClientPaths struct {
+		Log        string `json:"log"`
+		Thumbnails string `json:"thumbnails"`
+		Videos     string `json:"videos"`
+	} `json:"client-paths"`
+	Logs struct {
+		Backup   string `json:"backup"`
+		Update   string `json:"update"`
+		Download string `json:"download"`
+		SoftTube string `json:"softtube"`
+	} `json:"logs"`
 	Intervals struct {
 		High   int `json:"high"`
 		Medium int `json:"medium"`
