@@ -12,7 +12,8 @@ type DownloadTable struct {
 
 // TODO : Make max downloads a setting
 const sqlStatementGetDownloads = "SELECT video_id FROM Download LIMIT 5"
-const sqlStatementInsertDownload = "INSERT INTO Download (video_id) VALUES (?1)"
+const sqlStatementInsertDownload = "INSERT INTO Download (video_id) VALUES (?)"
+const sqlStatementSetAsDownloaded = "DELETE FROM Download WHERE video_id=?"
 
 // Insert : Insert a new download request into the database
 func (d DownloadTable) Insert(id string) error {
@@ -27,6 +28,22 @@ func (d DownloadTable) Insert(id string) error {
 		return err
 	}
 
+	return nil
+}
+
+// SetAsDownloaded : Deletes the row from the downloaded list
+func (d DownloadTable) SetAsDownloaded(id string) error {
+	// Check that database is opened
+	if d.Connection == nil {
+		return errors.New("database not opened")
+	}
+
+	// Execute insert statement
+	_, err := d.Connection.Exec(sqlStatementSetAsDownloaded, id)
+
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

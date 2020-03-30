@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path"
+	"sync"
 
 	core "github.com/hultan/softtube/softtube.core"
 )
@@ -24,8 +25,8 @@ func main() {
 	defer logger.Close()
 
 	// Start updating the softtube database
-	logger.LogStart(config, "softtube update")
-	defer logger.LogFinished("softtube update")
+	logger.LogStart(config, "softtube download")
+	defer logger.LogFinished("softtube download")
 
 	// Decrypt the MySQL password
 	conn := config.Connection
@@ -47,18 +48,17 @@ func main() {
 		panic(err)
 	}
 
-	// var waitGroup sync.WaitGroup
+	var waitGroup sync.WaitGroup
 
 	for i := 0; i < len(downloads); i++ {
-		// waitGroup.Add(1)
-		downloadVideo(downloads[i].ID)
-		// waitGroup.Done()
+		waitGroup.Add(1)
+		go downloadVideo(downloads[i].ID, &waitGroup)
 	}
-	// waitGroup.Wait()
+	waitGroup.Wait()
 }
 
 // Download a youtube video
-func downloadVideo(videoID string) error {
+func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 	command := fmt.Sprintf("%s --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
@@ -69,8 +69,18 @@ func downloadVideo(videoID string) error {
 		msg := fmt.Sprintf("Command : %s", command)
 		logger.Log(msg)
 		logger.LogError(err)
+		wait.Done()
 		return err
 	}
+	// Set the video as downloaded in database
+	err = db.Download.SetAsDownloaded(videoID)
+	if err != nil {
+		logger.Log("Failed to set as downloaded after download!")
+		logger.LogError(err)
+		wait.Done()
+		return err
+	}
+	wait.Done()
 	return nil
 }
 
