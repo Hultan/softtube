@@ -18,7 +18,7 @@ const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id,
 								VALUES (?, ?, ?, ?, ?, ?);`
 const sqlStatementUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
 const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=?"
-const sqlStatementUpdateStatus = "UPDATE Videos SET status=? WHERE id="
+const sqlStatementUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
 
 // TODO : Make a setting of max number of videos
 const sqlStatementGetLatestVideos = "SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name FROM Videos INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id ORDER BY Videos.Added DESC LIMIT 200;"
@@ -75,6 +75,22 @@ func (v VideosTable) Insert(id string, subscriptionID string, title string, dura
 
 	// Execute insert statement
 	_, err := v.Connection.Exec(sqlStatementInsertVideo, id, subscriptionID, title, duration, published, now)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateStatus : Update the status for a video
+func (v VideosTable) UpdateStatus(id string, status int) error {
+	// Check that database is opened
+	if v.Connection == nil {
+		return errors.New("database not opened")
+	}
+
+	// Execute the update statement
+	_, err := v.Connection.Exec(sqlStatementUpdateStatus, status, id)
 	if err != nil {
 		return err
 	}

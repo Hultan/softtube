@@ -38,12 +38,12 @@ func (d DownloadTable) SetAsDownloaded(id string) error {
 		return errors.New("database not opened")
 	}
 
-	// Execute insert statement
+	// Execute statement
 	_, err := d.Connection.Exec(sqlStatementSetAsDownloaded, id)
-
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

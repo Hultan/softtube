@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 	"path"
+	"strings"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
@@ -16,6 +19,8 @@ import (
 type VideoList struct {
 	List *gtk.TreeView
 }
+
+var videos []core.Video
 
 // Load : Loads the toolbar
 func (v *VideoList) Load(builder *gtk.Builder) error {
@@ -30,14 +35,126 @@ func (v *VideoList) Load(builder *gtk.Builder) error {
 
 // SetupEvents : Setup the list events
 func (v *VideoList) SetupEvents() {
-	// v.List.Connect("button-press-event", func() {
-	// 	gtk.MainQuit()
-	// })
+
+	v.List.Connect("row_activated", rowActivated)
+
+}
+
+func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath) {
+	video := getSelectedVideo(treeView)
+	if video == nil {
+		return
+	}
+
+	if video.Status == constStatusDownloaded {
+		playVideo(video.ID)
+	} else {
+		downloadVideo(video.ID)
+	}
+}
+
+func playVideo(videoID string) {
+	path := getVideoPath(videoID)
+	if path == "" {
+		msg := fmt.Sprintf("Failed to find video : %s", videoID)
+		logger.Log(msg)
+		return
+	}
+	command := fmt.Sprintf("smplayer '%s'", path)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	_, err := cmd.CombinedOutput()
+	if err != nil {
+		panic(err)
+	}
+
+	// Set video status as downloaded
+	err = db.Videos.UpdateStatus(videoID, constStatusWatched)
+	if err != nil {
+		logger.Log("Failed to set video status to watched after download!")
+		logger.LogError(err)
+	}
+}
+
+func getVideoPath(videoID string) string {
+	tryPath := path.Join(config.ClientPaths.Videos, videoID+".mkv")
+	if _, err := os.Stat(tryPath); err == nil {
+		return tryPath
+	}
+
+	tryPath = path.Join(config.ClientPaths.Videos, videoID+".mp4")
+	if _, err := os.Stat(tryPath); err == nil {
+		return tryPath
+	}
+
+	tryPath = path.Join(config.ClientPaths.Videos, videoID+".webm")
+	if _, err := os.Stat(tryPath); err == nil {
+		return tryPath
+	}
+
+	return ""
+}
+
+// Download a youtube video
+func downloadVideo(videoID string) error {
+	command := fmt.Sprintf("%s --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
+	// fmt.Println(command)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	// Wait for the command to be executed (video to be downloaded)
+	err := cmd.Run()
+	if err != nil {
+		logger.Log("Failed to download video!")
+		msg := fmt.Sprintf("Command : %s", command)
+		logger.Log(msg)
+		logger.LogError(err)
+		return err
+	}
+
+	// Set the video to be downloaded
+	err = db.Download.Insert(videoID)
+	if err != nil {
+		logger.Log("Failed to set video to be downloaded!")
+		logger.LogError(err)
+		return err
+	}
+
+	return nil
+}
+
+func getYoutubePath() string {
+	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
+}
+
+func getSelectedVideo(treeView *gtk.TreeView) *core.Video {
+	selection, err := treeView.GetSelection()
+	if err != nil {
+		return nil
+	}
+	model, iter, ok := selection.GetSelected()
+	if ok {
+		value, err := model.(*gtk.TreeModel).GetValue(iter, liststoreColumnVideoID)
+		if err != nil {
+			return nil
+		}
+		videoID, err := value.GetString()
+		if err != nil {
+			return nil
+		}
+		for i := 0; i < len(videos); i++ {
+			video := videos[i]
+			if video.ID == videoID {
+				return &video
+			}
+		}
+		return nil
+	}
+
+	return nil
 }
 
 // Fill : Fills the video list
 func (v *VideoList) Fill(db *core.Database) {
-	videos, err := db.Videos.GetVideos()
+	var err error
+	videos, err = db.Videos.GetVideos()
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -56,7 +173,31 @@ func (v *VideoList) Fill(db *core.Database) {
 		video := videos[i]
 		progress := 0
 		progressText := ""
-		var color string = ""
+		var color string = constColorNotDownloaded
+		var duration string = ""
+
+		if video.Status == constStatusDeleted {
+			color = constColorDeleted
+		} else if video.Status == constStatusWatched {
+			color = constColorWatched
+		} else if video.Status == constStatusDownloaded {
+			color = constColorDownloaded
+		}
+
+		if video.Duration.Valid && len(strings.Trim(video.Duration.String, " \n")) <= 1 {
+			duration = ""
+			color = constColorWarning
+		} else {
+			duration = video.Duration.String
+		}
+
+		if video.Status == constStatusWatched {
+			progress = 100
+			progressText = "watched"
+		} else if video.Status == constStatusDownloaded {
+			progress = 50
+			progressText = "downloaded"
+		}
 
 		thumbnail := getThumbnail(video.ID)
 
@@ -69,7 +210,7 @@ func (v *VideoList) Fill(db *core.Database) {
 				progress,
 				color,
 				video.ID,
-				video.Duration,
+				duration,
 				progressText})
 
 		if err != nil {
@@ -92,8 +233,8 @@ func (v VideoList) SetupColumns() {
 }
 
 func getThumbnailPath(videoID string) string {
-	fmt.Println(config.ClientPaths.Thumbnails)
-	fmt.Println(path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID)))
+	// fmt.Println(config.ClientPaths.Thumbnails)
+	// fmt.Println(path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID)))
 	return "/" + path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
 }
 

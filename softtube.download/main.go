@@ -59,11 +59,21 @@ func main() {
 
 // Download a youtube video
 func downloadVideo(videoID string, wait *sync.WaitGroup) error {
+	// Set video status as downloading
+	err := db.Videos.UpdateStatus(videoID, constStatusDownloading)
+	if err != nil {
+		logger.Log("Failed to set video status to downloading before download!")
+		logger.LogError(err)
+		wait.Done()
+		return err
+	}
+
+	// Download the video
 	command := fmt.Sprintf("%s --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	// Wait for the command to be executed (video to be downloaded)
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		logger.Log("Failed to download video!")
 		msg := fmt.Sprintf("Command : %s", command)
@@ -72,14 +82,25 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 		wait.Done()
 		return err
 	}
+
 	// Set the video as downloaded in database
 	err = db.Download.SetAsDownloaded(videoID)
 	if err != nil {
-		logger.Log("Failed to set as downloaded after download!")
+		logger.Log("Failed to delete video from table download after download!")
 		logger.LogError(err)
 		wait.Done()
 		return err
 	}
+
+	// Set video status as downloaded
+	err = db.Videos.UpdateStatus(videoID, constStatusDownloaded)
+	if err != nil {
+		logger.Log("Failed to set video status to downloaded after download!")
+		logger.LogError(err)
+		wait.Done()
+		return err
+	}
+
 	wait.Done()
 	return nil
 }
