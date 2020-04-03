@@ -14,9 +14,10 @@ const liststoreColumnBackground = 5
 const liststoreColumnVideoID = 6
 const liststoreColumnDuration = 7
 const liststoreColumnProgressText = 8
+const liststoreColumnForeground = 9
 
 const constColorNotDownloaded = "#444444"
-const constColorDownloading = "Gold"
+const constColorDownloading = "Dodger Blue"
 const constColorDownloaded = "Dark Slate Blue"
 const constColorWatched = "Dark Green"
 const constColorDeleted = "Dark Slate Gray"

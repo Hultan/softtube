@@ -162,7 +162,7 @@ func (v *VideoList) Fill(db *core.Database) {
 	fmt.Println("Videos loaded!", len(videos))
 
 	v.List.SetModel(nil)
-	listStore, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_INT64, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING)
+	listStore, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_INT64, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
 		logger.Log("Failed to create liststore!")
 		logger.LogError(err)
@@ -173,20 +173,28 @@ func (v *VideoList) Fill(db *core.Database) {
 		video := videos[i]
 		progress := 0
 		progressText := ""
-		var color string = constColorNotDownloaded
+		var backgroundColor string = constColorNotDownloaded
+		var foregroundColor string = "White"
 		var duration string = ""
 
 		if video.Status == constStatusDeleted {
-			color = constColorDeleted
+			backgroundColor = constColorDeleted
+			foregroundColor = "Black"
 		} else if video.Status == constStatusWatched {
-			color = constColorWatched
+			backgroundColor = constColorWatched
+			foregroundColor = "Black"
 		} else if video.Status == constStatusDownloaded {
-			color = constColorDownloaded
+			backgroundColor = constColorDownloaded
+			foregroundColor = "Black"
+		} else if video.Status == constStatusDownloading {
+			backgroundColor = constColorDownloading
+			foregroundColor = "Black"
 		}
 
 		if video.Duration.Valid && len(strings.Trim(video.Duration.String, " \n")) <= 1 {
 			duration = ""
-			color = constColorWarning
+			backgroundColor = constColorWarning
+			foregroundColor = "Black"
 		} else {
 			duration = video.Duration.String
 		}
@@ -202,16 +210,17 @@ func (v *VideoList) Fill(db *core.Database) {
 		thumbnail := getThumbnail(video.ID)
 
 		iter := listStore.Append()
-		err = listStore.Set(iter, []int{0, 1, 2, 3, 4, 5, 6, 7, 8},
+		err = listStore.Set(iter, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
 			[]interface{}{thumbnail,
 				video.SubscriptionName,
 				video.Added.Format(constDateLayout),
 				video.Title,
 				progress,
-				color,
+				backgroundColor,
 				video.ID,
 				duration,
-				progressText})
+				progressText,
+				foregroundColor})
 
 		if err != nil {
 			logger.Log("Failed to add row!")
@@ -225,10 +234,10 @@ func (v *VideoList) Fill(db *core.Database) {
 // SetupColumns : Sets up the listview columns
 func (v VideoList) SetupColumns() {
 	v.List.AppendColumn(createImageColumn("Image"))
-	v.List.AppendColumn(createTextColumn("Channel name", liststoreColumnChannelName, 200, 200))
-	v.List.AppendColumn(createTextColumn("Date", liststoreColumnDate, 90, 200))
+	v.List.AppendColumn(createTextColumn("Channel name", liststoreColumnChannelName, 200, 300))
+	v.List.AppendColumn(createTextColumn("Date", liststoreColumnDate, 90, 300))
 	v.List.AppendColumn(createTextColumn("Title", liststoreColumnTitle, 0, 600))
-	v.List.AppendColumn(createTextColumn("Duration", liststoreColumnDuration, 90, 200))
+	v.List.AppendColumn(createTextColumn("Duration", liststoreColumnDuration, 90, 300))
 	v.List.AppendColumn(createProgressColumn("Progress"))
 }
 
@@ -272,6 +281,7 @@ func createTextColumn(title string, id int, width int, weight int) *gtk.TreeView
 		log.Fatal("Unable to create cell column:", err)
 	}
 	column.AddAttribute(cellRenderer, "background", liststoreColumnBackground)
+	column.AddAttribute(cellRenderer, "foreground", liststoreColumnForeground)
 	if width == 0 {
 		column.SetExpand(true)
 	} else {
