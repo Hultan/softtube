@@ -8,6 +8,7 @@ import (
 
 // Toolbar : The toobar for SoftTube application
 type Toolbar struct {
+	Parent                 *SoftTube
 	ToolbarSubscriptions   *gtk.ToolButton
 	ToolbarToWatch         *gtk.ToolButton
 	ToolbarToDelete        *gtk.ToolButton
@@ -89,6 +90,26 @@ func (t *Toolbar) Load(builder *gtk.Builder) error {
 func (t *Toolbar) SetupEvents() {
 	t.ToolbarQuit.Connect("clicked", func() {
 		gtk.MainQuit()
+	})
+	t.ToolbarRefresh.Connect("clicked", func() {
+		s := t.Parent
+		s.VideoList.Refresh()
+	})
+	t.ToolbarDeleteAll.Connect("clicked", func() {
+		s := t.Parent
+		s.VideoList.DeleteWatchedVideos()
+	})
+	t.ToolbarSubscriptions.Connect("clicked", func() {
+		s := t.Parent
+		s.VideoList.SetFilterMode(constFilterModeSubscriptions)
+	})
+	t.ToolbarToWatch.Connect("clicked", func() {
+		s := t.Parent
+		s.VideoList.SetFilterMode(constFilterModeToWatch)
+	})
+	t.ToolbarToDelete.Connect("clicked", func() {
+		s := t.Parent
+		s.VideoList.SetFilterMode(constFilterModeToDelete)
 	})
 }
 

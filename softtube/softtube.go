@@ -12,6 +12,8 @@ import (
 
 // SoftTube : The SoftTube application object
 type SoftTube struct {
+	Database *core.Database
+
 	Toolbar   Toolbar
 	VideoList VideoList
 }
@@ -20,6 +22,8 @@ type SoftTube struct {
 func (s SoftTube) StartApplication(db *core.Database) error {
 	logger.Log("SoftTube client startup")
 	defer logger.Log("SoftTube client shutdown")
+
+	s.Database = db
 
 	gtk.Init(nil)
 
@@ -49,7 +53,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	})
 
 	// Load toolbar
-	s.Toolbar = Toolbar{}
+	s.Toolbar = Toolbar{Parent: &s}
 	err = s.Toolbar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -58,7 +62,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	s.Toolbar.SetupEvents()
 
 	// Load video list
-	s.VideoList = VideoList{}
+	s.VideoList = VideoList{Parent: &s}
 	err = s.VideoList.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -66,7 +70,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	}
 	s.VideoList.SetupColumns()
 	s.VideoList.SetupEvents()
-	s.VideoList.Fill(db)
+	s.VideoList.Refresh()
 
 	// Show the Window and all of its components.
 	win.ShowAll()
