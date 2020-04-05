@@ -19,7 +19,7 @@ func main() {
 	config.Load("main")
 
 	backup("softtube", config.ServerPaths.Backup)
-	backup("softtubeTEST", config.ServerPaths.Backup)
+	//backup("softtubeTEST", config.ServerPaths.Backup)
 }
 
 // Backs up a mysql database

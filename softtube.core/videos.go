@@ -19,9 +19,15 @@ const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id,
 const sqlStatementUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
 const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=?"
 const sqlStatementUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
+const sqlStatementSearchVideos = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
+									Videos.status, Subscriptions.name 
+									FROM Videos 
+									INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id 
+									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
+									ORDER BY Videos.Added DESC`
 
 // TODO : Make a setting of max number of videos
-const sqlStatementGetLatestVideos = "SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name FROM Videos INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id ORDER BY Videos.Added DESC LIMIT 200;"
+//const sqlStatementGetLatestVideos = "SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name FROM Videos INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id ORDER BY Videos.Added DESC LIMIT 200;"
 const sqlStatementGetLatest = `SELECT * FROM 
 (SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
 FROM Videos 
@@ -144,6 +150,34 @@ func (v VideosTable) DeleteFromDatabase(id string) error {
 	}
 
 	return nil
+}
+
+// Search : Searches for videos
+func (v VideosTable) Search(text string) ([]Video, error) {
+	// Check that database is opened
+	if v.Connection == nil {
+		return nil, errors.New("database not opened")
+	}
+
+	search := fmt.Sprintf("%%%s%%", text)
+	rows, err := v.Connection.Query(sqlStatementSearchVideos, search, search)
+	if err != nil {
+		return []Video{}, err
+	}
+	defer rows.Close()
+
+	var videos []Video
+
+	for rows.Next() {
+		video := new(Video)
+		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName)
+		if err != nil {
+			return []Video{}, err
+		}
+		videos = append(videos, *video)
+	}
+
+	return videos, nil
 }
 
 // GetVideos : Gets a list of the latest videos

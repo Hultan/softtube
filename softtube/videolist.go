@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
@@ -18,19 +19,36 @@ import (
 
 // VideoList : The SoftTube video list
 type VideoList struct {
-	Parent *SoftTube
-	List   *gtk.TreeView
-	Filter *gtk.TreeModelFilter
+	Parent          *SoftTube
+	List            *gtk.TreeView
+	ScrolledWindow  *gtk.ScrolledWindow
+	KeepScrollToEnd bool
 }
 
 var videos []core.Video
 var filterMode int = 0
 var listStore *gtk.ListStore
+var filter *gtk.TreeModelFilter
+var videoList *VideoList
+
+// ScrollToStart : Scrolls to the start of the list
+func (v *VideoList) ScrollToStart() {
+	var adjustment = v.ScrolledWindow.GetVAdjustment()
+	adjustment.SetValue(adjustment.GetLower())
+	v.ScrolledWindow.Show()
+}
+
+// ScrollToEnd : Scrolls to the end of the list
+func (v *VideoList) ScrollToEnd() {
+	var adjustment = v.ScrolledWindow.GetVAdjustment()
+	adjustment.SetValue(adjustment.GetUpper())
+	v.ScrolledWindow.Show()
+}
 
 // SetFilterMode : Changes filter mode
 func (v *VideoList) SetFilterMode(mode int) {
 	filterMode = mode
-	v.Refresh()
+	v.Refresh("")
 }
 
 // Load : Loads the toolbar from the glade file
@@ -41,13 +59,22 @@ func (v *VideoList) Load(builder *gtk.Builder) error {
 	}
 	v.List = list
 
+	scroll, err := getScrolledWindow(builder, "scrolled_window")
+	if err != nil {
+		return err
+	}
+	v.ScrolledWindow = scroll
+
+	// Is this bad?
+	videoList = v
+
 	return nil
 }
 
 // SetupEvents : Setup the list events
 func (v *VideoList) SetupEvents() {
 
-	v.List.Connect("row_activated", rowActivated)
+	v.List.Connect("row_activated", rowActivated, v)
 
 }
 
@@ -71,19 +98,23 @@ func (v *VideoList) DeleteWatchedVideos() {
 		}
 	}
 
-	v.Refresh()
+	v.Refresh("")
 }
 
 // Refresh : Refreshes the video list
-func (v *VideoList) Refresh() {
+func (v *VideoList) Refresh(text string) {
 	var err error
+
 	db := v.Parent.Database
-	videos, err = db.Videos.GetVideos()
+	if text == "" {
+		videos, err = db.Videos.GetVideos()
+	} else {
+		videos, err = db.Videos.Search(text)
+	}
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
 	}
-	//fmt.Println("Videos loaded!", len(videos))
 
 	v.List.SetModel(nil)
 	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_INT64, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING)
@@ -98,14 +129,32 @@ func (v *VideoList) Refresh() {
 		addVideo(&video, listStore)
 	}
 
-	//v.List.SetModel(listStore)
-
-	model, err := listStore.FilterNew(&gtk.TreePath{})
-	err = model.SetVisibleFunc(filterFunc)
+	filter, err := listStore.FilterNew(&gtk.TreePath{})
+	err = filter.SetVisibleFunc(filterFunc)
 	if err != nil {
 		logger.LogError(err)
 	}
-	v.List.SetModel(model)
+	v.List.SetModel(filter)
+
+	count := filter.IterNChildren(nil)
+	v.Parent.StatusBar.UpdateVideoCount(count)
+
+	if v.KeepScrollToEnd {
+		// For some reason, we can't scroll to end in the
+		// UI thread so create a goroutine that does the
+		// scrolling down 50 milliseconds later
+		go func() {
+			select {
+			case <-time.After(50 * time.Millisecond):
+				v.ScrollToEnd()
+			}
+		}()
+	}
+}
+
+// Search : Searches for a video
+func (v *VideoList) Search(text string) {
+	v.Refresh(text)
 }
 
 //
@@ -327,7 +376,20 @@ func getTreeView(builder *gtk.Builder, name string) (*gtk.TreeView, error) {
 	return nil, errors.New("not a gtk tree view")
 }
 
-func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath) {
+func getScrolledWindow(builder *gtk.Builder, name string) (*gtk.ScrolledWindow, error) {
+	obj, err := builder.GetObject(name)
+	if err != nil {
+		// object not found
+		return nil, err
+	}
+	if tool, ok := obj.(*gtk.ScrolledWindow); ok {
+		return tool, nil
+	}
+
+	return nil, errors.New("not a gtk scrolled window")
+}
+
+func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeViewColumn, v *VideoList) {
 	video := getSelectedVideo(treeView)
 	if video == nil {
 		return
@@ -337,6 +399,7 @@ func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath) {
 		playVideo(video.ID)
 		// Mark the selected video with watched color
 		setRowColor(treeView, constColorWatched)
+		videoList.Refresh("")
 	} else if video.Status == constStatusNotDownloaded {
 		downloadVideo(video.ID)
 		// Mark the selected video with downloading color
@@ -367,10 +430,10 @@ func playVideo(videoID string) {
 		panic(err)
 	}
 
-	// Set video status as downloaded
+	// Set video status as watched
 	err = db.Videos.UpdateStatus(videoID, constStatusWatched)
 	if err != nil {
-		logger.Log("Failed to set video status to watched after download!")
+		logger.Log("Failed to set video status to watched!")
 		logger.LogError(err)
 	}
 }
@@ -402,6 +465,13 @@ func downloadVideo(videoID string) error {
 		logger.Log("Failed to set video to be downloaded!")
 		logger.LogError(err)
 		return err
+	}
+
+	// Set video status as downloading
+	err = db.Videos.UpdateStatus(videoID, constStatusDownloading)
+	if err != nil {
+		logger.Log("Failed to set video status to downloading!")
+		logger.LogError(err)
 	}
 
 	return nil

@@ -63,12 +63,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_file_quit">
-                        <property name="label">gtk-quit</property>
+                      <object class="GtkMenuItem" id="menu_file_quit">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Quit</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                       </object>
                     </child>
                   </object>
@@ -179,12 +178,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_help_about">
-                        <property name="label">gtk-about</property>
+                      <object class="GtkMenuItem" id="menu_help_about">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">About</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                       </object>
                     </child>
                   </object>
@@ -203,12 +201,13 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkToolButton" id="toolbar_subscriptions">
+              <object class="GtkToggleToolButton" id="toolbar_subscriptions">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Select to show the 'Subscription' view...</property>
                 <property name="label" translatable="yes">Subscriptions</property>
                 <property name="use_underline">True</property>
+                <property name="active">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -216,7 +215,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbar_to_watch">
+              <object class="GtkToggleToolButton" id="toolbar_to_watch">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Select to show the 'To watch' view...</property>
@@ -229,7 +228,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbar_to_delete">
+              <object class="GtkToggleToolButton" id="toolbar_to_delete">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Select to show the 'To delete' view...</property>
@@ -333,6 +332,7 @@
             <child>
               <object class="GtkToolButton" id="toolbar_delete_all_button">
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Click this button to delete all watched videos...</property>
                 <property name="label" translatable="yes">Delete all</property>

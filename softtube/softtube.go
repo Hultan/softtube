@@ -15,6 +15,9 @@ type SoftTube struct {
 	Database *core.Database
 
 	Toolbar   Toolbar
+	StatusBar StatusBar
+	MenuBar   MenuBar
+	SearchBar SearchBar
 	VideoList VideoList
 }
 
@@ -52,7 +55,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 		gtk.MainQuit()
 	})
 
-	// Load toolbar
+	// Load tool bar
 	s.Toolbar = Toolbar{Parent: &s}
 	err = s.Toolbar.Load(builder)
 	if err != nil {
@@ -60,6 +63,32 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 		panic(err)
 	}
 	s.Toolbar.SetupEvents()
+
+	// Load status bar
+	s.StatusBar = StatusBar{Parent: &s}
+	err = s.StatusBar.Load(builder)
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+
+	// Load menu bar
+	s.MenuBar = MenuBar{Parent: &s}
+	err = s.MenuBar.Load(builder)
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+	s.MenuBar.SetupEvents()
+
+	// Load search bar
+	s.SearchBar = SearchBar{Parent: &s}
+	err = s.SearchBar.Load(builder)
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+	s.SearchBar.SetupEvents()
 
 	// Load video list
 	s.VideoList = VideoList{Parent: &s}
@@ -70,7 +99,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	}
 	s.VideoList.SetupColumns()
 	s.VideoList.SetupEvents()
-	s.VideoList.Refresh()
+	s.VideoList.Refresh("")
 
 	// Show the Window and all of its components.
 	win.ShowAll()

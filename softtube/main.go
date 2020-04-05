@@ -73,21 +73,3 @@ func startApplication(db *core.Database) {
 		panic(err)
 	}
 }
-
-// func playVideo() {
-// 	command := "smplayer smb://192.168.1.3/softtube/test.mkv"
-// 	cmd := exec.Command("/bin/bash", "-c", command)
-// 	_, err := cmd.CombinedOutput()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
-
-// func downloadVideo() {
-// 	command := "nano smb://192.168.1.3/softtube/download/test.download"
-// 	cmd := exec.Command("/bin/bash", "-c", command)
-// 	_, err := cmd.CombinedOutput()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }

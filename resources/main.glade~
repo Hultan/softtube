@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.22.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkAboutDialog" id="about_window">
@@ -11,7 +11,7 @@
     <property name="website_label" translatable="yes">SoftTeam:s homepage</property>
     <property name="logo_icon_name">video-display</property>
     <property name="license_type">gpl-3-0</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -40,7 +40,7 @@
     <property name="can_focus">False</property>
     <property name="default_width">1280</property>
     <property name="default_height">1024</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child>
@@ -63,12 +63,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_file_quit">
-                        <property name="label">gtk-quit</property>
+                      <object class="GtkMenuItem" id="menu_file_quit">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">gtk-quit</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                       </object>
                     </child>
                   </object>
@@ -179,12 +178,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="menu_help_about">
-                        <property name="label">gtk-about</property>
+                      <object class="GtkMenuItem" id="menu_help_about">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">About</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
                       </object>
                     </child>
                   </object>
@@ -203,12 +201,13 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkToolButton" id="toolbar_subscriptions">
+              <object class="GtkToggleToolButton" id="toolbar_subscriptions">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Select to show the 'Subscription' view...</property>
                 <property name="label" translatable="yes">Subscriptions</property>
                 <property name="use_underline">True</property>
+                <property name="active">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -216,7 +215,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbar_to_watch">
+              <object class="GtkToggleToolButton" id="toolbar_to_watch">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Select to show the 'To watch' view...</property>
@@ -229,7 +228,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="toolbar_to_delete">
+              <object class="GtkToggleToolButton" id="toolbar_to_delete">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Select to show the 'To delete' view...</property>
@@ -616,7 +615,7 @@
     <property name="default_width">320</property>
     <property name="default_height">260</property>
     <property name="type_hint">dialog</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -859,7 +858,7 @@
     <property name="height_request">480</property>
     <property name="can_focus">False</property>
     <property name="type_hint">dialog</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">

@@ -9,9 +9,9 @@ import (
 // Toolbar : The toobar for SoftTube application
 type Toolbar struct {
 	Parent                 *SoftTube
-	ToolbarSubscriptions   *gtk.ToolButton
-	ToolbarToWatch         *gtk.ToolButton
-	ToolbarToDelete        *gtk.ToolButton
+	ToolbarSubscriptions   *gtk.ToggleToolButton
+	ToolbarToWatch         *gtk.ToggleToolButton
+	ToolbarToDelete        *gtk.ToggleToolButton
 	ToolbarScrollToStart   *gtk.ToolButton
 	ToolbarScrollToEnd     *gtk.ToolButton
 	ToolbarKeepScrollToEnd *gtk.ToggleToolButton
@@ -23,25 +23,25 @@ type Toolbar struct {
 
 // Load : Loads the toolbar
 func (t *Toolbar) Load(builder *gtk.Builder) error {
-	tool, err := getToolButton(builder, "toolbar_subscriptions")
+	toggle, err := getToggleToolButton(builder, "toolbar_subscriptions")
 	if err != nil {
 		return err
 	}
-	t.ToolbarSubscriptions = tool
+	t.ToolbarSubscriptions = toggle
 
-	tool, err = getToolButton(builder, "toolbar_to_watch")
+	toggle, err = getToggleToolButton(builder, "toolbar_to_watch")
 	if err != nil {
 		return err
 	}
-	t.ToolbarToWatch = tool
+	t.ToolbarToWatch = toggle
 
-	tool, err = getToolButton(builder, "toolbar_to_delete")
+	toggle, err = getToggleToolButton(builder, "toolbar_to_delete")
 	if err != nil {
 		return err
 	}
-	t.ToolbarToDelete = tool
+	t.ToolbarToDelete = toggle
 
-	tool, err = getToolButton(builder, "toolbar_scroll_to_start")
+	tool, err := getToolButton(builder, "toolbar_scroll_to_start")
 	if err != nil {
 		return err
 	}
@@ -93,23 +93,57 @@ func (t *Toolbar) SetupEvents() {
 	})
 	t.ToolbarRefresh.Connect("clicked", func() {
 		s := t.Parent
-		s.VideoList.Refresh()
+		s.VideoList.Refresh("")
 	})
 	t.ToolbarDeleteAll.Connect("clicked", func() {
 		s := t.Parent
 		s.VideoList.DeleteWatchedVideos()
 	})
 	t.ToolbarSubscriptions.Connect("clicked", func() {
-		s := t.Parent
-		s.VideoList.SetFilterMode(constFilterModeSubscriptions)
+		if t.ToolbarSubscriptions.GetActive() {
+			s := t.Parent
+			t.ToolbarDeleteAll.SetSensitive(false)
+			t.ToolbarToWatch.SetActive(false)
+			t.ToolbarToDelete.SetActive(false)
+			s.VideoList.SetFilterMode(constFilterModeSubscriptions)
+		}
 	})
 	t.ToolbarToWatch.Connect("clicked", func() {
-		s := t.Parent
-		s.VideoList.SetFilterMode(constFilterModeToWatch)
+		if t.ToolbarToWatch.GetActive() {
+			s := t.Parent
+			t.ToolbarDeleteAll.SetSensitive(false)
+			t.ToolbarSubscriptions.SetActive(false)
+			t.ToolbarToDelete.SetActive(false)
+			s.VideoList.SetFilterMode(constFilterModeToWatch)
+		}
 	})
 	t.ToolbarToDelete.Connect("clicked", func() {
+		if t.ToolbarToDelete.GetActive() {
+			s := t.Parent
+			t.ToolbarDeleteAll.SetSensitive(true)
+			t.ToolbarSubscriptions.SetActive(false)
+			t.ToolbarToWatch.SetActive(false)
+			s.VideoList.SetFilterMode(constFilterModeToDelete)
+		}
+	})
+	t.ToolbarScrollToStart.Connect("clicked", func() {
 		s := t.Parent
-		s.VideoList.SetFilterMode(constFilterModeToDelete)
+		s.VideoList.ScrollToStart()
+	})
+	t.ToolbarScrollToEnd.Connect("clicked", func() {
+		s := t.Parent
+		s.VideoList.ScrollToEnd()
+	})
+	t.ToolbarKeepScrollToEnd.Connect("clicked", func() {
+		if t.ToolbarKeepScrollToEnd.GetActive() {
+			s := t.Parent
+			s.VideoList.KeepScrollToEnd = true
+			s.VideoList.ScrollToEnd()
+		} else {
+			s := t.Parent
+			s.VideoList.KeepScrollToEnd = false
+			s.VideoList.ScrollToStart()
+		}
 	})
 }
 
