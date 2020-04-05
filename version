@@ -1,0 +1,6 @@
+./build
+
+#unalias cp
+yes | cp -r resources/* output/resources
+yes | cp -r output/* /softtube/client
+#alias cp='cp -i'
