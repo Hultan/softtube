@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -23,61 +21,63 @@ type Toolbar struct {
 
 // Load : Loads the toolbar
 func (t *Toolbar) Load(builder *gtk.Builder) error {
-	toggle, err := getToggleToolButton(builder, "toolbar_subscriptions")
+	helper := new(GtkHelper)
+
+	toggle, err := helper.GetToggleToolButton(builder, "toolbar_subscriptions")
 	if err != nil {
 		return err
 	}
 	t.ToolbarSubscriptions = toggle
 
-	toggle, err = getToggleToolButton(builder, "toolbar_to_watch")
+	toggle, err = helper.GetToggleToolButton(builder, "toolbar_to_watch")
 	if err != nil {
 		return err
 	}
 	t.ToolbarToWatch = toggle
 
-	toggle, err = getToggleToolButton(builder, "toolbar_to_delete")
+	toggle, err = helper.GetToggleToolButton(builder, "toolbar_to_delete")
 	if err != nil {
 		return err
 	}
 	t.ToolbarToDelete = toggle
 
-	tool, err := getToolButton(builder, "toolbar_scroll_to_start")
+	tool, err := helper.GetToolButton(builder, "toolbar_scroll_to_start")
 	if err != nil {
 		return err
 	}
 	t.ToolbarScrollToStart = tool
 
-	tool, err = getToolButton(builder, "toolbar_scroll_to_end")
+	tool, err = helper.GetToolButton(builder, "toolbar_scroll_to_end")
 	if err != nil {
 		return err
 	}
 	t.ToolbarScrollToEnd = tool
 
-	toggleTool, err := getToggleToolButton(builder, "toolbar_keep_scroll_to_end")
+	toggleTool, err := helper.GetToggleToolButton(builder, "toolbar_keep_scroll_to_end")
 	if err != nil {
 		return err
 	}
 	t.ToolbarKeepScrollToEnd = toggleTool
 
-	tool, err = getToolButton(builder, "toolbar_refresh_button")
+	tool, err = helper.GetToolButton(builder, "toolbar_refresh_button")
 	if err != nil {
 		return err
 	}
 	t.ToolbarRefresh = tool
 
-	tool, err = getToolButton(builder, "toolbar_delete_button")
+	tool, err = helper.GetToolButton(builder, "toolbar_delete_button")
 	if err != nil {
 		return err
 	}
 	t.ToolbarDelete = tool
 
-	tool, err = getToolButton(builder, "toolbar_delete_all_button")
+	tool, err = helper.GetToolButton(builder, "toolbar_delete_all_button")
 	if err != nil {
 		return err
 	}
 	t.ToolbarDeleteAll = tool
 
-	tool, err = getToolButton(builder, "toolbar_quit_button")
+	tool, err = helper.GetToolButton(builder, "toolbar_quit_button")
 	if err != nil {
 		return err
 	}
@@ -145,30 +145,4 @@ func (t *Toolbar) SetupEvents() {
 			s.VideoList.ScrollToStart()
 		}
 	})
-}
-
-func getToolButton(builder *gtk.Builder, name string) (*gtk.ToolButton, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if tool, ok := obj.(*gtk.ToolButton); ok {
-		return tool, nil
-	}
-
-	return nil, errors.New("not a gtk tool button")
-}
-
-func getToggleToolButton(builder *gtk.Builder, name string) (*gtk.ToggleToolButton, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if tool, ok := obj.(*gtk.ToggleToolButton); ok {
-		return tool, nil
-	}
-
-	return nil, errors.New("not a gtk toggle tool button")
 }

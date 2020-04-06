@@ -27,11 +27,10 @@ var videos []core.Video
 var filterMode int = 0
 var listStore *gtk.ListStore
 var filter *gtk.TreeModelFilter
-var helper *TreeviewHelper
 
 // Load : Loads the toolbar from the glade file
 func (v *VideoList) Load(builder *gtk.Builder) error {
-	helper = new(TreeviewHelper)
+	helper := new(GtkHelper)
 
 	// Get the tree view
 	treeview, err := helper.GetTreeView(builder, "video_treeview")
@@ -58,6 +57,7 @@ func (v *VideoList) SetupEvents() {
 
 // SetupColumns : Sets up the listview columns
 func (v VideoList) SetupColumns() {
+	helper := new(TreeviewHelper)
 	v.Treeview.AppendColumn(helper.CreateImageColumn("Image"))
 	v.Treeview.AppendColumn(helper.CreateTextColumn("Channel name", liststoreColumnChannelName, 200, 300))
 	v.Treeview.AppendColumn(helper.CreateTextColumn("Date", liststoreColumnDate, 90, 300))
@@ -97,7 +97,7 @@ func (v *VideoList) DeleteWatchedVideos() {
 		video := videos[i]
 		if video.Status == constStatusWatched {
 			// Delete the video from disk
-			deleteVideo(video.ID)
+			deleteVideo(&video)
 		}
 	}
 
@@ -185,8 +185,8 @@ func filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData interfa
 	return false
 }
 
-func deleteVideo(videoID string) {
-	path := getVideoPath(videoID)
+func deleteVideo(video *core.Video) {
+	path := getVideoPath(video.ID)
 	if path != "" {
 		command := fmt.Sprintf("rm %s", path)
 		cmd := exec.Command("/bin/bash", "-c", command)
@@ -195,13 +195,20 @@ func deleteVideo(videoID string) {
 		if err != nil {
 			panic(err)
 		}
-	}
 
-	// Set video status as deleted
-	err := db.Videos.UpdateStatus(videoID, constStatusDeleted)
-	if err != nil {
-		logger.Log("Failed to set video status to deleted!")
-		logger.LogError(err)
+		// Log that the video has been deleted
+		err = db.Log.Insert(constLogDeleteVideo, video.Title)
+		if err != nil {
+			logger.Log("Failed to log video as watched!")
+			logger.LogError(err)
+		}
+
+		// Set video status as deleted
+		err = db.Videos.UpdateStatus(video.ID, constStatusDeleted)
+		if err != nil {
+			logger.Log("Failed to set video status to deleted!")
+			logger.LogError(err)
+		}
 	}
 }
 
@@ -304,12 +311,12 @@ func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeVi
 	}
 
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
-		playVideo(video.ID)
+		playVideo(video)
 		// Mark the selected video with watched color
 		setRowColor(treeView, constColorWatched)
 		v.Refresh("")
 	} else if video.Status == constStatusNotDownloaded {
-		downloadVideo(video.ID)
+		downloadVideo(video)
 		// Mark the selected video with downloading color
 		setRowColor(treeView, constColorDownloading)
 	}
@@ -323,10 +330,10 @@ func setRowColor(treeView *gtk.TreeView, color string) {
 	_ = listStore.SetValue(iter, liststoreColumnBackground, color)
 }
 
-func playVideo(videoID string) {
-	path := getVideoPath(videoID)
+func playVideo(video *core.Video) {
+	path := getVideoPath(video.ID)
 	if path == "" {
-		msg := fmt.Sprintf("Failed to find video : %s", videoID)
+		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
 		logger.Log(msg)
 		return
 	}
@@ -338,8 +345,14 @@ func playVideo(videoID string) {
 		panic(err)
 	}
 
+	err = db.Log.Insert(constLogPlayVideo, video.Title)
+	if err != nil {
+		logger.Log("Failed to log video as watched!")
+		logger.LogError(err)
+	}
+
 	// Set video status as watched
-	err = db.Videos.UpdateStatus(videoID, constStatusWatched)
+	err = db.Videos.UpdateStatus(video.ID, constStatusWatched)
 	if err != nil {
 		logger.Log("Failed to set video status to watched!")
 		logger.LogError(err)
@@ -366,17 +379,23 @@ func getVideoPath(videoID string) string {
 }
 
 // Download a youtube video
-func downloadVideo(videoID string) error {
+func downloadVideo(video *core.Video) error {
 	// Set the video to be downloaded
-	err := db.Download.Insert(videoID)
+	err := db.Download.Insert(video.ID)
 	if err != nil {
 		logger.Log("Failed to set video to be downloaded!")
 		logger.LogError(err)
 		return err
 	}
 
+	err = db.Log.Insert(constLogDownloadVideo, video.Title)
+	if err != nil {
+		logger.Log("Failed to log video as watched!")
+		logger.LogError(err)
+	}
+
 	// Set video status as downloading
-	err = db.Videos.UpdateStatus(videoID, constStatusDownloading)
+	err = db.Videos.UpdateStatus(video.ID, constStatusDownloading)
 	if err != nil {
 		logger.Log("Failed to set video status to downloading!")
 		logger.LogError(err)

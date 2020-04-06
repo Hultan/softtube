@@ -34,3 +34,7 @@ const constStatusDownloadFailed = 6 // Not used yet
 const constFilterModeSubscriptions = 0
 const constFilterModeToWatch = 1
 const constFilterModeToDelete = 2
+
+const constLogDownloadVideo = 0
+const constLogPlayVideo = 1
+const constLogDeleteVideo = 2

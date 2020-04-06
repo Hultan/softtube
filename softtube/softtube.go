@@ -1,11 +1,6 @@
 package main
 
 import (
-	"errors"
-	"os"
-	"path"
-	"path/filepath"
-
 	"github.com/gotk3/gotk3/gtk"
 	core "github.com/hultan/softtube/softtube.core"
 )
@@ -30,13 +25,16 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 
 	gtk.Init(nil)
 
-	// Get the GtkBuilder UI definition in the glade file.
-	path, err := getGladePath()
+	helper := new(GtkHelper)
+
+	// Get the path to the glade file
+	path, err := helper.GetGladePath()
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
 	}
 
+	// Create the builder from the glade file
 	builder, err := gtk.BuilderNewFromFile(path)
 	if err != nil {
 		// panic for any errors.
@@ -44,7 +42,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 		panic(err)
 	}
 
-	win, err := getWindow(builder, "main_window")
+	win, err := helper.GetWindow(builder, "main_window")
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -106,35 +104,4 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	gtk.Main()
 
 	return nil
-}
-
-// Gets a gtk.Window from the builder
-func getWindow(builder *gtk.Builder, name string) (*gtk.Window, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		return nil, err
-	}
-	if win, ok := obj.(*gtk.Window); ok {
-		return win, nil
-	}
-
-	return nil, errors.New("not a gtk window")
-}
-
-func getGladePath() (string, error) {
-	// Get directory from where the program is launched
-	basePath := filepath.Dir(os.Args[0])
-
-	// Check main path, works most times
-	gladePath := path.Join(basePath, "resources/main.glade")
-	if _, err := os.Stat(gladePath); err == nil {
-		return gladePath, nil
-	}
-	// Check secondary path, for debug mode (when run from VS Code)
-	gladePath = path.Join(basePath, "../resources/main.glade")
-	if _, err := os.Stat(gladePath); err == nil {
-		return gladePath, nil
-	}
-
-	return "", errors.New("Glade file is missing (%s)")
 }

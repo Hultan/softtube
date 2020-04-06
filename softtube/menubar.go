@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -15,13 +13,15 @@ type MenuBar struct {
 
 // Load : Loads the toolbar
 func (m *MenuBar) Load(builder *gtk.Builder) error {
-	menuItem, err := getMenuItem(builder, "menu_file_quit")
+	helper := new(GtkHelper)
+
+	menuItem, err := helper.GetMenuItem(builder, "menu_file_quit")
 	if err != nil {
 		return err
 	}
 	m.MenuFileQuit = menuItem
 
-	menuItem, err = getMenuItem(builder, "menu_help_about")
+	menuItem, err = helper.GetMenuItem(builder, "menu_help_about")
 	if err != nil {
 		return err
 	}
@@ -37,17 +37,4 @@ func (m *MenuBar) SetupEvents() {
 	})
 	m.MenuHelpAbout.Connect("activate", func() {
 	})
-}
-
-func getMenuItem(builder *gtk.Builder, name string) (*gtk.MenuItem, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if menuItem, ok := obj.(*gtk.MenuItem); ok {
-		return menuItem, nil
-	}
-
-	return nil, errors.New("not a gtk menu item")
 }

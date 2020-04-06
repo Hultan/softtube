@@ -20,6 +20,7 @@ type Database struct {
 	Videos           VideosTable
 	Version          VersionTable
 	Download         DownloadTable
+	Log              LogTable
 }
 
 // New : Creates a new database object
@@ -41,6 +42,7 @@ func (d *Database) OpenDatabase() error {
 	d.Videos = VideosTable{Connection: conn}
 	d.Version = VersionTable{Connection: conn}
 	d.Download = DownloadTable{Connection: conn}
+	d.Log = LogTable{Connection: conn}
 
 	return nil
 }

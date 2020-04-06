@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 
 	"github.com/gotk3/gotk3/gtk"
@@ -9,34 +8,6 @@ import (
 
 // TreeviewHelper : A helper class for a gtk treeview
 type TreeviewHelper struct {
-}
-
-// GetTreeView : Gets a treeview from the builder
-func (t *TreeviewHelper) GetTreeView(builder *gtk.Builder, name string) (*gtk.TreeView, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if tool, ok := obj.(*gtk.TreeView); ok {
-		return tool, nil
-	}
-
-	return nil, errors.New("not a gtk tree view")
-}
-
-// GetScrolledWindow : Gets a ScrolledWindow from the builder
-func (t *TreeviewHelper) GetScrolledWindow(builder *gtk.Builder, name string) (*gtk.ScrolledWindow, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if tool, ok := obj.(*gtk.ScrolledWindow); ok {
-		return tool, nil
-	}
-
-	return nil, errors.New("not a gtk scrolled window")
 }
 
 // CreateTextColumn : Add a column to the tree view (during the initialization of the tree view)
