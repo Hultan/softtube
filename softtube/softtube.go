@@ -2,10 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
+	"path"
+	"path/filepath"
 
-	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	core "github.com/hultan/softtube/softtube.core"
 )
@@ -108,10 +108,10 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	return nil
 }
 
+// Gets a gtk.Window from the builder
 func getWindow(builder *gtk.Builder, name string) (*gtk.Window, error) {
 	obj, err := builder.GetObject(name)
 	if err != nil {
-		// object not found
 		return nil, err
 	}
 	if win, ok := obj.(*gtk.Window); ok {
@@ -121,27 +121,20 @@ func getWindow(builder *gtk.Builder, name string) (*gtk.Window, error) {
 	return nil, errors.New("not a gtk window")
 }
 
-func isWindow(obj glib.IObject) (*gtk.Window, error) {
-	// Make type assertion (as per gtk.go).
-	if win, ok := obj.(*gtk.Window); ok {
-		return win, nil
-	}
-	return nil, errors.New("not a *gtk.Window")
-}
-
 func getGladePath() (string, error) {
-	path := "resources/main.glade"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		path = "../resources/main.glade"
-		if _, err := os.Stat(path); os.IsNotExist(err) {
-			path = "main.glade"
-			if _, err := os.Stat(path); os.IsNotExist(err) {
-				errorMessage := fmt.Sprintf("Glade file is missing (%s)", path)
-				return "", errors.New(errorMessage)
-			}
-			return path, nil
-		}
-		return path, nil
+	// Get directory from where the program is launched
+	basePath := filepath.Dir(os.Args[0])
+
+	// Check main path, works most times
+	gladePath := path.Join(basePath, "resources/main.glade")
+	if _, err := os.Stat(gladePath); err == nil {
+		return gladePath, nil
 	}
-	return path, nil
+	// Check secondary path, for debug mode (when run from VS Code)
+	gladePath = path.Join(basePath, "../resources/main.glade")
+	if _, err := os.Stat(gladePath); err == nil {
+		return gladePath, nil
+	}
+
+	return "", errors.New("Glade file is missing (%s)")
 }

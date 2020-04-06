@@ -2,9 +2,7 @@ package main
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -20,7 +18,7 @@ import (
 // VideoList : The SoftTube video list
 type VideoList struct {
 	Parent          *SoftTube
-	List            *gtk.TreeView
+	Treeview        *gtk.TreeView
 	ScrolledWindow  *gtk.ScrolledWindow
 	KeepScrollToEnd bool
 }
@@ -29,7 +27,49 @@ var videos []core.Video
 var filterMode int = 0
 var listStore *gtk.ListStore
 var filter *gtk.TreeModelFilter
-var videoList *VideoList
+var helper *TreeviewHelper
+
+// Load : Loads the toolbar from the glade file
+func (v *VideoList) Load(builder *gtk.Builder) error {
+	helper = new(TreeviewHelper)
+
+	// Get the tree view
+	treeview, err := helper.GetTreeView(builder, "video_treeview")
+	if err != nil {
+		return err
+	}
+	v.Treeview = treeview
+
+	// Get the scrolled window surrounding the treeview
+	scroll, err := helper.GetScrolledWindow(builder, "scrolled_window")
+	if err != nil {
+		return err
+	}
+	v.ScrolledWindow = scroll
+
+	return nil
+}
+
+// SetupEvents : Setup the list events
+func (v *VideoList) SetupEvents() {
+	// Send in the videolist as a user data parameter to the event
+	v.Treeview.Connect("row_activated", rowActivated, v)
+}
+
+// SetupColumns : Sets up the listview columns
+func (v VideoList) SetupColumns() {
+	v.Treeview.AppendColumn(helper.CreateImageColumn("Image"))
+	v.Treeview.AppendColumn(helper.CreateTextColumn("Channel name", liststoreColumnChannelName, 200, 300))
+	v.Treeview.AppendColumn(helper.CreateTextColumn("Date", liststoreColumnDate, 90, 300))
+	v.Treeview.AppendColumn(helper.CreateTextColumn("Title", liststoreColumnTitle, 0, 600))
+	v.Treeview.AppendColumn(helper.CreateTextColumn("Duration", liststoreColumnDuration, 90, 300))
+	v.Treeview.AppendColumn(helper.CreateProgressColumn("Progress"))
+}
+
+// Search : Searches for a video
+func (v *VideoList) Search(text string) {
+	v.Refresh(text)
+}
 
 // ScrollToStart : Scrolls to the start of the list
 func (v *VideoList) ScrollToStart() {
@@ -49,43 +89,6 @@ func (v *VideoList) ScrollToEnd() {
 func (v *VideoList) SetFilterMode(mode int) {
 	filterMode = mode
 	v.Refresh("")
-}
-
-// Load : Loads the toolbar from the glade file
-func (v *VideoList) Load(builder *gtk.Builder) error {
-	list, err := getTreeView(builder, "video_treeview")
-	if err != nil {
-		return err
-	}
-	v.List = list
-
-	scroll, err := getScrolledWindow(builder, "scrolled_window")
-	if err != nil {
-		return err
-	}
-	v.ScrolledWindow = scroll
-
-	// Is this bad?
-	videoList = v
-
-	return nil
-}
-
-// SetupEvents : Setup the list events
-func (v *VideoList) SetupEvents() {
-
-	v.List.Connect("row_activated", rowActivated, v)
-
-}
-
-// SetupColumns : Sets up the listview columns
-func (v VideoList) SetupColumns() {
-	v.List.AppendColumn(createImageColumn("Image"))
-	v.List.AppendColumn(createTextColumn("Channel name", liststoreColumnChannelName, 200, 300))
-	v.List.AppendColumn(createTextColumn("Date", liststoreColumnDate, 90, 300))
-	v.List.AppendColumn(createTextColumn("Title", liststoreColumnTitle, 0, 600))
-	v.List.AppendColumn(createTextColumn("Duration", liststoreColumnDuration, 90, 300))
-	v.List.AppendColumn(createProgressColumn("Progress"))
 }
 
 // DeleteWatchedVideos : Deletes all watched videos from disk
@@ -116,7 +119,7 @@ func (v *VideoList) Refresh(text string) {
 		panic(err)
 	}
 
-	v.List.SetModel(nil)
+	v.Treeview.SetModel(nil)
 	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_INT64, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
 		logger.Log("Failed to create liststore!")
@@ -134,7 +137,7 @@ func (v *VideoList) Refresh(text string) {
 	if err != nil {
 		logger.LogError(err)
 	}
-	v.List.SetModel(filter)
+	v.Treeview.SetModel(filter)
 
 	count := filter.IterNChildren(nil)
 	v.Parent.StatusBar.UpdateVideoCount(count)
@@ -150,11 +153,6 @@ func (v *VideoList) Refresh(text string) {
 			}
 		}()
 	}
-}
-
-// Search : Searches for a video
-func (v *VideoList) Search(text string) {
-	v.Refresh(text)
 }
 
 //
@@ -299,96 +297,6 @@ func getThumbnail(videoID string) *gdk.Pixbuf {
 	return thumbnail
 }
 
-// Add a column to the tree view (during the initialization of the tree view)
-func createTextColumn(title string, id int, width int, weight int) *gtk.TreeViewColumn {
-	cellRenderer, err := gtk.CellRendererTextNew()
-	if err != nil {
-		log.Fatal("Unable to create text cell renderer:", err)
-	}
-	cellRenderer.SetProperty("weight", weight)
-	//cellRenderer.ellipsize = Pango.EllipsizeMode.END
-
-	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", id)
-	if err != nil {
-		log.Fatal("Unable to create cell column:", err)
-	}
-	column.AddAttribute(cellRenderer, "background", liststoreColumnBackground)
-	column.AddAttribute(cellRenderer, "foreground", liststoreColumnForeground)
-	if width == 0 {
-		column.SetExpand(true)
-	} else {
-		column.SetFixedWidth(width)
-	}
-
-	return column
-}
-
-// Add a column to the tree view (during the initialization of the tree view)
-func createImageColumn(title string) *gtk.TreeViewColumn {
-	cellRenderer, err := gtk.CellRendererPixbufNew()
-	if err != nil {
-		log.Fatal("Unable to create pixbuf cell renderer:", err)
-	}
-	//cellRenderer.SetProperty("weight", weight)
-	//cellRenderer.SetVisible(true)
-
-	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "pixbuf", liststoreColumnImage)
-	if err != nil {
-		log.Fatal("Unable to create cell column:", err)
-	}
-	column.SetFixedWidth(160)
-	column.SetVisible(true)
-	column.SetExpand(false)
-
-	return column
-}
-
-// Add a column to the tree view (during the initialization of the tree view)
-func createProgressColumn(title string) *gtk.TreeViewColumn {
-	cellRenderer, err := gtk.CellRendererProgressNew()
-	if err != nil {
-		log.Fatal("Unable to create progress cell renderer:", err)
-	}
-	//cellRenderer.SetVisible(true)
-
-	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", liststoreColumnProgressText)
-	if err != nil {
-		log.Fatal("Unable to create cell column:", err)
-	}
-	column.SetFixedWidth(90)
-	column.SetVisible(true)
-	column.SetExpand(false)
-	column.AddAttribute(cellRenderer, "value", liststoreColumnProgress)
-
-	return column
-}
-
-func getTreeView(builder *gtk.Builder, name string) (*gtk.TreeView, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if tool, ok := obj.(*gtk.TreeView); ok {
-		return tool, nil
-	}
-
-	return nil, errors.New("not a gtk tree view")
-}
-
-func getScrolledWindow(builder *gtk.Builder, name string) (*gtk.ScrolledWindow, error) {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		// object not found
-		return nil, err
-	}
-	if tool, ok := obj.(*gtk.ScrolledWindow); ok {
-		return tool, nil
-	}
-
-	return nil, errors.New("not a gtk scrolled window")
-}
-
 func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeViewColumn, v *VideoList) {
 	video := getSelectedVideo(treeView)
 	if video == nil {
@@ -399,7 +307,7 @@ func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeVi
 		playVideo(video.ID)
 		// Mark the selected video with watched color
 		setRowColor(treeView, constColorWatched)
-		videoList.Refresh("")
+		v.Refresh("")
 	} else if video.Status == constStatusNotDownloaded {
 		downloadVideo(video.ID)
 		// Mark the selected video with downloading color

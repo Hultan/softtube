@@ -2,5 +2,5 @@
 
 #unalias cp
 yes | cp -r resources/* output/resources
-yes | cp -r output/* /softtube/client
+yes | cp -r output/* /softtube/client/files
 #alias cp='cp -i'
