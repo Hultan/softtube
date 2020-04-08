@@ -35,6 +35,9 @@ const constFilterModeSubscriptions = 0
 const constFilterModeToWatch = 1
 const constFilterModeToDelete = 2
 
-const constLogDownloadVideo = 0
-const constLogPlayVideo = 1
-const constLogDeleteVideo = 2
+const constLogDownload = 0
+const constLogPlay = 1
+const constLogDelete = 2
+const constLogSetWatched = 3
+const constLogSetUnwatched = 4
+const constLogError = 5

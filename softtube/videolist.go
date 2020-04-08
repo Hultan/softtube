@@ -97,7 +97,7 @@ func (v *VideoList) DeleteWatchedVideos() {
 		video := videos[i]
 		if video.Status == constStatusWatched {
 			// Delete the video from disk
-			deleteVideo(&video)
+			v.deleteVideo(&video)
 		}
 	}
 
@@ -185,7 +185,7 @@ func filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData interfa
 	return false
 }
 
-func deleteVideo(video *core.Video) {
+func (v *VideoList) deleteVideo(video *core.Video) {
 	path := getVideoPath(video.ID)
 	if path != "" {
 		command := fmt.Sprintf("rm %s", path)
@@ -196,12 +196,16 @@ func deleteVideo(video *core.Video) {
 			panic(err)
 		}
 
-		// Log that the video has been deleted
-		err = db.Log.Insert(constLogDeleteVideo, video.Title)
+		// Log that the video has been deleted in the database
+		err = db.Log.Insert(constLogDelete, video.Title)
 		if err != nil {
 			logger.Log("Failed to log video as watched!")
 			logger.LogError(err)
 		}
+
+		// Log that the video has been deleted in the GUI
+		v.Parent.Log.InsertLog(constLogDelete, video.Title)
+		//v.Parent.Log.FillLog()
 
 		// Set video status as deleted
 		err = db.Videos.UpdateStatus(video.ID, constStatusDeleted)
@@ -311,12 +315,12 @@ func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeVi
 	}
 
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
-		playVideo(video)
+		v.playVideo(video)
 		// Mark the selected video with watched color
 		setRowColor(treeView, constColorWatched)
 		v.Refresh("")
 	} else if video.Status == constStatusNotDownloaded {
-		downloadVideo(video)
+		v.downloadVideo(video)
 		// Mark the selected video with downloading color
 		setRowColor(treeView, constColorDownloading)
 	}
@@ -330,7 +334,7 @@ func setRowColor(treeView *gtk.TreeView, color string) {
 	_ = listStore.SetValue(iter, liststoreColumnBackground, color)
 }
 
-func playVideo(video *core.Video) {
+func (v *VideoList) playVideo(video *core.Video) {
 	path := getVideoPath(video.ID)
 	if path == "" {
 		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
@@ -345,11 +349,16 @@ func playVideo(video *core.Video) {
 		panic(err)
 	}
 
-	err = db.Log.Insert(constLogPlayVideo, video.Title)
+	// Log that the video has been deleted in the database
+	err = db.Log.Insert(constLogPlay, video.Title)
 	if err != nil {
 		logger.Log("Failed to log video as watched!")
 		logger.LogError(err)
 	}
+
+	// Log that the video has been deleted in the GUI
+	v.Parent.Log.InsertLog(constLogPlay, video.Title)
+	//v.Parent.Log.FillLog()
 
 	// Set video status as watched
 	err = db.Videos.UpdateStatus(video.ID, constStatusWatched)
@@ -379,7 +388,7 @@ func getVideoPath(videoID string) string {
 }
 
 // Download a youtube video
-func downloadVideo(video *core.Video) error {
+func (v *VideoList) downloadVideo(video *core.Video) error {
 	// Set the video to be downloaded
 	err := db.Download.Insert(video.ID)
 	if err != nil {
@@ -388,11 +397,16 @@ func downloadVideo(video *core.Video) error {
 		return err
 	}
 
-	err = db.Log.Insert(constLogDownloadVideo, video.Title)
+	// Log that the video has been deleted in the database
+	err = db.Log.Insert(constLogDownload, video.Title)
 	if err != nil {
 		logger.Log("Failed to log video as watched!")
 		logger.LogError(err)
 	}
+
+	// Log that the video has been deleted in the GUI
+	v.Parent.Log.InsertLog(constLogDownload, video.Title)
+	//v.Parent.Log.FillLog()
 
 	// Set video status as downloading
 	err = db.Videos.UpdateStatus(video.ID, constStatusDownloading)

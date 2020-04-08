@@ -162,7 +162,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 	search := fmt.Sprintf("%%%s%%", text)
 	rows, err := v.Connection.Query(sqlStatementSearchVideos, search, search)
 	if err != nil {
-		return []Video{}, err
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -172,7 +172,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 		video := new(Video)
 		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName)
 		if err != nil {
-			return []Video{}, err
+			return nil, err
 		}
 		videos = append(videos, *video)
 	}

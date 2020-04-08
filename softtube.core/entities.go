@@ -19,9 +19,9 @@ type Version struct {
 
 // Log : Represents a SoftTube log entry
 type Log struct {
-	LogID      int
-	LogMessage string
-	LogType    int
+	ID      int
+	Message string
+	Type    int
 }
 
 // Subscription : Represents a YouTube subscription in SoftTube

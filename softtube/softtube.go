@@ -14,6 +14,7 @@ type SoftTube struct {
 	MenuBar   MenuBar
 	SearchBar SearchBar
 	VideoList VideoList
+	Log       Log
 }
 
 // StartApplication : Starts the SoftTube application
@@ -52,6 +53,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
+	win.SetIconName("video-display")
 
 	// Load tool bar
 	s.Toolbar = Toolbar{Parent: &s}
@@ -98,6 +100,11 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	s.VideoList.SetupColumns()
 	s.VideoList.SetupEvents()
 	s.VideoList.Refresh("")
+
+	// Load log
+	s.Log = Log{Parent: &s, TreeView: s.VideoList.Treeview}
+	s.Log.Load(builder)
+	s.Log.FillLog()
 
 	// Show the Window and all of its components.
 	win.ShowAll()

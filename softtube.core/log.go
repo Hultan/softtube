@@ -12,7 +12,7 @@ type LogTable struct {
 
 // sql : Get version
 const sqlStatementInsertLog = `INSERT INTO Log (type, message) VALUES (?, ?);`
-const sqlStatementGetLogs = `SELECT type, message FROM Log                 
+const sqlStatementGetLogs = `SELECT id, type, message FROM Log                 
 ORDER BY id desc
 LIMIT 50`
 
@@ -41,24 +41,22 @@ func (l *LogTable) GetLatest() ([]Log, error) {
 	}
 
 	// Get rows from database
-	rows, err := l.Connection.Query(sqlStatementGetVersion)
+	rows, err := l.Connection.Query(sqlStatementGetLogs)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	var logs []Log
-	count := 0
 
 	// Get logs from rows
 	for rows.Next() {
-		log := logs[count]
-		err = rows.Scan(&log.LogID, &log.LogMessage, &log.LogType)
+		log := new(Log)
+		err = rows.Scan(&log.ID, &log.Type, &log.Message)
 		if err != nil {
 			return nil, err
 		}
-		count++
-		logs = append(logs, log)
+		logs = append(logs, *log)
 	}
 
 	// Return the logs
