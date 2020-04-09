@@ -3,10 +3,9 @@ package main
 import (
 	"errors"
 	"os"
-	"path"
-	"path/filepath"
 
 	"github.com/gotk3/gotk3/gtk"
+	resources "github.com/hultan/softteam/resources"
 )
 
 // GtkHelper : A helper class for GTK
@@ -15,19 +14,18 @@ type GtkHelper struct {
 
 // GetGladePath : Get the path to the glade external resource file
 func (g *GtkHelper) GetGladePath() (string, error) {
-	// Get directory from where the program is launched
-	basePath := filepath.Dir(os.Args[0])
-
 	// Check main path, works most times
-	gladePath := path.Join(basePath, "resources/main.glade")
+	resources := new(resources.Resources)
+
+	gladePath := resources.GetResourcePath("main.glade")
 	if _, err := os.Stat(gladePath); err == nil {
 		return gladePath, nil
 	}
-	// Check secondary path, for debug mode (when run from VS Code)
-	gladePath = path.Join(basePath, "../resources/main.glade")
-	if _, err := os.Stat(gladePath); err == nil {
-		return gladePath, nil
-	}
+	// // Check secondary path, for debug mode (when run from VS Code)
+	// gladePath = path.Join(getExecutablePath(), "../resources/main.glade")
+	// if _, err := os.Stat(gladePath); err == nil {
+	// 	return gladePath, nil
+	// }
 
 	return "", errors.New("Glade file is missing (%s)")
 }

@@ -73,3 +73,15 @@ func startApplication(db *core.Database) {
 		panic(err)
 	}
 }
+
+// func getExecutablePath() string {
+// 	ex, err := os.Executable()
+// 	if err != nil {
+// 		return ""
+// 	}
+// 	return filepath.Dir(ex)
+// }
+
+// func getResourcePath() string {
+// 	return path.Join(getExecutablePath(), "resources")
+// }

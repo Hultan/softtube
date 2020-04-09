@@ -1,13 +1,10 @@
 package main
 
 import (
-	"os"
-	"path"
-	"path/filepath"
-
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	resources "github.com/hultan/softteam/resources"
 	core "github.com/hultan/softtube/softtube.core"
 )
 
@@ -105,12 +102,11 @@ func (l *Log) setupColumns() {
 }
 
 func (l *Log) loadResources() {
-	resourcePath := path.Join(filepath.Dir(os.Args[0]), "..", "resources")
 	for i := constLogDownload; i <= constLogError; i++ {
 		fileName := l.getImageFileName(i)
 		if fileName != "" {
-
-			pic, err := gdk.PixbufNewFromFile(path.Join(resourcePath, fileName))
+			resources := new(resources.Resources)
+			pic, err := gdk.PixbufNewFromFile(resources.GetResourcePath(fileName))
 			if err != nil {
 				logger.LogError(err)
 			}
