@@ -12,6 +12,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	gtkhelper "github.com/hultan/softteam/gtk"
 	core "github.com/hultan/softtube/softtube.core"
 )
 
@@ -30,7 +31,7 @@ var filter *gtk.TreeModelFilter
 
 // Load : Loads the toolbar from the glade file
 func (v *VideoList) Load(builder *gtk.Builder) error {
-	helper := new(GtkHelper)
+	helper := new(gtkhelper.GtkHelper)
 
 	// Get the tree view
 	treeview, err := helper.GetTreeView(builder, "video_treeview")

@@ -6,6 +6,7 @@ import (
 	"path"
 	"sync"
 
+	"github.com/hultan/softteam/crypt"
 	core "github.com/hultan/softtube/softtube.core"
 )
 
@@ -38,7 +39,7 @@ func main() {
 	defer logger.LogFinished("softtube update")
 
 	conn := config.Connection
-	crypt := core.Crypt{}
+	crypt := crypt.Crypt{}
 	password, err := crypt.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")

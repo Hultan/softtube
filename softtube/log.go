@@ -4,6 +4,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	gtkhelper "github.com/hultan/softteam/gtk"
 	resources "github.com/hultan/softteam/resources"
 	core "github.com/hultan/softtube/softtube.core"
 )
@@ -18,7 +19,7 @@ type Log struct {
 
 // Load : Loads the log
 func (l *Log) Load(builder *gtk.Builder) {
-	helper := new(GtkHelper)
+	helper := new(gtkhelper.GtkHelper)
 	tree, err := helper.GetTreeView(builder, "log_treeview")
 	if err != nil {
 		logger.LogError(err)

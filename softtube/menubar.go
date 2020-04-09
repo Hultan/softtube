@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	gtkhelper "github.com/hultan/softteam/gtk"
 )
 
 // MenuBar : The SoftTube menu bar
@@ -13,7 +14,7 @@ type MenuBar struct {
 
 // Load : Loads the toolbar
 func (m *MenuBar) Load(builder *gtk.Builder) error {
-	helper := new(GtkHelper)
+	helper := new(gtkhelper.GtkHelper)
 
 	menuItem, err := helper.GetMenuItem(builder, "menu_file_quit")
 	if err != nil {

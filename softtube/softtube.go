@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	gtkhelper "github.com/hultan/softteam/gtk"
 	core "github.com/hultan/softtube/softtube.core"
 )
 
@@ -26,7 +27,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 
 	gtk.Init(nil)
 
-	helper := new(GtkHelper)
+	helper := new(gtkhelper.GtkHelper)
 
 	// Get the path to the glade file
 	path, err := helper.GetGladePath()
