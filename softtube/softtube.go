@@ -19,7 +19,7 @@ type SoftTube struct {
 }
 
 // StartApplication : Starts the SoftTube application
-func (s SoftTube) StartApplication(db *core.Database) error {
+func (s *SoftTube) StartApplication(db *core.Database) error {
 	logger.Log("SoftTube client startup")
 	defer logger.Log("SoftTube client shutdown")
 
@@ -57,7 +57,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	win.SetIconName("video-display")
 
 	// Load tool bar
-	s.Toolbar = &Toolbar{Parent: &s}
+	s.Toolbar = &Toolbar{Parent: s}
 	err = s.Toolbar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -66,7 +66,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	s.Toolbar.SetupEvents()
 
 	// Load status bar
-	s.StatusBar = &StatusBar{Parent: &s}
+	s.StatusBar = &StatusBar{Parent: s}
 	err = s.StatusBar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -74,7 +74,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	}
 
 	// Load menu bar
-	s.MenuBar = &MenuBar{Parent: &s}
+	s.MenuBar = &MenuBar{Parent: s}
 	err = s.MenuBar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -83,7 +83,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	s.MenuBar.SetupEvents()
 
 	// Load search bar
-	s.SearchBar = &SearchBar{Parent: &s}
+	s.SearchBar = &SearchBar{Parent: s}
 	err = s.SearchBar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -92,7 +92,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	s.SearchBar.SetupEvents()
 
 	// Load video list
-	s.VideoList = &VideoList{Parent: &s}
+	s.VideoList = &VideoList{Parent: s}
 	err = s.VideoList.Load(builder)
 	if err != nil {
 		logger.LogError(err)
@@ -103,7 +103,7 @@ func (s SoftTube) StartApplication(db *core.Database) error {
 	s.VideoList.Refresh("")
 
 	// Load log
-	s.Log = &Log{Parent: &s, TreeView: s.VideoList.Treeview}
+	s.Log = &Log{Parent: s, TreeView: s.VideoList.Treeview}
 	s.Log.Load(builder)
 	s.Log.FillLog()
 
