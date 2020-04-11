@@ -8,5 +8,3 @@ const constConfigPathTest string = "/.config/softtube/softtube-test.config"
 
 const constHostNameMaxLength = 255
 const constMachineIDMaxLength = 32
-
-const constMaxLogFileSize = 500000

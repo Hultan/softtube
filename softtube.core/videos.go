@@ -26,24 +26,22 @@ const sqlStatementSearchVideos = `SELECT Videos.id, Videos.subscription_id, Vide
 									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
 									ORDER BY Videos.Added DESC`
 
-// TODO : Make a setting of max number of videos
-//const sqlStatementGetLatestVideos = "SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name FROM Videos INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id ORDER BY Videos.Added DESC LIMIT 200;"
 const sqlStatementGetLatest = `SELECT * FROM 
-(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
-FROM Videos 
-INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
-ORDER BY added desc
-LIMIT 200) as Newest
+									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
+									FROM Videos 
+									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
+									ORDER BY added desc
+									LIMIT 200) as Newest
 
-UNION
+									UNION
 
-SELECT * FROM
-	(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
-	FROM Videos 
-	INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
-	WHERE Videos.status NOT IN (0,4)) as Downloaded
+									SELECT * FROM
+										(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
+										FROM Videos 
+										INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
+										WHERE Videos.status NOT IN (0,4)) as Downloaded
 
-ORDER BY added desc`
+									ORDER BY added desc`
 
 // Get : Returns a subscription
 func (v VideosTable) Get(id string) (Video, error) {
@@ -194,7 +192,6 @@ func (v VideosTable) GetVideos() ([]Video, error) {
 	defer rows.Close()
 
 	var videos []Video
-	//const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status FROM Videos WHERE id=?"
 
 	for rows.Next() {
 		video := new(Video)

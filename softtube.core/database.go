@@ -16,16 +16,16 @@ type Database struct {
 	Database         string
 	Username         string
 	Password         string
-	Subscriptions    SubscriptionTable
-	Videos           VideosTable
-	Version          VersionTable
-	Download         DownloadTable
-	Log              LogTable
+	Subscriptions    *SubscriptionTable
+	Videos           *VideosTable
+	Version          *VersionTable
+	Download         *DownloadTable
+	Log              *LogTable
 }
 
 // New : Creates a new database object
-func New(server string, port int, database, username, password string) Database {
-	return Database{Server: server, Port: port, Database: database, Username: username, Password: password}
+func New(server string, port int, database, username, password string) *Database {
+	return &Database{Server: server, Port: port, Database: database, Username: username, Password: password}
 }
 
 // OpenDatabase : Open the database
@@ -38,11 +38,11 @@ func (d *Database) OpenDatabase() error {
 		return err
 	}
 	d.Connection = conn
-	d.Subscriptions = SubscriptionTable{Connection: conn}
-	d.Videos = VideosTable{Connection: conn}
-	d.Version = VersionTable{Connection: conn}
-	d.Download = DownloadTable{Connection: conn}
-	d.Log = LogTable{Connection: conn}
+	d.Subscriptions = &SubscriptionTable{Connection: conn}
+	d.Videos = &VideosTable{Connection: conn}
+	d.Version = &VersionTable{Connection: conn}
+	d.Download = &DownloadTable{Connection: conn}
+	d.Log = &LogTable{Connection: conn}
 
 	return nil
 }

@@ -53,7 +53,7 @@ func (v *VideoList) Load(builder *gtk.Builder) error {
 // SetupEvents : Setup the list events
 func (v *VideoList) SetupEvents() {
 	// Send in the videolist as a user data parameter to the event
-	v.Treeview.Connect("row_activated", rowActivated, v)
+	v.Treeview.Connect("row_activated", v.rowActivated)
 }
 
 // SetupColumns : Sets up the listview columns
@@ -130,11 +130,11 @@ func (v *VideoList) Refresh(text string) {
 
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]
-		addVideo(&video, listStore)
+		v.addVideo(&video, listStore)
 	}
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
-	err = filter.SetVisibleFunc(filterFunc)
+	err = filter.SetVisibleFunc(v.filterFunc)
 	if err != nil {
 		logger.LogError(err)
 	}
@@ -160,7 +160,7 @@ func (v *VideoList) Refresh(text string) {
 // Private functions
 //
 
-func filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData interface{}) bool {
+func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData interface{}) bool {
 	value, err := model.GetValue(iter, liststoreColumnBackground)
 	if err != nil {
 		// TODO : Log error
@@ -187,7 +187,7 @@ func filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData interfa
 }
 
 func (v *VideoList) deleteVideo(video *core.Video) {
-	path := getVideoPath(video.ID)
+	path := v.getVideoPath(video.ID)
 	if path != "" {
 		command := fmt.Sprintf("rm %s", path)
 		cmd := exec.Command("/bin/bash", "-c", command)
@@ -217,19 +217,19 @@ func (v *VideoList) deleteVideo(video *core.Video) {
 	}
 }
 
-func addVideo(video *core.Video, listStore *gtk.ListStore) {
+func (v *VideoList) addVideo(video *core.Video, listStore *gtk.ListStore) {
 	// Get color based on status
-	backgroundColor, foregroundColor := getColor(video.Status)
+	backgroundColor, foregroundColor := v.getColor(video.Status)
 	// Get the duration of the video
-	duration := getDuration(video.Duration)
+	duration := v.getDuration(video.Duration)
 	// If duration is invalid, lets change color to warning
 	if duration == "" {
-		backgroundColor, foregroundColor = setWarningColor()
+		backgroundColor, foregroundColor = v.setWarningColor()
 	}
 	// Get progress
-	progress, progressText := getProgress(video.Status)
+	progress, progressText := v.getProgress(video.Status)
 	// Get thumbnail
-	thumbnail := getThumbnail(video.ID)
+	thumbnail := v.getThumbnail(video.ID)
 
 	// Append video to list
 	iter := listStore.Append()
@@ -251,18 +251,18 @@ func addVideo(video *core.Video, listStore *gtk.ListStore) {
 	}
 }
 
-func setWarningColor() (string, string) {
+func (v *VideoList) setWarningColor() (string, string) {
 	return constColorWarning, "Black"
 }
 
-func getDuration(duration sql.NullString) string {
+func (v *VideoList) getDuration(duration sql.NullString) string {
 	if duration.Valid && len(strings.Trim(duration.String, " \n")) <= 1 {
 		return ""
 	}
 	return duration.String
 }
 
-func getProgress(status int) (int, string) {
+func (v *VideoList) getProgress(status int) (int, string) {
 	if status == constStatusWatched {
 		return 100, "watched"
 	} else if status == constStatusDownloaded {
@@ -272,7 +272,7 @@ func getProgress(status int) (int, string) {
 	return 0, ""
 }
 
-func getColor(status int) (string, string) {
+func (v *VideoList) getColor(status int) (string, string) {
 	if status == constStatusDeleted {
 		return constColorDeleted, "Black"
 	} else if status == constStatusWatched {
@@ -285,14 +285,14 @@ func getColor(status int) (string, string) {
 	return constColorNotDownloaded, "White"
 }
 
-func getThumbnailPath(videoID string) string {
+func (v *VideoList) getThumbnailPath(videoID string) string {
 	// fmt.Println(config.ClientPaths.Thumbnails)
 	// fmt.Println(path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID)))
 	return "/" + path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
 }
 
-func getThumbnail(videoID string) *gdk.Pixbuf {
-	path := getThumbnailPath(videoID)
+func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
+	path := v.getThumbnailPath(videoID)
 
 	thumbnail, err := gdk.PixbufNewFromFile(path)
 	if err != nil {
@@ -309,8 +309,8 @@ func getThumbnail(videoID string) *gdk.Pixbuf {
 	return thumbnail
 }
 
-func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeViewColumn, v *VideoList) {
-	video := getSelectedVideo(treeView)
+func (v *VideoList) rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeViewColumn) {
+	video := v.getSelectedVideo(treeView)
 	if video == nil {
 		return
 	}
@@ -318,16 +318,16 @@ func rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeVi
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
 		v.playVideo(video)
 		// Mark the selected video with watched color
-		setRowColor(treeView, constColorWatched)
+		v.setRowColor(treeView, constColorWatched)
 		v.Refresh("")
 	} else if video.Status == constStatusNotDownloaded {
 		v.downloadVideo(video)
 		// Mark the selected video with downloading color
-		setRowColor(treeView, constColorDownloading)
+		v.setRowColor(treeView, constColorDownloading)
 	}
 }
 
-func setRowColor(treeView *gtk.TreeView, color string) {
+func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
 	selection, _ := treeView.GetSelection()
 	rows := selection.GetSelectedRows(listStore)
 	path := rows.Data().(*gtk.TreePath)
@@ -336,7 +336,7 @@ func setRowColor(treeView *gtk.TreeView, color string) {
 }
 
 func (v *VideoList) playVideo(video *core.Video) {
-	path := getVideoPath(video.ID)
+	path := v.getVideoPath(video.ID)
 	if path == "" {
 		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
 		logger.Log(msg)
@@ -369,7 +369,7 @@ func (v *VideoList) playVideo(video *core.Video) {
 	}
 }
 
-func getVideoPath(videoID string) string {
+func (v *VideoList) getVideoPath(videoID string) string {
 	tryPath := path.Join(config.ClientPaths.Videos, videoID+".mkv")
 	if _, err := os.Stat(tryPath); err == nil {
 		return tryPath
@@ -419,11 +419,12 @@ func (v *VideoList) downloadVideo(video *core.Video) error {
 	return nil
 }
 
-func getYoutubePath() string {
-	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
-}
+// Not used???
+// func (v *VideoList) getYoutubePath() string {
+// 	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
+// }
 
-func getSelectedVideo(treeView *gtk.TreeView) *core.Video {
+func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *core.Video {
 	selection, err := treeView.GetSelection()
 	if err != nil {
 		return nil

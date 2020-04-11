@@ -12,14 +12,14 @@ import (
 	"path"
 	"strings"
 
-	core "github.com/hultan/softtube/softtube.core"
+	log "github.com/hultan/softteam/log"
 )
 
 type youtube struct {
 }
 
 // Get the duration of a youtube video
-func (y youtube) getDuration(videoID string, logger core.Logger) error {
+func (y youtube) getDuration(videoID string, logger *log.Logger) error {
 	// youtube-dl --get-duration -- '%s'
 	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
@@ -38,7 +38,7 @@ func (y youtube) getDuration(videoID string, logger core.Logger) error {
 }
 
 // Get the thumbnail of a youtube video
-func (y youtube) getThumbnail(videoID, thumbnailPath string, logger core.Logger) error {
+func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *log.Logger) error {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, thumbnailPath, videoID)
 

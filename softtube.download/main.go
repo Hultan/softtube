@@ -6,14 +6,15 @@ import (
 	"path"
 	"sync"
 
-	"github.com/hultan/softteam/crypt"
+	crypt "github.com/hultan/softteam/crypt"
+	log "github.com/hultan/softteam/log"
 	core "github.com/hultan/softtube/softtube.core"
 )
 
 var (
-	logger core.Logger
+	logger *log.Logger
 	config *core.Config
-	db     core.Database
+	db     *core.Database
 )
 
 func main() {
@@ -22,11 +23,11 @@ func main() {
 	config.Load("main")
 
 	// Setup logging
-	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Download))
+	logger = log.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Download))
 	defer logger.Close()
 
 	// Start updating the softtube database
-	logger.LogStart(config, "softtube download")
+	logger.LogStart("softtube download")
 	defer logger.LogFinished("softtube download")
 
 	// Decrypt the MySQL password

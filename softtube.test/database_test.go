@@ -172,7 +172,7 @@ func openDatabase(t *testing.T) (*core.Database, error) {
 		return nil, err
 	}
 
-	return &db, nil
+	return db, nil
 }
 
 func getTestConfig() (*core.Config, error) {

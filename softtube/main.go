@@ -5,13 +5,14 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	crypt "github.com/hultan/softteam/crypt"
+	log "github.com/hultan/softteam/log"
 	core "github.com/hultan/softtube/softtube.core"
 )
 
 var (
-	logger   core.Logger
+	logger   *log.Logger
 	config   *core.Config
-	db       core.Database
+	db       *core.Database
 	softtube *SoftTube
 )
 
@@ -27,7 +28,7 @@ func main() {
 	openDatabase()
 	defer db.CloseDatabase()
 
-	startApplication(&db)
+	startApplication(db)
 }
 
 func loadConfig() {
@@ -38,8 +39,8 @@ func loadConfig() {
 
 func startLogging() {
 	// Start logging
-	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
-	logger.LogStart(config, "softtube client")
+	logger = log.NewLog(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
+	logger.LogStart("softtube client")
 }
 
 func stopLogging() {
@@ -48,7 +49,7 @@ func stopLogging() {
 	logger.Close()
 }
 
-func openDatabase() core.Database {
+func openDatabase() *core.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
 	crypt := crypt.Crypt{}
