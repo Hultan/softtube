@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gotk3/gotk3/gdk"
@@ -197,23 +198,36 @@ func (v *VideoList) deleteVideo(video *core.Video) {
 			panic(err)
 		}
 
-		// Log that the video has been deleted in the database
-		err = db.Log.Insert(constLogDelete, video.Title)
-		if err != nil {
-			logger.Log("Failed to log video as watched!")
-			logger.LogError(err)
-		}
+		var wg sync.WaitGroup
+		wg.Add(3)
 
-		// Log that the video has been deleted in the GUI
-		v.Parent.Log.InsertLog(constLogDelete, video.Title)
-		//v.Parent.Log.FillLog()
+		go func() {
+			// Log that the video has been deleted in the database
+			err = db.Log.Insert(constLogDelete, video.Title)
+			if err != nil {
+				logger.Log("Failed to log video as watched!")
+				logger.LogError(err)
+			}
+			wg.Done()
+		}()
 
-		// Set video status as deleted
-		err = db.Videos.UpdateStatus(video.ID, constStatusDeleted)
-		if err != nil {
-			logger.Log("Failed to set video status to deleted!")
-			logger.LogError(err)
-		}
+		go func() {
+			// Log that the video has been deleted in the GUI
+			v.Parent.Log.InsertLog(constLogDelete, video.Title)
+			wg.Done()
+		}()
+
+		go func() {
+			// Set video status as deleted
+			err = db.Videos.UpdateStatus(video.ID, constStatusDeleted)
+			if err != nil {
+				logger.Log("Failed to set video status to deleted!")
+				logger.LogError(err)
+			}
+			wg.Done()
+		}()
+
+		wg.Wait()
 	}
 }
 
@@ -350,23 +364,35 @@ func (v *VideoList) playVideo(video *core.Video) {
 		panic(err)
 	}
 
-	// Log that the video has been deleted in the database
-	err = db.Log.Insert(constLogPlay, video.Title)
-	if err != nil {
-		logger.Log("Failed to log video as watched!")
-		logger.LogError(err)
-	}
+	var wg sync.WaitGroup
+	wg.Add(3)
 
-	// Log that the video has been deleted in the GUI
-	v.Parent.Log.InsertLog(constLogPlay, video.Title)
-	//v.Parent.Log.FillLog()
+	go func() {
+		// Log that the video has been deleted in the database
+		err = db.Log.Insert(constLogPlay, video.Title)
+		if err != nil {
+			logger.Log("Failed to log video as watched!")
+			logger.LogError(err)
+		}
+		wg.Done()
+	}()
 
-	// Set video status as watched
-	err = db.Videos.UpdateStatus(video.ID, constStatusWatched)
-	if err != nil {
-		logger.Log("Failed to set video status to watched!")
-		logger.LogError(err)
-	}
+	go func() {
+		// Log that the video has been deleted in the GUI
+		v.Parent.Log.InsertLog(constLogPlay, video.Title)
+		wg.Done()
+	}()
+
+	go func() {
+		// Set video status as watched
+		err = db.Videos.UpdateStatus(video.ID, constStatusWatched)
+		if err != nil {
+			logger.Log("Failed to set video status to watched!")
+			logger.LogError(err)
+		}
+		wg.Done()
+	}()
+	wg.Wait()
 }
 
 func (v *VideoList) getVideoPath(videoID string) string {
@@ -398,23 +424,36 @@ func (v *VideoList) downloadVideo(video *core.Video) error {
 		return err
 	}
 
-	// Log that the video has been deleted in the database
-	err = db.Log.Insert(constLogDownload, video.Title)
-	if err != nil {
-		logger.Log("Failed to log video as watched!")
-		logger.LogError(err)
-	}
+	var wg sync.WaitGroup
+	wg.Add(3)
 
-	// Log that the video has been deleted in the GUI
-	v.Parent.Log.InsertLog(constLogDownload, video.Title)
-	//v.Parent.Log.FillLog()
+	go func() {
+		// Log that the video has been requested to be downloaded in the database
+		err = db.Log.Insert(constLogDownload, video.Title)
+		if err != nil {
+			logger.Log("Failed to log video as watched!")
+			logger.LogError(err)
+		}
+		wg.Done()
+	}()
 
-	// Set video status as downloading
-	err = db.Videos.UpdateStatus(video.ID, constStatusDownloading)
-	if err != nil {
-		logger.Log("Failed to set video status to downloading!")
-		logger.LogError(err)
-	}
+	go func() {
+		// Log that the video has been deleted in the GUI
+		v.Parent.Log.InsertLog(constLogDownload, video.Title)
+		wg.Done()
+	}()
+
+	go func() {
+		// Set video status as downloading
+		err = db.Videos.UpdateStatus(video.ID, constStatusDownloading)
+		if err != nil {
+			logger.Log("Failed to set video status to downloading!")
+			logger.LogError(err)
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	return nil
 }
