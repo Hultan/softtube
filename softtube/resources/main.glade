@@ -310,19 +310,7 @@
                 <property name="tooltip_text" translatable="yes">Press the 'F5' key to refresh the video list...</property>
                 <property name="label" translatable="yes">Refresh</property>
                 <property name="use_underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="toolbar_delete_button">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Press the 'D' key to delete the selected video...</property>
-                <property name="label" translatable="yes">Delete</property>
-                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-refresh</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -337,6 +325,7 @@
                 <property name="tooltip_text" translatable="yes">Click this button to delete all watched videos...</property>
                 <property name="label" translatable="yes">Delete all</property>
                 <property name="use_underline">True</property>
+                <property name="stock_id">gtk-delete</property>
               </object>
               <packing>
                 <property name="expand">False</property>

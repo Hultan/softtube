@@ -66,12 +66,6 @@ func (t *Toolbar) Load(builder *gtk.Builder) error {
 	}
 	t.ToolbarRefresh = tool
 
-	tool, err = helper.GetToolButton(builder, "toolbar_delete_button")
-	if err != nil {
-		return err
-	}
-	t.ToolbarDelete = tool
-
 	tool, err = helper.GetToolButton(builder, "toolbar_delete_all_button")
 	if err != nil {
 		return err

@@ -17,7 +17,7 @@ const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, publi
 const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added) 
 								VALUES (?, ?, ?, ?, ?, ?);`
 const sqlStatementUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
-const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=?"
+const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=? AND save=0"
 const sqlStatementUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
 const sqlStatementSearchVideos = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
 									Videos.status, Subscriptions.name 
