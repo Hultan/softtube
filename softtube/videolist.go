@@ -23,15 +23,18 @@ type VideoList struct {
 	Treeview        *gtk.TreeView
 	ScrolledWindow  *gtk.ScrolledWindow
 	KeepScrollToEnd bool
+	FilterMode      uint
 }
 
 var videos []core.Video
-var filterMode int = 0
+
+//var filterMode int = 0
 var listStore *gtk.ListStore
 var filter *gtk.TreeModelFilter
 
 // Load : Loads the toolbar from the glade file
 func (v *VideoList) Load(builder *gtk.Builder) error {
+	v.FilterMode = 0
 	helper := new(gtkhelper.GtkHelper)
 
 	// Get the tree view
@@ -88,8 +91,8 @@ func (v *VideoList) ScrollToEnd() {
 }
 
 // SetFilterMode : Changes filter mode
-func (v *VideoList) SetFilterMode(mode int) {
-	filterMode = mode
+func (v *VideoList) SetFilterMode(mode uint) {
+	v.FilterMode = mode
 	v.Refresh("")
 }
 
@@ -97,7 +100,7 @@ func (v *VideoList) SetFilterMode(mode int) {
 func (v *VideoList) DeleteWatchedVideos() {
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]
-		if video.Status == constStatusWatched {
+		if video.Status == constStatusWatched && !video.Saved {
 			// Delete the video from disk
 			v.deleteVideo(&video)
 		}
@@ -171,7 +174,7 @@ func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, u
 		// TODO : Log error
 	}
 
-	switch filterMode {
+	switch v.FilterMode {
 	case constFilterModeSubscriptions:
 		return true
 	case constFilterModeToWatch:
@@ -180,6 +183,10 @@ func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, u
 		}
 	case constFilterModeToDelete:
 		if color == constColorWatched {
+			return true
+		}
+	case constFilterModeSaved:
+		if color == constColorSaved {
 			return true
 		}
 	}
@@ -233,7 +240,7 @@ func (v *VideoList) deleteVideo(video *core.Video) {
 
 func (v *VideoList) addVideo(video *core.Video, listStore *gtk.ListStore) {
 	// Get color based on status
-	backgroundColor, foregroundColor := v.getColor(video.Status)
+	backgroundColor, foregroundColor := v.getColor(video)
 	// Get the duration of the video
 	duration := v.getDuration(video.Duration)
 	// If duration is invalid, lets change color to warning
@@ -286,14 +293,18 @@ func (v *VideoList) getProgress(status int) (int, string) {
 	return 0, ""
 }
 
-func (v *VideoList) getColor(status int) (string, string) {
-	if status == constStatusDeleted {
+func (v *VideoList) getColor(video *core.Video) (string, string) {
+	if video.Saved {
+		return constColorSaved, "Black"
+	}
+
+	if video.Status == constStatusDeleted {
 		return constColorDeleted, "Black"
-	} else if status == constStatusWatched {
+	} else if video.Status == constStatusWatched {
 		return constColorWatched, "Black"
-	} else if status == constStatusDownloaded {
+	} else if video.Status == constStatusDownloaded {
 		return constColorDownloaded, "Black"
-	} else if status == constStatusDownloading {
+	} else if video.Status == constStatusDownloading {
 		return constColorDownloading, "Black"
 	}
 	return constColorNotDownloaded, "White"
@@ -323,6 +334,38 @@ func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
 	return thumbnail
 }
 
+func (v *VideoList) setAsWatched(video *core.Video, watched bool) {
+	status := constStatusWatched
+	if !watched {
+		status = constStatusDownloaded
+	}
+	err := v.Parent.Database.Videos.UpdateStatus(video.ID, status)
+	if err != nil {
+		if watched {
+			logger.LogFormat("Failed to set video as watched! %s", video.ID)
+		} else {
+			logger.LogFormat("Failed to set video as unwatched! %s", video.ID)
+		}
+		logger.LogError(err)
+	}
+	// v.setRowColor(v.Treeview, constColorSaved)
+	v.Refresh("")
+}
+
+func (v *VideoList) setAsSaved(video *core.Video, saved bool) {
+	err := v.Parent.Database.Videos.UpdateSave(video.ID, saved)
+	if err != nil {
+		if saved {
+			logger.LogFormat("Failed to set video as saved! %s", video.ID)
+		} else {
+			logger.LogFormat("Failed to set video as unsaved! %s", video.ID)
+		}
+		logger.LogError(err)
+	}
+	// v.setRowColor(v.Treeview, constColorSaved)
+	v.Refresh("")
+}
+
 func (v *VideoList) rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, column *gtk.TreeViewColumn) {
 	video := v.getSelectedVideo(treeView)
 	if video == nil {
@@ -331,13 +374,8 @@ func (v *VideoList) rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, col
 
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
 		v.playVideo(video)
-		// Mark the selected video with watched color
-		v.setRowColor(treeView, constColorWatched)
-		v.Refresh("")
 	} else if video.Status == constStatusNotDownloaded {
 		v.downloadVideo(video)
-		// Mark the selected video with downloading color
-		v.setRowColor(treeView, constColorDownloading)
 	}
 }
 
@@ -363,6 +401,9 @@ func (v *VideoList) playVideo(video *core.Video) {
 	if err != nil {
 		panic(err)
 	}
+
+	// Mark the selected video with watched color
+	v.setRowColor(v.Treeview, constColorWatched)
 
 	var wg sync.WaitGroup
 	wg.Add(3)
@@ -393,6 +434,8 @@ func (v *VideoList) playVideo(video *core.Video) {
 		wg.Done()
 	}()
 	wg.Wait()
+
+	v.Refresh("")
 }
 
 func (v *VideoList) getVideoPath(videoID string) string {
@@ -423,6 +466,9 @@ func (v *VideoList) downloadVideo(video *core.Video) error {
 		logger.LogError(err)
 		return err
 	}
+
+	// Mark the selected video with downloading color
+	v.setRowColor(v.Treeview, constColorDownloading)
 
 	var wg sync.WaitGroup
 	wg.Add(3)

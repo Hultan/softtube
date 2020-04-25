@@ -43,4 +43,5 @@ type Video struct {
 	Published        time.Time
 	Duration         sql.NullString
 	Status           int
+	Saved            bool
 }

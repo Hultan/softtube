@@ -13,21 +13,22 @@ type VideosTable struct {
 }
 
 const sqlStatementVideoExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
-const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status FROM Videos WHERE id=?"
+const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
 const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added) 
 								VALUES (?, ?, ?, ?, ?, ?);`
 const sqlStatementUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
 const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=? AND save=0"
 const sqlStatementUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
+const sqlStatementUpdateSave = "UPDATE Videos SET save=? WHERE id=?"
 const sqlStatementSearchVideos = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
-									Videos.status, Subscriptions.name 
+									Videos.status, Subscriptions.name , Videos.save
 									FROM Videos 
 									INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id 
 									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
 									ORDER BY Videos.Added DESC`
 
 const sqlStatementGetLatest = `SELECT * FROM 
-									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
+									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
 									FROM Videos 
 									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
 									ORDER BY added desc
@@ -36,10 +37,10 @@ const sqlStatementGetLatest = `SELECT * FROM
 									UNION
 
 									SELECT * FROM
-										(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name 
+										(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
 										FROM Videos 
 										INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
-										WHERE Videos.status NOT IN (0,4)) as Downloaded
+										WHERE Videos.status NOT IN (0,4) OR Videos.save=1) as Downloaded
 
 									ORDER BY added desc`
 
@@ -53,7 +54,11 @@ func (v VideosTable) Get(id string) (Video, error) {
 	row := v.Connection.QueryRow(sqlStatementGetVideo, id)
 
 	video := Video{}
-	err := row.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status)
+	var saved uint8
+	err := row.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &saved)
+	if saved == 1 {
+		video.Saved = true
+	}
 	// Return video
 	return video, err
 }
@@ -118,6 +123,22 @@ func (v VideosTable) UpdateStatus(id string, status int) error {
 	return nil
 }
 
+// UpdateSave : Update saved flag for a video
+func (v VideosTable) UpdateSave(id string, saved bool) error {
+	// Check that database is opened
+	if v.Connection == nil {
+		return errors.New("database not opened")
+	}
+
+	// Execute the update statement
+	_, err := v.Connection.Exec(sqlStatementUpdateSave, saved, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpdateDuration : Update duration for a video
 func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 	// Check that database is opened
@@ -165,12 +186,16 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 	defer rows.Close()
 
 	var videos []Video
+	var saved uint8
 
 	for rows.Next() {
 		video := new(Video)
-		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName)
+		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName, &saved)
 		if err != nil {
 			return nil, err
+		}
+		if saved == 1 {
+			video.Saved = true
 		}
 		videos = append(videos, *video)
 	}
@@ -192,12 +217,16 @@ func (v VideosTable) GetVideos() ([]Video, error) {
 	defer rows.Close()
 
 	var videos []Video
+	var saved uint8
 
 	for rows.Next() {
 		video := new(Video)
-		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName)
+		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName, &saved)
 		if err != nil {
 			return []Video{}, err
+		}
+		if saved == 1 {
+			video.Saved = true
 		}
 		videos = append(videos, *video)
 	}

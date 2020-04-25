@@ -22,6 +22,7 @@ const constColorDownloaded = "Dark Slate Blue"
 const constColorWatched = "Dark Green"
 const constColorDeleted = "Dark Slate Gray"
 const constColorWarning = "Coral"
+const constColorSaved = "Dark cyan"
 
 const constStatusNotDownloaded = 0
 const constStatusDownloading = 1
@@ -34,6 +35,7 @@ const constStatusDownloadFailed = 6 // Not used yet
 const constFilterModeSubscriptions = 0
 const constFilterModeToWatch = 1
 const constFilterModeToDelete = 2
+const constFilterModeSaved = 3
 
 const constLogDownload = 0
 const constLogPlay = 1
@@ -41,3 +43,8 @@ const constLogDelete = 2
 const constLogSetWatched = 3
 const constLogSetUnwatched = 4
 const constLogError = 5
+
+const constSetAsSaved = "Set as saved"
+const constSetAsNotSaved = "Set as not saved"
+const constSetAsWatched = "Set as watched"
+const constSetAsUnwatched = "Set as unwatched"

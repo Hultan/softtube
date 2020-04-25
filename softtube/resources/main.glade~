@@ -240,6 +240,19 @@
               </packing>
             </child>
             <child>
+              <object class="GtkToggleToolButton" id="toolbar_saved">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Select to show the 'Saved' view...</property>
+                <property name="label" translatable="yes">Saved</property>
+                <property name="use_underline">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkSeparatorToolItem" id="separator">
                 <property name="width_request">50</property>
                 <property name="visible">True</property>
@@ -325,6 +338,7 @@
                 <property name="tooltip_text" translatable="yes">Click this button to delete all watched videos...</property>
                 <property name="label" translatable="yes">Delete all</property>
                 <property name="use_underline">True</property>
+                <property name="stock_id">gtk-delete</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -544,14 +558,6 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="popup_delete">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Delete video</property>
-        <property name="use_underline">True</property>
-      </object>
-    </child>
-    <child>
       <object class="GtkMenuItem" id="popup_delete_all">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -564,6 +570,14 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Set as unwatched</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="popup_save">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Set as saved</property>
         <property name="use_underline">True</property>
       </object>
     </child>

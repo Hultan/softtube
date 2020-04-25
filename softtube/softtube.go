@@ -13,6 +13,7 @@ type SoftTube struct {
 	Toolbar   *Toolbar
 	StatusBar *StatusBar
 	MenuBar   *MenuBar
+	PopupMenu *PopupMenu
 	SearchBar *SearchBar
 	VideoList *VideoList
 	Log       *Log
@@ -101,6 +102,15 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 	s.VideoList.SetupColumns()
 	s.VideoList.SetupEvents()
 	s.VideoList.Refresh("")
+
+	// Load popup menu bar
+	s.PopupMenu = &PopupMenu{Parent: s}
+	err = s.PopupMenu.Load(builder)
+	if err != nil {
+		logger.LogError(err)
+		panic(err)
+	}
+	s.PopupMenu.SetupEvents()
 
 	// Load log
 	s.Log = &Log{Parent: s, TreeView: s.VideoList.Treeview}

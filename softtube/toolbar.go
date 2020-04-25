@@ -11,6 +11,7 @@ type Toolbar struct {
 	ToolbarSubscriptions   *gtk.ToggleToolButton
 	ToolbarToWatch         *gtk.ToggleToolButton
 	ToolbarToDelete        *gtk.ToggleToolButton
+	ToolbarSaved           *gtk.ToggleToolButton
 	ToolbarScrollToStart   *gtk.ToolButton
 	ToolbarScrollToEnd     *gtk.ToolButton
 	ToolbarKeepScrollToEnd *gtk.ToggleToolButton
@@ -41,6 +42,12 @@ func (t *Toolbar) Load(builder *gtk.Builder) error {
 		return err
 	}
 	t.ToolbarToDelete = toggle
+
+	toggle, err = helper.GetToggleToolButton(builder, "toolbar_saved")
+	if err != nil {
+		return err
+	}
+	t.ToolbarSaved = toggle
 
 	tool, err := helper.GetToolButton(builder, "toolbar_scroll_to_start")
 	if err != nil {
@@ -100,6 +107,7 @@ func (t *Toolbar) SetupEvents() {
 			t.ToolbarDeleteAll.SetSensitive(false)
 			t.ToolbarToWatch.SetActive(false)
 			t.ToolbarToDelete.SetActive(false)
+			t.ToolbarSaved.SetActive(false)
 			s.VideoList.SetFilterMode(constFilterModeSubscriptions)
 		}
 	})
@@ -109,6 +117,7 @@ func (t *Toolbar) SetupEvents() {
 			t.ToolbarDeleteAll.SetSensitive(false)
 			t.ToolbarSubscriptions.SetActive(false)
 			t.ToolbarToDelete.SetActive(false)
+			t.ToolbarSaved.SetActive(false)
 			s.VideoList.SetFilterMode(constFilterModeToWatch)
 		}
 	})
@@ -118,7 +127,18 @@ func (t *Toolbar) SetupEvents() {
 			t.ToolbarDeleteAll.SetSensitive(true)
 			t.ToolbarSubscriptions.SetActive(false)
 			t.ToolbarToWatch.SetActive(false)
+			t.ToolbarSaved.SetActive(false)
 			s.VideoList.SetFilterMode(constFilterModeToDelete)
+		}
+	})
+	t.ToolbarSaved.Connect("clicked", func() {
+		if t.ToolbarSaved.GetActive() {
+			s := t.Parent
+			t.ToolbarDeleteAll.SetSensitive(false)
+			t.ToolbarSubscriptions.SetActive(false)
+			t.ToolbarToWatch.SetActive(false)
+			t.ToolbarToDelete.SetActive(false)
+			s.VideoList.SetFilterMode(constFilterModeSaved)
 		}
 	})
 	t.ToolbarScrollToStart.Connect("clicked", func() {
