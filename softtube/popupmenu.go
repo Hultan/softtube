@@ -19,6 +19,7 @@ type PopupMenu struct {
 	PopupSubscriptions *gtk.MenuItem
 	PopupToWatch       *gtk.MenuItem
 	PopupToDelete      *gtk.MenuItem
+	PopupSaved         *gtk.MenuItem
 }
 
 // Load : Loads the popup menu
@@ -84,6 +85,12 @@ func (p *PopupMenu) Load(builder *gtk.Builder) error {
 		return err
 	}
 	p.PopupToDelete = menuItem
+
+	menuItem, err = helper.GetMenuItem(builder, "popup_view_saved")
+	if err != nil {
+		return err
+	}
+	p.PopupSaved = menuItem
 
 	return nil
 }
@@ -175,5 +182,17 @@ func (p *PopupMenu) SetupEvents() {
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		mode := p.PopupUnwatch.GetLabel() == constSetAsWatched
 		p.Parent.VideoList.setAsWatched(video, mode)
+	})
+	p.PopupSubscriptions.Connect("activate", func() {
+		p.Parent.VideoList.SetFilterMode(constFilterModeSubscriptions)
+	})
+	p.PopupToWatch.Connect("activate", func() {
+		p.Parent.VideoList.SetFilterMode(constFilterModeToWatch)
+	})
+	p.PopupToDelete.Connect("activate", func() {
+		p.Parent.VideoList.SetFilterMode(constFilterModeToDelete)
+	})
+	p.PopupSaved.Connect("activate", func() {
+		p.Parent.VideoList.SetFilterMode(constFilterModeSaved)
 	})
 }

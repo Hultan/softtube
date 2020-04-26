@@ -142,6 +142,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkRadioMenuItem" id="menu_view_saved">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Saved</property>
+                        <property name="use_underline">True</property>
+                        <property name="draw_as_radio">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -608,6 +617,14 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">To delete view</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="popup_view_saved">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Saved</property>
         <property name="use_underline">True</property>
       </object>
     </child>
