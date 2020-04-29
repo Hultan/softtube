@@ -112,6 +112,7 @@ func (p *PopupMenu) SetupEvents() {
 				p.PopupSubscriptions.SetSensitive(false)
 				p.PopupToWatch.SetSensitive(true)
 				p.PopupToDelete.SetSensitive(true)
+				p.PopupSaved.SetSensitive(true)
 			case constFilterModeToWatch:
 				p.PopupDownload.SetSensitive(false)
 				p.PopupPlay.SetSensitive(true)
@@ -123,6 +124,7 @@ func (p *PopupMenu) SetupEvents() {
 				p.PopupSubscriptions.SetSensitive(true)
 				p.PopupToWatch.SetSensitive(false)
 				p.PopupToDelete.SetSensitive(true)
+				p.PopupSaved.SetSensitive(true)
 			case constFilterModeToDelete:
 				p.PopupDownload.SetSensitive(false)
 				p.PopupPlay.SetSensitive(true)
@@ -134,6 +136,7 @@ func (p *PopupMenu) SetupEvents() {
 				p.PopupSubscriptions.SetSensitive(true)
 				p.PopupToWatch.SetSensitive(true)
 				p.PopupToDelete.SetSensitive(false)
+				p.PopupSaved.SetSensitive(true)
 			case constFilterModeSaved:
 				p.PopupDownload.SetSensitive(false)
 				p.PopupPlay.SetSensitive(true)
@@ -144,7 +147,8 @@ func (p *PopupMenu) SetupEvents() {
 				p.PopupSave.SetLabel(constSetAsNotSaved)
 				p.PopupSubscriptions.SetSensitive(true)
 				p.PopupToWatch.SetSensitive(true)
-				p.PopupToDelete.SetSensitive(false)
+				p.PopupToDelete.SetSensitive(true)
+				p.PopupSaved.SetSensitive(false)
 			}
 			p.PopupMenu.PopupAtPointer(event)
 		}
