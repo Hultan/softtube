@@ -23,70 +23,68 @@ type PopupMenu struct {
 }
 
 // Load : Loads the popup menu
-func (p *PopupMenu) Load(builder *gtk.Builder) error {
-	helper := new(gtkhelper.GtkHelper)
-
-	menu, err := helper.GetMenu(builder, "popupmenu")
+func (p *PopupMenu) Load(helper *gtkhelper.GtkHelper) error {
+	menu, err := helper.GetMenu("popupmenu")
 	if err != nil {
 		return err
 	}
 	p.PopupMenu = menu
 
-	menuItem, err := helper.GetMenuItem(builder, "popup_refresh")
+	menuItem, err := helper.GetMenuItem("popup_refresh")
 	if err != nil {
 		return err
 	}
 	p.PopupRefresh = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_download")
+	menuItem, err = helper.GetMenuItem("popup_download")
 	if err != nil {
 		return err
 	}
 	p.PopupDownload = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_play")
+	menuItem, err = helper.GetMenuItem("popup_play")
 	if err != nil {
 		return err
 	}
 	p.PopupPlay = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_delete_all")
+	menuItem, err = helper.GetMenuItem("popup_delete_all")
 	if err != nil {
 		return err
 	}
 	p.PopupDeleteAll = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_unwatch")
+	menuItem, err = helper.GetMenuItem("popup_unwatch")
 	if err != nil {
 		return err
 	}
 	p.PopupUnwatch = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_save")
+	menuItem, err = helper.GetMenuItem("popup_save")
 	if err != nil {
 		return err
 	}
 	p.PopupSave = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_view_subscriptions")
+	menuItem, err = helper.GetMenuItem("popup_view_subscriptions")
 	if err != nil {
 		return err
 	}
 	p.PopupSubscriptions = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_view_to_watch")
+	menuItem, err = helper.GetMenuItem("popup_view_to_watch")
 	if err != nil {
 		return err
 	}
 	p.PopupToWatch = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_view_to_delete")
+	menuItem, err = helper.GetMenuItem("popup_view_to_delete")
 	if err != nil {
 		return err
 	}
 	p.PopupToDelete = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "popup_view_saved")
+	menuItem, err = helper.GetMenuItem("popup_view_saved")
 	if err != nil {
 		return err
 	}
@@ -105,8 +103,8 @@ func (p *PopupMenu) SetupEvents() {
 				p.PopupDownload.SetSensitive(true)
 				p.PopupPlay.SetSensitive(false)
 				p.PopupDeleteAll.SetSensitive(false)
-				p.PopupUnwatch.SetSensitive(false)
-				p.PopupUnwatch.SetLabel(constSetAsWatched)
+				p.PopupUnwatch.SetSensitive(true)
+				p.PopupUnwatch.SetLabel(constSetAsNotDownloaded)
 				p.PopupSave.SetSensitive(false)
 				p.PopupSave.SetLabel(constSetAsSaved)
 				p.PopupSubscriptions.SetSensitive(false)
@@ -184,7 +182,18 @@ func (p *PopupMenu) SetupEvents() {
 	p.PopupUnwatch.Connect("activate", func() {
 		treeview := p.Parent.VideoList.Treeview
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
-		mode := p.PopupUnwatch.GetLabel() == constSetAsWatched
+		var mode int
+		switch p.PopupUnwatch.GetLabel() {
+		case constSetAsNotDownloaded:
+			mode = 0
+			break
+		case constSetAsWatched:
+			mode = 1
+			break
+		case constSetAsUnwatched:
+			mode = 2
+			break
+		}
 		p.Parent.VideoList.setAsWatched(video, mode)
 	})
 	p.PopupSubscriptions.Connect("activate", func() {

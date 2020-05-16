@@ -18,9 +18,8 @@ type Log struct {
 }
 
 // Load : Loads the log
-func (l *Log) Load(builder *gtk.Builder) {
-	helper := new(gtkhelper.GtkHelper)
-	tree, err := helper.GetTreeView(builder, "log_treeview")
+func (l *Log) Load(helper *gtkhelper.GtkHelper) {
+	tree, err := helper.GetTreeView("log_treeview")
 	if err != nil {
 		logger.LogError(err)
 		return

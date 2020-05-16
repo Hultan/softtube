@@ -33,19 +33,17 @@ var listStore *gtk.ListStore
 var filter *gtk.TreeModelFilter
 
 // Load : Loads the toolbar from the glade file
-func (v *VideoList) Load(builder *gtk.Builder) error {
+func (v *VideoList) Load(helper *gtkhelper.GtkHelper) error {
 	v.FilterMode = 0
-	helper := new(gtkhelper.GtkHelper)
-
 	// Get the tree view
-	treeview, err := helper.GetTreeView(builder, "video_treeview")
+	treeview, err := helper.GetTreeView("video_treeview")
 	if err != nil {
 		return err
 	}
 	v.Treeview = treeview
 
 	// Get the scrolled window surrounding the treeview
-	scroll, err := helper.GetScrolledWindow(builder, "scrolled_window")
+	scroll, err := helper.GetScrolledWindow("scrolled_window")
 	if err != nil {
 		return err
 	}
@@ -121,11 +119,20 @@ func (v *VideoList) Refresh(text string) {
 	}
 	if err != nil {
 		logger.LogError(err)
-		panic(err)
+		return
 	}
 
 	v.Treeview.SetModel(nil)
-	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_INT64, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING, glib.TYPE_STRING)
+	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), // Thumbnail
+		glib.TYPE_STRING, // Subscription name
+		glib.TYPE_STRING, // Added date
+		glib.TYPE_STRING, // Title
+		glib.TYPE_INT64,  // Progress
+		glib.TYPE_STRING, // Background color
+		glib.TYPE_STRING, // Video ID
+		glib.TYPE_STRING, // Duration
+		glib.TYPE_STRING, // Progress text
+		glib.TYPE_STRING) // Foreground color
 	if err != nil {
 		logger.Log("Failed to create liststore!")
 		logger.LogError(err)
@@ -195,14 +202,14 @@ func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, u
 }
 
 func (v *VideoList) deleteVideo(video *core.Video) {
-	path := v.getVideoPath(video.ID)
+	path := v.getVideoPathForDeletion(video.ID)
 	if path != "" {
 		command := fmt.Sprintf("rm %s", path)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		// Starts a sub process that deletes the video
 		err := cmd.Start()
 		if err != nil {
-			panic(err)
+			//panic(err)
 		}
 
 		var wg sync.WaitGroup
@@ -334,18 +341,22 @@ func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
 	return thumbnail
 }
 
-func (v *VideoList) setAsWatched(video *core.Video, watched bool) {
-	status := constStatusWatched
-	if !watched {
+func (v *VideoList) setAsWatched(video *core.Video, mode int) {
+	var status int
+	switch mode {
+	case 0:
+		status = constStatusNotDownloaded
+		break
+	case 1:
+		status = constStatusWatched
+		break
+	case 2:
 		status = constStatusDownloaded
+		break
 	}
 	err := v.Parent.Database.Videos.UpdateStatus(video.ID, status)
 	if err != nil {
-		if watched {
-			logger.LogFormat("Failed to set video as watched! %s", video.ID)
-		} else {
-			logger.LogFormat("Failed to set video as unwatched! %s", video.ID)
-		}
+		logger.LogFormat("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
 		logger.LogError(err)
 	}
 	// v.setRowColor(v.Treeview, constColorSaved)
@@ -455,6 +466,11 @@ func (v *VideoList) getVideoPath(videoID string) string {
 	}
 
 	return ""
+}
+
+func (v *VideoList) getVideoPathForDeletion(videoID string) string {
+	tryPath := path.Join(config.ClientPaths.Videos, videoID+"*")
+	return tryPath
 }
 
 // Download a youtube video

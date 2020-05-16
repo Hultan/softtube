@@ -13,16 +13,14 @@ type SearchBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *SearchBar) Load(builder *gtk.Builder) error {
-	helper := new(gtkhelper.GtkHelper)
-
-	clearButton, err := helper.GetButton(builder, "clear_search_button")
+func (s *SearchBar) Load(helper *gtkhelper.GtkHelper) error {
+	clearButton, err := helper.GetButton("clear_search_button")
 	if err != nil {
 		return err
 	}
 	s.ClearButton = clearButton
 
-	searchEntry, err := helper.GetEntry(builder, "search_entry")
+	searchEntry, err := helper.GetEntry("search_entry")
 	if err != nil {
 		return err
 	}

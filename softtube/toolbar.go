@@ -22,64 +22,62 @@ type Toolbar struct {
 }
 
 // Load : Loads the toolbar
-func (t *Toolbar) Load(builder *gtk.Builder) error {
-	helper := new(gtkhelper.GtkHelper)
-
-	toggle, err := helper.GetToggleToolButton(builder, "toolbar_subscriptions")
+func (t *Toolbar) Load(helper *gtkhelper.GtkHelper) error {
+	toggle, err := helper.GetToggleToolButton("toolbar_subscriptions")
 	if err != nil {
 		return err
 	}
 	t.ToolbarSubscriptions = toggle
 
-	toggle, err = helper.GetToggleToolButton(builder, "toolbar_to_watch")
+	toggle, err = helper.GetToggleToolButton("toolbar_to_watch")
 	if err != nil {
 		return err
 	}
 	t.ToolbarToWatch = toggle
 
-	toggle, err = helper.GetToggleToolButton(builder, "toolbar_to_delete")
+	toggle, err = helper.GetToggleToolButton("toolbar_to_delete")
 	if err != nil {
 		return err
 	}
 	t.ToolbarToDelete = toggle
 
-	toggle, err = helper.GetToggleToolButton(builder, "toolbar_saved")
+	toggle, err = helper.GetToggleToolButton("toolbar_saved")
 	if err != nil {
 		return err
 	}
 	t.ToolbarSaved = toggle
 
-	tool, err := helper.GetToolButton(builder, "toolbar_scroll_to_start")
+	tool, err := helper.GetToolButton("toolbar_scroll_to_start")
 	if err != nil {
 		return err
 	}
 	t.ToolbarScrollToStart = tool
 
-	tool, err = helper.GetToolButton(builder, "toolbar_scroll_to_end")
+	tool, err = helper.GetToolButton("toolbar_scroll_to_end")
 	if err != nil {
 		return err
 	}
 	t.ToolbarScrollToEnd = tool
 
-	toggleTool, err := helper.GetToggleToolButton(builder, "toolbar_keep_scroll_to_end")
+	toggleTool, err := helper.GetToggleToolButton("toolbar_keep_scroll_to_end")
 	if err != nil {
 		return err
 	}
 	t.ToolbarKeepScrollToEnd = toggleTool
 
-	tool, err = helper.GetToolButton(builder, "toolbar_refresh_button")
+	tool, err = helper.GetToolButton("toolbar_refresh_button")
 	if err != nil {
 		return err
 	}
 	t.ToolbarRefresh = tool
 
-	tool, err = helper.GetToolButton(builder, "toolbar_delete_all_button")
+	tool, err = helper.GetToolButton("toolbar_delete_all_button")
 	if err != nil {
 		return err
 	}
 	t.ToolbarDeleteAll = tool
 
-	tool, err = helper.GetToolButton(builder, "toolbar_quit_button")
+	tool, err = helper.GetToolButton("toolbar_quit_button")
 	if err != nil {
 		return err
 	}

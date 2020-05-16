@@ -70,7 +70,20 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 		return err
 	}
 
+	// Set the video as downloaded in database
+	// Delete it from the table download immediately to
+	// avoid multiple download attempts (that can cause
+	// crashes)
+	err = db.Download.SetAsDownloaded(videoID)
+	if err != nil {
+		logger.Log("Failed to delete video from table download after download!")
+		logger.LogError(err)
+		wait.Done()
+		return err
+	}
+
 	// Download the video
+	//command := fmt.Sprintf("%s -f 'bestvideo[height>=720]+bestaudio/best[height>=720]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
@@ -80,15 +93,6 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 		logger.Log("Failed to download video!")
 		msg := fmt.Sprintf("Command : %s", command)
 		logger.Log(msg)
-		logger.LogError(err)
-		wait.Done()
-		return err
-	}
-
-	// Set the video as downloaded in database
-	err = db.Download.SetAsDownloaded(videoID)
-	if err != nil {
-		logger.Log("Failed to delete video from table download after download!")
 		logger.LogError(err)
 		wait.Done()
 		return err

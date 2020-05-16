@@ -14,10 +14,8 @@ type StatusBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *StatusBar) Load(builder *gtk.Builder) error {
-	helper := new(gtkhelper.GtkHelper)
-
-	label, err := helper.GetLabel(builder, "statusbar_number_of_videos")
+func (s *StatusBar) Load(helper *gtkhelper.GtkHelper) error {
+	label, err := helper.GetLabel("statusbar_number_of_videos")
 	if err != nil {
 		return err
 	}

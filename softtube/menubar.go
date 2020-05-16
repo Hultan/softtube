@@ -13,16 +13,14 @@ type MenuBar struct {
 }
 
 // Load : Loads the toolbar
-func (m *MenuBar) Load(builder *gtk.Builder) error {
-	helper := new(gtkhelper.GtkHelper)
-
-	menuItem, err := helper.GetMenuItem(builder, "menu_file_quit")
+func (m *MenuBar) Load(helper *gtkhelper.GtkHelper) error {
+	menuItem, err := helper.GetMenuItem("menu_file_quit")
 	if err != nil {
 		return err
 	}
 	m.MenuFileQuit = menuItem
 
-	menuItem, err = helper.GetMenuItem(builder, "menu_help_about")
+	menuItem, err = helper.GetMenuItem("menu_help_about")
 	if err != nil {
 		return err
 	}
