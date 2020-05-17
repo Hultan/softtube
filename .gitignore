@@ -1,3 +1,4 @@
 .vscode
-output
+output/*
+!output/resources
 softtube.update/softtube-update.log
