@@ -122,6 +122,10 @@ func (v *VideoList) Refresh(text string) {
 		return
 	}
 
+	if listStore!=nil {
+		listStore.Clear()
+	}
+
 	v.Treeview.SetModel(nil)
 	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), // Thumbnail
 		glib.TYPE_STRING, // Subscription name
