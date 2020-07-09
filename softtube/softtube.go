@@ -28,24 +28,7 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 
 	gtk.Init(nil)
 
-	helper := gtkHelper.GtkHelperNew(nil)
-
-	// Get the path to the glade file
-	path, err := helper.GetGladePath("main.glade")
-	if err != nil {
-		logger.LogError(err)
-		panic(err)
-	}
-
-	// Create the builder from the glade file
-	builder, err := gtk.BuilderNewFromFile(path)
-	if err != nil {
-		// panic for any errors.
-		logger.LogError(err)
-		panic(err)
-	}
-
-	helper.SetBuilder(builder)
+	helper := gtkHelper.GtkHelperNewFromFile("main.glade")
 
 	win, err := helper.GetWindow("main_window")
 	if err != nil {
