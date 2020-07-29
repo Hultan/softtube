@@ -13,6 +13,7 @@ type VideosTable struct {
 }
 
 const sqlStatementVideoExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
+const sqlStatementGetStatus = "SELECT status FROM Videos WHERE id=?"
 const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
 const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added) 
 								VALUES (?, ?, ?, ?, ?, ?);`
@@ -87,6 +88,32 @@ func (v VideosTable) Exists(videoID string) (bool, error) {
 	}
 
 	return false, fmt.Errorf("failed to check if video '%s' exists", videoID)
+}
+
+// GetStatus : Get the video status
+func (v VideosTable) GetStatus(videoID string) (int, error) {
+	// Check that database is opened
+	if v.Connection == nil {
+		return -1, errors.New("database not opened")
+	}
+
+	// Execute select query
+	rows, err := v.Connection.Query(sqlStatementGetStatus, videoID)
+	if err != nil {
+		return -1, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var result int
+		err = rows.Scan(&result)
+		if err != nil {
+			return -1, err
+		}
+		return result, nil
+	}
+
+	return -1, fmt.Errorf("failed to check if video '%s' exists", videoID)
 }
 
 // Insert : Insert a new video into the database

@@ -13,7 +13,7 @@ var (
 	logger   *log.Logger
 	config   *core.Config
 	db       *core.Database
-	softtube *SoftTube
+	softTube *SoftTube
 )
 
 func main() {
@@ -67,8 +67,8 @@ func openDatabase() *core.Database {
 
 func startApplication(db *core.Database) {
 	// Create a new application.
-	softtube = new(SoftTube)
-	err := softtube.StartApplication(db)
+	softTube = new(SoftTube)
+	err := softTube.StartApplication(db)
 	if err != nil {
 		logger.Log("Failed to start application!")
 		logger.LogError(err)

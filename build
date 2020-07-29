@@ -2,4 +2,5 @@ go build -o ./output/softtube.core ./softtube.core
 go build -o ./output/softtube.backup ./softtube.backup
 go build -o ./output/softtube.update ./softtube.update
 go build -o ./output/softtube.download ./softtube.download
+go build -o ./output/softtube.cleanup ./softtube.cleanup
 go build -o ./output/softtube ./softtube

@@ -83,8 +83,8 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 	}
 
 	// Download the video
-	//command := fmt.Sprintf("%s -f 'bestvideo[height>=720]+bestaudio/best[height>=720]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
-	command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
+	command := fmt.Sprintf("%s -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
+	//command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	// Wait for the command to be executed (video to be downloaded)
