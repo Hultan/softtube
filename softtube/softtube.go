@@ -98,7 +98,7 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 	s.PopupMenu.SetupEvents()
 
 	// Load log
-	s.Log = &Log{Parent: s, TreeView: s.VideoList.Treeview}
+	s.Log = &Log{Parent: s, TreeView: s.VideoList.TreeView}
 	s.Log.Load(helper)
 	s.Log.FillLog()
 

@@ -95,7 +95,7 @@ func (p *PopupMenu) Load(helper *gtkhelper.GtkHelper) error {
 
 // SetupEvents : Setup the toolbar events
 func (p *PopupMenu) SetupEvents() {
-	p.Parent.VideoList.Treeview.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
+	p.Parent.VideoList.TreeView.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
 		buttonEvent := gdk.EventButtonNewFromEvent(event)
 		if buttonEvent.Button() == 3 { // 3 == Mouse right button!?
 			switch p.Parent.VideoList.FilterMode {
@@ -157,13 +157,13 @@ func (p *PopupMenu) SetupEvents() {
 	})
 
 	p.PopupDownload.Connect("activate", func() {
-		treeview := p.Parent.VideoList.Treeview
+		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		p.Parent.VideoList.downloadVideo(video)
 	})
 
 	p.PopupPlay.Connect("activate", func() {
-		treeview := p.Parent.VideoList.Treeview
+		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		p.Parent.VideoList.playVideo(video)
 	})
@@ -173,14 +173,14 @@ func (p *PopupMenu) SetupEvents() {
 	})
 
 	p.PopupSave.Connect("activate", func() {
-		treeview := p.Parent.VideoList.Treeview
+		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		mode := p.PopupSave.GetLabel() == constSetAsSaved
 		p.Parent.VideoList.setAsSaved(video, mode)
 	})
 
 	p.PopupUnwatch.Connect("activate", func() {
-		treeview := p.Parent.VideoList.Treeview
+		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		var mode int
 		switch p.PopupUnwatch.GetLabel() {

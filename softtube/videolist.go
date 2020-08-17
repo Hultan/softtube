@@ -13,14 +13,15 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	gtkhelper "github.com/hultan/softteam/gtk"
+	gtkHelper "github.com/hultan/softteam/gtk"
 	core "github.com/hultan/softtube/softtube.core"
+	//_ "golang.org/x/image/webp"
 )
 
 // VideoList : The SoftTube video list
 type VideoList struct {
 	Parent          *SoftTube
-	Treeview        *gtk.TreeView
+	TreeView        *gtk.TreeView
 	ScrolledWindow  *gtk.ScrolledWindow
 	KeepScrollToEnd bool
 	FilterMode      uint
@@ -33,14 +34,14 @@ var listStore *gtk.ListStore
 var filter *gtk.TreeModelFilter
 
 // Load : Loads the toolbar from the glade file
-func (v *VideoList) Load(helper *gtkhelper.GtkHelper) error {
+func (v *VideoList) Load(helper *gtkHelper.GtkHelper) error {
 	v.FilterMode = 0
 	// Get the tree view
-	treeview, err := helper.GetTreeView("video_treeview")
+	treeView, err := helper.GetTreeView("video_treeview")
 	if err != nil {
 		return err
 	}
-	v.Treeview = treeview
+	v.TreeView = treeView
 
 	// Get the scrolled window surrounding the treeview
 	scroll, err := helper.GetScrolledWindow("scrolled_window")
@@ -55,18 +56,21 @@ func (v *VideoList) Load(helper *gtkhelper.GtkHelper) error {
 // SetupEvents : Setup the list events
 func (v *VideoList) SetupEvents() {
 	// Send in the videolist as a user data parameter to the event
-	v.Treeview.Connect("row_activated", v.rowActivated)
+	_, err := v.TreeView.Connect("row_activated", v.rowActivated)
+	if err != nil {
+		logger.LogError(err)
+	}
 }
 
 // SetupColumns : Sets up the listview columns
 func (v VideoList) SetupColumns() {
 	helper := new(TreeviewHelper)
-	v.Treeview.AppendColumn(helper.CreateImageColumn("Image"))
-	v.Treeview.AppendColumn(helper.CreateTextColumn("Channel name", liststoreColumnChannelName, 200, 300))
-	v.Treeview.AppendColumn(helper.CreateTextColumn("Date", liststoreColumnDate, 90, 300))
-	v.Treeview.AppendColumn(helper.CreateTextColumn("Title", liststoreColumnTitle, 0, 600))
-	v.Treeview.AppendColumn(helper.CreateTextColumn("Duration", liststoreColumnDuration, 90, 300))
-	v.Treeview.AppendColumn(helper.CreateProgressColumn("Progress"))
+	v.TreeView.AppendColumn(helper.CreateImageColumn("Image"))
+	v.TreeView.AppendColumn(helper.CreateTextColumn("Channel name", liststoreColumnChannelName, 200, 300))
+	v.TreeView.AppendColumn(helper.CreateTextColumn("Date", liststoreColumnDate, 90, 300))
+	v.TreeView.AppendColumn(helper.CreateTextColumn("Title", liststoreColumnTitle, 0, 600))
+	v.TreeView.AppendColumn(helper.CreateTextColumn("Duration", liststoreColumnDuration, 90, 300))
+	v.TreeView.AppendColumn(helper.CreateProgressColumn("Progress"))
 }
 
 // Search : Searches for a video
@@ -122,11 +126,11 @@ func (v *VideoList) Refresh(text string) {
 		return
 	}
 
-	if listStore!=nil {
+	if listStore != nil {
 		listStore.Clear()
 	}
 
-	v.Treeview.SetModel(nil)
+	v.TreeView.SetModel(nil)
 	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), // Thumbnail
 		glib.TYPE_STRING, // Subscription name
 		glib.TYPE_STRING, // Added date
@@ -138,7 +142,7 @@ func (v *VideoList) Refresh(text string) {
 		glib.TYPE_STRING, // Progress text
 		glib.TYPE_STRING) // Foreground color
 	if err != nil {
-		logger.Log("Failed to create liststore!")
+		logger.Log("Failed to create list store!")
 		logger.LogError(err)
 		panic(err)
 	}
@@ -149,11 +153,14 @@ func (v *VideoList) Refresh(text string) {
 	}
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
+	if err!=nil{
+		logger.LogError(err)
+	}
 	err = filter.SetVisibleFunc(v.filterFunc)
 	if err != nil {
 		logger.LogError(err)
 	}
-	v.Treeview.SetModel(filter)
+	v.TreeView.SetModel(filter)
 
 	count := filter.IterNChildren(nil)
 	v.Parent.StatusBar.UpdateVideoCount(count)
@@ -178,11 +185,11 @@ func (v *VideoList) Refresh(text string) {
 func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData interface{}) bool {
 	value, err := model.GetValue(iter, liststoreColumnBackground)
 	if err != nil {
-		// TODO : Log error
+		logger.LogError(err)
 	}
 	color, err := value.GetString()
 	if err != nil {
-		// TODO : Log error
+		logger.LogError(err)
 	}
 
 	switch v.FilterMode {
@@ -206,9 +213,9 @@ func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, u
 }
 
 func (v *VideoList) deleteVideo(video *core.Video) {
-	path := v.getVideoPathForDeletion(video.ID)
-	if path != "" {
-		command := fmt.Sprintf("rm %s", path)
+	pathForDeletion := v.getVideoPathForDeletion(video.ID)
+	if pathForDeletion != "" {
+		command := fmt.Sprintf("rm %s", pathForDeletion)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		// Starts a sub process that deletes the video
 		err := cmd.Start()
@@ -322,21 +329,34 @@ func (v *VideoList) getColor(video *core.Video) (string, string) {
 }
 
 func (v *VideoList) getThumbnailPath(videoID string) string {
-	// fmt.Println(config.ClientPaths.Thumbnails)
-	// fmt.Println(path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID)))
-	return "/" + path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
+	thumbnailPath := "/" + path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
+	if _, err := os.Stat(thumbnailPath); err == nil {
+		return thumbnailPath
+	}
+	thumbnailPath = "/" + path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.webp", videoID))
+	if _, err := os.Stat(thumbnailPath); err == nil {
+		// YouTube started to return *.webp thumbnails instead of *.jpg thumbnails sometimes
+		// Go can't read them, and getThumbnail fails to get a PixBuf, so return "" for now
+		return ""
+		//return thumbnailPath
+	}
+	return ""
 }
 
 func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
-	path := v.getThumbnailPath(videoID)
+	thumbnailPath := v.getThumbnailPath(videoID)
+	if thumbnailPath=="" {
+		return nil
+	}
 
-	thumbnail, err := gdk.PixbufNewFromFile(path)
+	thumbnail, err := gdk.PixbufNewFromFile(thumbnailPath)
 	if err != nil {
+		logger.LogError(err)
 		thumbnail = nil
 	} else {
 		thumbnail, err = thumbnail.ScaleSimple(160, 90, gdk.INTERP_BILINEAR)
 		if err != nil {
-			msg := fmt.Sprintf("Failed to scale thumnail (%s)!", path)
+			msg := fmt.Sprintf("Failed to scale thumnail (%s)!", thumbnailPath)
 			logger.Log(msg)
 			thumbnail = nil
 		}
@@ -390,35 +410,38 @@ func (v *VideoList) rowActivated(treeView *gtk.TreeView, path *gtk.TreePath, col
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
 		v.playVideo(video)
 	} else if video.Status == constStatusNotDownloaded {
-		v.downloadVideo(video)
+		err:=v.downloadVideo(video)
+		if err!=nil {
+			logger.LogError(err)
+		}
 	}
 }
 
 func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
 	selection, _ := treeView.GetSelection()
 	rows := selection.GetSelectedRows(listStore)
-	path := rows.Data().(*gtk.TreePath)
-	iter, _ := listStore.GetIter(path)
+	treePath := rows.Data().(*gtk.TreePath)
+	iter, _ := listStore.GetIter(treePath)
 	_ = listStore.SetValue(iter, liststoreColumnBackground, color)
 }
 
 func (v *VideoList) playVideo(video *core.Video) {
-	path := v.getVideoPath(video.ID)
-	if path == "" {
+	videoPath := v.getVideoPath(video.ID)
+	if videoPath == "" {
 		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
 		logger.Log(msg)
 		return
 	}
-	command := fmt.Sprintf("smplayer '%s'", path)
+	command := fmt.Sprintf("smplayer '%s'", videoPath)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	// Starts a sub process (smplayer)
 	err := cmd.Start()
 	if err != nil {
-		panic(err)
+		logger.LogError(err)
 	}
 
 	// Mark the selected video with watched color
-	v.setRowColor(v.Treeview, constColorWatched)
+	v.setRowColor(v.TreeView, constColorWatched)
 
 	var wg sync.WaitGroup
 	wg.Add(3)
@@ -488,7 +511,7 @@ func (v *VideoList) downloadVideo(video *core.Video) error {
 	}
 
 	// Mark the selected video with downloading color
-	v.setRowColor(v.Treeview, constColorDownloading)
+	v.setRowColor(v.TreeView, constColorDownloading)
 
 	var wg sync.WaitGroup
 	wg.Add(3)

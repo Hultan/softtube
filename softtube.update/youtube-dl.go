@@ -12,7 +12,7 @@ import (
 	"path"
 	"strings"
 
-	log "github.com/hultan/softteam/log"
+	"github.com/hultan/softteam/log"
 )
 
 type youtube struct {
@@ -33,7 +33,10 @@ func (y youtube) getDuration(videoID string, logger *log.Logger) error {
 		return err
 	}
 	// Save duration in the database
-	db.Videos.UpdateDuration(videoID, strings.Trim(string(output), " \n"))
+	err=db.Videos.UpdateDuration(videoID, strings.Trim(string(output), " \n"))
+	if err!=nil {
+		logger.Log(err.Error())
+	}
 	return nil
 }
 
@@ -68,12 +71,20 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer response.Body.Close()
+
 
 	// Convert the response body to a string
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(response.Body)
+	_,err = buf.ReadFrom(response.Body)
+	if err!=nil {
+		logger.LogError(err)
+	}
 	xml := buf.String()
+
+	err = response.Body.Close()
+	if err!=nil {
+		logger.LogError(err)
+	}
 
 	return xml, nil
 }
