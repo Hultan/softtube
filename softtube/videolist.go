@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -176,6 +177,14 @@ func (v *VideoList) Refresh(text string) {
 			}
 		}()
 	}
+
+	// Run garbage collect after refreshing list
+	go func() {
+		select {
+		case <-time.After(50 * time.Millisecond):
+			runtime.GC()
+		}
+	}()
 }
 
 //

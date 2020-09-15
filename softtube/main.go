@@ -26,7 +26,7 @@ func main() {
 
 	// Open the SoftTube database
 	openDatabase()
-	defer db.CloseDatabase()
+	defer closeDatabase()
 
 	startApplication(db)
 }
@@ -63,6 +63,10 @@ func openDatabase() *core.Database {
 	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	db.OpenDatabase()
 	return db
+}
+
+func closeDatabase() {
+	db.CloseDatabase()
 }
 
 func startApplication(db *core.Database) {
