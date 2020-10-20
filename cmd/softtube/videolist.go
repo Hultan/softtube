@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -357,6 +358,7 @@ func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
 
 	thumbnail, err := gdk.PixbufNewFromFile(thumbnailPath)
 	if err != nil {
+		v.renameJPG2WEBP(thumbnailPath)
 		logger.LogError(err)
 		thumbnail = nil
 	} else {
@@ -583,4 +585,14 @@ func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *core.Video {
 	}
 
 	return nil
+}
+
+// Some .webp images are erroneously named .jpg, so
+// rename them so that the converter can take care of them
+func (v *VideoList) renameJPG2WEBP(thumbnailPath string) {
+	extension := filepath.Ext(thumbnailPath)
+	if extension == ".jpg" {
+		newName:=thumbnailPath[:len(thumbnailPath)-len(extension)] + ".webp"
+		_ = os.Rename(thumbnailPath, newName)
+	}
 }

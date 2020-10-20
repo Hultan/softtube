@@ -1,7 +1,4 @@
-./build
-build_old
+./compile
 
-#unalias cp
-yes | cp -r softtube/resources/* output/resources
-yes | cp -r output/* /softtube/client/files
-#alias cp='cp -i'
+yes | cp -r ./assets /softtube/client/files
+yes | cp -r ./build/* /softtube/client/files
