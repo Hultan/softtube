@@ -6,7 +6,5 @@ github.com/gotk3/gotk3 v0.4.1-0.20200919055744-5c37c8051f06 h1:H+vnMHYamP+gF78TY
 github.com/gotk3/gotk3 v0.4.1-0.20200919055744-5c37c8051f06/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/hultan/softteam v0.1.2 h1:fw7tA7nDxMvpgAjFEckYXYKhTE7xBcSlU0RuxhcRve4=
 github.com/hultan/softteam v0.1.2/go.mod h1:QEXMKw8q+S4qRoL0REfFtTa9e8d8Kj9KHFq/U2skAPY=
-github.com/hultan/softteam-tools v1.2.1 h1:GpNZWhdI2Qebo1t8duJk8zwKxjN1D4h2fzpLW1VDCwc=
-github.com/hultan/softteam-tools v1.2.1/go.mod h1:PxNInslnmARlAlqpYK/DhUGndmWVRU8HAh/Ir8RL9mI=
 github.com/hultan/softteam-tools v1.2.2 h1:3K80JRsMP6+UgYUtg0SirVYeZPDz7gTms9oIQKCVLQ4=
 github.com/hultan/softteam-tools v1.2.2/go.mod h1:PxNInslnmARlAlqpYK/DhUGndmWVRU8HAh/Ir8RL9mI=
