@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"regexp"
 	"sync"
 
 	crypt "github.com/hultan/softteam/crypt"
@@ -140,6 +141,8 @@ func updateSubscription(subscription *core.Subscription) {
 			message := fmt.Sprintf("New video for channel '%s' : '%s'", subscription.Name, video.Title)
 			logger.Log(message)
 
+			video.Title = clean(video.Title)
+
 			// Insert the video in the database
 			// This must be executed before getDuration()
 			err := db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
@@ -188,6 +191,12 @@ func updateSubscription(subscription *core.Subscription) {
 	db.Subscriptions.UpdateLastChecked(subscription, interval)
 
 	waitGroup.Wait()
+}
+
+func clean(title string) string {
+	re := regexp.MustCompile("[^[:ascii:]åäö]")
+
+	return re.ReplaceAllLiteralString(title, "")
 }
 
 func getInterval(frequency int) (int, error) {
