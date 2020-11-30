@@ -5,6 +5,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -20,6 +21,20 @@ type youtube struct {
 
 // Get the duration of a youtube video
 func (y youtube) getDuration(videoID string, logger *log.Logger) error {
+	err := y.getDurationInternal(videoID, logger)
+	if err!=nil {
+		logger.Log("GetDuration failed, trying again : ")
+		logger.LogError(err)
+		err = y.getDurationInternal(videoID, logger)
+		if err!=nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Get the duration of a youtube video
+func (y youtube) getDurationInternal(videoID string, logger *log.Logger) error {
 	// youtube-dl --get-duration -- '%s'
 	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
@@ -32,6 +47,11 @@ func (y youtube) getDuration(videoID string, logger *log.Logger) error {
 		logger.LogError(err)
 		return err
 	}
+
+	if strings.Trim(string(output), " \n") == "" {
+		return errors.New("failed to get duration")
+	}
+
 	// Save duration in the database
 	err= db.Videos.UpdateDuration(videoID, strings.Trim(string(output), " \n"))
 	if err!=nil {
