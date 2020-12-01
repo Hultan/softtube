@@ -1,6 +1,6 @@
 module github.com/hultan/softtube
 
-go 1.15
+go 1.14
 
 // FOR TESTING
 //replace github.com/hultan/softteam-tools => ../softteam-tools
