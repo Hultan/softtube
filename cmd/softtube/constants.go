@@ -23,6 +23,7 @@ const constColorDownloaded = "Dark Slate Blue"
 const constColorWatched = "Dark Green"
 const constColorDeleted = "Dark Slate Gray"
 const constColorWarning = "Coral"
+const constColorLive = "Goldenrod"
 const constColorSaved = "Dark cyan"
 
 const constStatusNotDownloaded = 0

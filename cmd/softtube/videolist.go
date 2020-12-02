@@ -268,8 +268,11 @@ func (v *VideoList) addVideo(video *core.Video, listStore *gtk.ListStore) {
 	backgroundColor, foregroundColor := v.getColor(video)
 	// Get the duration of the video
 	duration := v.getDuration(video.Duration)
-	// If duration is invalid, lets change color to warning
-	if duration == "" {
+	if strings.Trim(duration," ") == "LIVE" {
+		// If duration is LIVE, lets change color to live color
+		backgroundColor, foregroundColor = v.setLiveColor()
+	} else if duration == "" {
+		// If duration is invalid, lets change color to warning
 		backgroundColor, foregroundColor = v.setWarningColor()
 	}
 	// Get progress
@@ -295,6 +298,10 @@ func (v *VideoList) addVideo(video *core.Video, listStore *gtk.ListStore) {
 		logger.Log("Failed to add row!")
 		logger.LogError(err)
 	}
+}
+
+func (v *VideoList) setLiveColor() (string, string) {
+	return constColorLive, "Black"
 }
 
 func (v *VideoList) setWarningColor() (string, string) {
