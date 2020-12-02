@@ -1,4 +1,3 @@
-# go build -o ./build/softtube.core ./internal/softtube.core
 go build -o ./build/softtube.backup ./tools/softtube.backup
 go build -o ./build/softtube.update ./tools/softtube.update
 go build -o ./build/softtube.download ./tools/softtube.download
