@@ -189,7 +189,7 @@ func (v *VideoList) Refresh(text string) {
 // Private functions
 //
 
-func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, userData ...interface{}) bool {
+func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, _ ...interface{}) bool {
 	value, err := model.GetValue(iter, listStoreColumnBackground)
 	if err != nil {
 		logger.LogError(err)

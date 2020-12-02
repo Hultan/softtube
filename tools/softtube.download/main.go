@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path"
 	"sync"
 
-	crypt "github.com/hultan/softteam/crypt"
-	log "github.com/hultan/softteam/log"
+	"github.com/hultan/softteam/crypt"
+	"github.com/hultan/softteam/log"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
@@ -20,7 +21,11 @@ var (
 func main() {
 	// Load config file
 	config = new(core.Config)
-	config.Load("main")
+	err := config.Load("main")
+	if err != nil {
+		fmt.Println("ERROR (Open config) : ", err.Error())
+		os.Exit(errorOpenConfig)
+	}
 
 	// Setup logging
 	logger = log.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Download))
@@ -42,7 +47,12 @@ func main() {
 
 	// Create the database object, and get all subscriptions
 	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	db.OpenDatabase()
+	err = db.OpenDatabase()
+	if err != nil {
+		logger.Log("ERROR (Open database)")
+		logger.LogError(err)
+		os.Exit(errorOpenDatabase)
+	}
 	defer db.CloseDatabase()
 	downloads, err := db.Download.GetAll()
 	if err != nil {

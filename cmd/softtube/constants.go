@@ -31,8 +31,7 @@ const constStatusDownloading = 1
 const constStatusDownloaded = 2
 const constStatusWatched = 3
 const constStatusDeleted = 4
-const constStatusSaved = 5          // Not used yet
-//const constStatusDownloadFailed = 6 // Not used yet
+const constStatusSaved = 5
 
 const constFilterModeSubscriptions = 0
 const constFilterModeToWatch = 1
