@@ -19,6 +19,8 @@ import (
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
+const constVideoDurationCommand = "%s --get-duration -- '%s'"
+
 // VideoList : The SoftTube video list
 type VideoList struct {
 	Parent          *SoftTube
@@ -154,7 +156,7 @@ func (v *VideoList) Refresh(text string) {
 	}
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
-	if err!=nil{
+	if err != nil {
 		logger.LogError(err)
 		return
 	}
@@ -268,7 +270,7 @@ func (v *VideoList) addVideo(video *core.Video, listStore *gtk.ListStore) {
 	backgroundColor, foregroundColor := v.getColor(video)
 	// Get the duration of the video
 	duration := v.getDuration(video.Duration)
-	if strings.Trim(duration," ") == "LIVE" {
+	if strings.Trim(duration, " ") == "LIVE" {
 		// If duration is LIVE, lets change color to live color
 		backgroundColor, foregroundColor = v.setLiveColor()
 	} else if duration == "" {
@@ -315,6 +317,34 @@ func (v *VideoList) getDuration(duration sql.NullString) string {
 	return duration.String
 }
 
+func (v *VideoList) getYoutubePath() string {
+	return "youtube-dl"
+}
+
+// Download a youtube video
+func (v *VideoList) downloadDuration(video *core.Video) {
+	if video == nil {
+		return
+	}
+
+	go func() {
+		// youtube-dl --get-duration -- '%s'
+		command := fmt.Sprintf(constVideoDurationCommand, v.getYoutubePath(), video.ID)
+		cmd := exec.Command("/bin/bash", "-c", command)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return
+		}
+		duration := string(output)
+		if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(duration, "ERROR: This live event") {
+			// Is it a live streaming event?
+			duration = "LIVE"
+		}
+
+		_ = v.Parent.Database.Videos.UpdateDuration(video.ID, duration)
+	}()
+}
+
 func (v *VideoList) getProgress(status int) (int, string) {
 	if status == constStatusWatched {
 		return 100, "watched"
@@ -359,7 +389,7 @@ func (v *VideoList) getThumbnailPath(videoID string) string {
 
 func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
 	thumbnailPath := v.getThumbnailPath(videoID)
-	if thumbnailPath=="" {
+	if thumbnailPath == "" {
 		return nil
 	}
 
@@ -425,8 +455,8 @@ func (v *VideoList) rowActivated(treeView *gtk.TreeView) {
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
 		v.playVideo(video)
 	} else if video.Status == constStatusNotDownloaded {
-		err:=v.downloadVideo(video)
-		if err!=nil {
+		err := v.downloadVideo(video)
+		if err != nil {
 			logger.LogError(err)
 		}
 	}
@@ -599,7 +629,26 @@ func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *core.Video {
 func (v *VideoList) renameJPG2WEBP(thumbnailPath string) {
 	extension := filepath.Ext(thumbnailPath)
 	if extension == ".jpg" {
-		newName:=thumbnailPath[:len(thumbnailPath)-len(extension)] + ".webp"
+		newName := thumbnailPath[:len(thumbnailPath)-len(extension)] + ".webp"
 		_ = os.Rename(thumbnailPath, newName)
 	}
 }
+
+//func (v *VideoList) setTooltips() {
+//	iter, _ := listStore.GetIterFirst()
+//	for ;iter != nil; {
+//		videoIDValue, err := listStore.GetValue(iter, 6)
+//		if err!=nil {
+//			continue
+//		}
+//		//path, err := listStore.GetPath(iter)
+//		//if err!=nil {
+//		//	continue
+//		//}
+//		videoID, err := videoIDValue.GetString()
+//		fmt.Println(videoID)
+//		//tool := gtk.Tooltip{videoID}
+//		//v.TreeView.SetTooltipCell(videoID, path, v.TreeView.GetColumn(0),0)
+//		_ = listStore.IterNext(iter)
+//	}
+//}

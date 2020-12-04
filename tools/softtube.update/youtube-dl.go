@@ -5,7 +5,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -23,44 +22,60 @@ type youtube struct {
 // Get the duration of a youtube video
 func (y youtube) getDuration(videoID string, logger *log.Logger) error {
 
-	output, err := y.getDurationInternal(videoID,logger)
-	if err!=nil {
-		logger.Log("Failed to get duration, trying again in 5 seconds!")
-		time.Sleep(5 * time.Second)
-		output, err = y.getDurationInternal(videoID,logger)
-		if err!=nil {
-			logger.Log("Failed to get duration, trying again in 30 seconds!")
-			time.Sleep(30 * time.Second)
-			output, err = y.getDurationInternal(videoID, logger)
-			if err != nil {
-				logger.Log("DURATION FAILED : ")
-				logger.Log("DURATION OUTPUT (start) : ")
-				logger.Log(output)
+	for i := 0; i < 3; i++ {
+		duration, err := y.getDurationInternal(videoID)
+		if y.checkDuration(videoID, duration) {
+			return nil
+		}
+		if err != nil {
+			switch i {
+			case 0:
+				logger.Log("Failed to get duration (" + videoID + "), trying again in 5 seconds!")
+				time.Sleep(5 * time.Second)
+				continue
+			case 1:
+				logger.Log("Failed to get duration (" + videoID + "), trying again in 30 seconds!")
+				time.Sleep(30 * time.Second)
+				continue
+			case 2:
+				logger.Log("DURATION OUTPUT (" + videoID + ") : ")
+				logger.Log(duration)
 				logger.Log("DURATION OUTPUT (end) ")
-				logger.Log("DURATION ERROR (start) : ")
-				logger.LogError(err)
-				logger.Log("DURATION ERROR (end) ")
+				// Save duration in the database
+				y.updateDuration(videoID, "", logger)
 				return err
 			}
 		}
+
+		// Success, save duration in the database
+		y.updateDuration(videoID, duration, logger)
 	}
 
-	// Is it a live streaming event?
-	duration := string(output)
-	if strings.HasPrefix(duration, "ERROR: Premieres") {
-		duration = "LIVE"
-	}
-
-	// Save duration in the database
-	err= db.Videos.UpdateDuration(videoID, strings.Trim(duration, " \n"))
-	if err!=nil {
-		logger.Log(err.Error())
-	}
 	return nil
 }
 
+func (y youtube) checkDuration(videoID, duration string) bool {
+	if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(duration, "ERROR: This live event") {
+		// Is it a live streaming event?
+		// Save duration in the database
+		y.updateDuration(videoID, "LIVE", logger)
+		return true
+	}
+	return false
+}
+
+func (y youtube) updateDuration(videoID, duration string, logger *log.Logger) {
+	// Save duration in the database
+	err := db.Videos.UpdateDuration(videoID, strings.Trim(duration, " \n"))
+	if err != nil {
+		logger.Log("UPDATE DURATION ERROR (" + videoID + ") : ")
+		logger.Log(err.Error())
+		logger.Log("UPDATE DURATION ERROR (end) : ")
+	}
+}
+
 // Get the duration of a youtube video
-func (y youtube) getDurationInternal(videoID string, logger *log.Logger) (string, error) {
+func (y youtube) getDurationInternal(videoID string) (string, error) {
 	// youtube-dl --get-duration -- '%s'
 	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
@@ -74,22 +89,22 @@ func (y youtube) getDurationInternal(videoID string, logger *log.Logger) (string
 // Get the thumbnail of a youtube video
 func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *log.Logger) error {
 
-	output, err := y.getThumbnailInternal(videoID, thumbnailPath)
-	if err!=nil {
-		logger.Log("Failed to download thumbnail, trying again in 5 seconds!")
-		time.Sleep(5 * time.Second)
-		output, err = y.getThumbnailInternal(videoID, thumbnailPath)
+	for i:=0;i<3;i++ {
+		output, err := y.getThumbnailInternal(videoID, thumbnailPath)
 		if err!=nil {
-			logger.Log("Failed to download thumbnail, trying again in 30 seconds!")
-			time.Sleep(30 * time.Second)
-			output, err = y.getThumbnailInternal(videoID, thumbnailPath)
-			if err != nil {
-				logger.Log("THUMBNAIL OUTPUT (start) : ")
+			switch i {
+			case 0:
+				logger.Log("Failed to download thumbnail (" + videoID + "), trying again in 5 seconds!")
+				time.Sleep(5 * time.Second)
+				continue
+			case 1:
+				logger.Log("Failed to download thumbnail (" + videoID + "), trying again in 30 seconds!")
+				time.Sleep(30 * time.Second)
+				continue
+			case 2:
+				logger.Log("THUMBNAIL OUTPUT (" + videoID + ") : ")
 				logger.Log(output)
 				logger.Log("THUMBNAIL OUTPUT (end) ")
-				logger.Log("THUMBNAIL ERROR (start) : ")
-				logger.LogError(err)
-				logger.Log("THUMBNAIL ERROR (end) ")
 				return err
 			}
 		}
@@ -124,17 +139,16 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 		return "", err
 	}
 
-
 	// Convert the response body to a string
 	buf := new(bytes.Buffer)
-	_,err = buf.ReadFrom(response.Body)
-	if err!=nil {
+	_, err = buf.ReadFrom(response.Body)
+	if err != nil {
 		logger.LogError(err)
 	}
 	xml := buf.String()
 
 	err = response.Body.Close()
-	if err!=nil {
+	if err != nil {
 		logger.LogError(err)
 	}
 

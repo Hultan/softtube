@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 	gtkHelper "github.com/hultan/softteam-tools/pkg/gtk-helper"
@@ -13,6 +14,8 @@ type PopupMenu struct {
 	PopupRefresh       *gtk.MenuItem
 	PopupDownload      *gtk.MenuItem
 	PopupPlay          *gtk.MenuItem
+	PopupGetDuration   *gtk.MenuItem
+	PopupGetVideoID    *gtk.MenuItem
 	PopupDeleteAll     *gtk.MenuItem
 	PopupUnwatch       *gtk.MenuItem
 	PopupSave          *gtk.MenuItem
@@ -47,6 +50,18 @@ func (p *PopupMenu) Load(helper *gtkHelper.GtkHelper) error {
 		return err
 	}
 	p.PopupPlay = menuItem
+
+	menuItem, err = helper.GetMenuItem("popup_get_duration")
+	if err != nil {
+		return err
+	}
+	p.PopupGetDuration = menuItem
+
+	menuItem, err = helper.GetMenuItem("popup_get_videoid")
+	if err != nil {
+		return err
+	}
+	p.PopupGetVideoID = menuItem
 
 	menuItem, err = helper.GetMenuItem("popup_delete_all")
 	if err != nil {
@@ -102,6 +117,8 @@ func (p *PopupMenu) SetupEvents() {
 			case constFilterModeSubscriptions:
 				p.PopupDownload.SetSensitive(true)
 				p.PopupPlay.SetSensitive(false)
+				p.PopupGetDuration.SetSensitive(true)
+				p.PopupGetVideoID.SetSensitive(true)
 				p.PopupDeleteAll.SetSensitive(false)
 				p.PopupUnwatch.SetSensitive(true)
 				p.PopupUnwatch.SetLabel(constSetAsNotDownloaded)
@@ -114,6 +131,8 @@ func (p *PopupMenu) SetupEvents() {
 			case constFilterModeToWatch:
 				p.PopupDownload.SetSensitive(false)
 				p.PopupPlay.SetSensitive(true)
+				p.PopupGetDuration.SetSensitive(false)
+				p.PopupGetVideoID.SetSensitive(true)
 				p.PopupDeleteAll.SetSensitive(false)
 				p.PopupUnwatch.SetSensitive(true)
 				p.PopupUnwatch.SetLabel(constSetAsWatched)
@@ -126,6 +145,8 @@ func (p *PopupMenu) SetupEvents() {
 			case constFilterModeToDelete:
 				p.PopupDownload.SetSensitive(false)
 				p.PopupPlay.SetSensitive(true)
+				p.PopupGetDuration.SetSensitive(false)
+				p.PopupGetVideoID.SetSensitive(true)
 				p.PopupDeleteAll.SetSensitive(true)
 				p.PopupUnwatch.SetSensitive(true)
 				p.PopupUnwatch.SetLabel(constSetAsUnwatched)
@@ -138,6 +159,8 @@ func (p *PopupMenu) SetupEvents() {
 			case constFilterModeSaved:
 				p.PopupDownload.SetSensitive(false)
 				p.PopupPlay.SetSensitive(true)
+				p.PopupGetDuration.SetSensitive(false)
+				p.PopupGetVideoID.SetSensitive(true)
 				p.PopupDeleteAll.SetSensitive(false)
 				p.PopupUnwatch.SetSensitive(false)
 				p.PopupUnwatch.SetLabel(constSetAsWatched)
@@ -159,13 +182,37 @@ func (p *PopupMenu) SetupEvents() {
 	_,_ = p.PopupDownload.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
-		_ = p.Parent.VideoList.downloadVideo(video)
+		if video!=nil {
+			_ = p.Parent.VideoList.downloadVideo(video)
+		}
 	})
 
 	_,_ = p.PopupPlay.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
-		p.Parent.VideoList.playVideo(video)
+		if video!=nil {
+			p.Parent.VideoList.playVideo(video)
+		}
+	})
+
+	_,_ = p.PopupGetDuration.Connect("activate", func() {
+		treeview := p.Parent.VideoList.TreeView
+		video := p.Parent.VideoList.getSelectedVideo(treeview)
+		if video!=nil {
+			p.Parent.VideoList.downloadDuration(video)
+		}
+	})
+
+	_,_ = p.PopupGetVideoID.Connect("activate", func() {
+		treeview := p.Parent.VideoList.TreeView
+		video := p.Parent.VideoList.getSelectedVideo(treeview)
+		if video!=nil {
+			clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
+			if err != nil {
+				fmt.Println("Clipboard error!")
+			}
+			clipboard.SetText(video.ID)
+		}
 	})
 
 	_,_ = p.PopupDeleteAll.Connect("activate", func() {
@@ -175,26 +222,30 @@ func (p *PopupMenu) SetupEvents() {
 	_,_ = p.PopupSave.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
-		mode := p.PopupSave.GetLabel() == constSetAsSaved
-		p.Parent.VideoList.setAsSaved(video, mode)
+		if video!=nil {
+			mode := p.PopupSave.GetLabel() == constSetAsSaved
+			p.Parent.VideoList.setAsSaved(video, mode)
+		}
 	})
 
 	_,_ = p.PopupUnwatch.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
-		var mode int
-		switch p.PopupUnwatch.GetLabel() {
-		case constSetAsNotDownloaded:
-			mode = 0
-			break
-		case constSetAsWatched:
-			mode = 1
-			break
-		case constSetAsUnwatched:
-			mode = 2
-			break
+		if video!=nil {
+			var mode int
+			switch p.PopupUnwatch.GetLabel() {
+			case constSetAsNotDownloaded:
+				mode = 0
+				break
+			case constSetAsWatched:
+				mode = 1
+				break
+			case constSetAsUnwatched:
+				mode = 2
+				break
+			}
+			p.Parent.VideoList.setAsWatched(video, mode)
 		}
-		p.Parent.VideoList.setAsWatched(video, mode)
 	})
 	_,_ = p.PopupSubscriptions.Connect("activate", func() {
 		p.Parent.VideoList.SetFilterMode(constFilterModeSubscriptions)
