@@ -2,5 +2,5 @@ go build -o ./build/softtube.backup ./tools/softtube.backup
 go build -o ./build/softtube.update ./tools/softtube.update
 go build -o ./build/softtube.download ./tools/softtube.download
 go build -o ./build/softtube.cleanup ./tools/softtube.cleanup
-go build -o ./build/softtube ./cmd/softtube
-# CGO_ENABLED=0 go build -o ./build/softtube ./cmd/softtube
+#go build -o ./build/softtube ./cmd/softtube
+CGO_ENABLED=0 go build -o ./build/softtube ./cmd/softtube
