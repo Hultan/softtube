@@ -12,5 +12,5 @@ require (
 	github.com/gotk3/gotk3 v0.4.1-0.20200919055744-5c37c8051f06
 	//github.com/gotk3/gotk3 v0.5.1
 	github.com/hultan/softteam v0.1.2
-	github.com/hultan/softteam-tools v1.2.2
+	github.com/hultan/softteam-tools v1.2.4
 )

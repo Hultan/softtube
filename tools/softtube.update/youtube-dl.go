@@ -27,7 +27,7 @@ func (y youtube) getDuration(videoID string, logger *log.Logger) error {
 		if y.checkDuration(videoID, duration) {
 			return nil
 		}
-		if err != nil {
+		if err != nil || duration == ""{
 			switch i {
 			case 0:
 				logger.Log("Failed to get duration (" + videoID + "), trying again in 5 seconds!")

@@ -10,3 +10,5 @@ github.com/hultan/softteam v0.1.2 h1:fw7tA7nDxMvpgAjFEckYXYKhTE7xBcSlU0RuxhcRve4
 github.com/hultan/softteam v0.1.2/go.mod h1:QEXMKw8q+S4qRoL0REfFtTa9e8d8Kj9KHFq/U2skAPY=
 github.com/hultan/softteam-tools v1.2.2 h1:3K80JRsMP6+UgYUtg0SirVYeZPDz7gTms9oIQKCVLQ4=
 github.com/hultan/softteam-tools v1.2.2/go.mod h1:PxNInslnmARlAlqpYK/DhUGndmWVRU8HAh/Ir8RL9mI=
+github.com/hultan/softteam-tools v1.2.4 h1:P6PidHyLD/bMmz/FmCHPkoRdh5GksKE801YSgEU36Uk=
+github.com/hultan/softteam-tools v1.2.4/go.mod h1:PxNInslnmARlAlqpYK/DhUGndmWVRU8HAh/Ir8RL9mI=
