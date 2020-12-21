@@ -171,10 +171,13 @@ func (v *VideoList) Refresh(text string) {
 		// UI thread so create a goroutine that does the
 		// scrolling down 50 milliseconds later
 		go func() {
-			select {
-			case <-time.After(50 * time.Millisecond):
-				v.ScrollToEnd()
-			}
+
+			time.Sleep(50 * time.Millisecond)
+			v.ScrollToEnd()
+			//select {
+			//case <-time.After(50 * time.Millisecond):
+			//	v.ScrollToEnd()
+			//}
 		}()
 	}
 
