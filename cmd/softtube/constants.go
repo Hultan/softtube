@@ -1,7 +1,8 @@
 package main
 
-//const constAppID = "com.github.hultan.softtube"
-//const constAppVersion = "0.1"
+const constAppID = "com.github.hultan.softtube"
+const constAppTitle = "SoftPlan"
+const constAppVersion = "2.0"
 const constDateLayout = "2006-01-02"
 
 // LISTSTORE COLUMNS

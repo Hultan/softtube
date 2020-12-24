@@ -6,21 +6,20 @@ package main
 import (
 	"bytes"
 	"fmt"
+	core "github.com/hultan/softtube/internal/softtube.core"
 	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"time"
-
-	"github.com/hultan/softteam/log"
 )
 
 type youtube struct {
 }
 
 // Get the duration of a youtube video
-func (y youtube) getDuration(videoID string, logger *log.Logger) error {
+func (y youtube) getDuration(videoID string, logger *core.Logger) error {
 
 	for i := 0; i < 3; i++ {
 		duration, err := y.getDurationInternal(videoID)
@@ -64,7 +63,7 @@ func (y youtube) checkDuration(videoID, duration string) bool {
 	return false
 }
 
-func (y youtube) updateDuration(videoID, duration string, logger *log.Logger) {
+func (y youtube) updateDuration(videoID, duration string, logger *core.Logger) {
 	// Save duration in the database
 	err := db.Videos.UpdateDuration(videoID, strings.Trim(duration, " \n"))
 	if err != nil {
@@ -87,7 +86,7 @@ func (y youtube) getDurationInternal(videoID string) (string, error) {
 }
 
 // Get the thumbnail of a youtube video
-func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *log.Logger) error {
+func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger) error {
 
 	for i:=0;i<3;i++ {
 		output, err := y.getThumbnailInternal(videoID, thumbnailPath)

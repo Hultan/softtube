@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
-	gtkHelper "github.com/hultan/softteam-tools/pkg/gtk-helper"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
@@ -28,14 +27,14 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 
 	gtk.Init(nil)
 
-	helper := gtkHelper.GtkHelperNewFromFile("main.glade")
+	helper := GtkHelperNewFromFile("main.glade")
 
 	win, err := helper.GetWindow("main_window")
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
 	}
-	win.SetTitle("SoftTube!")
+	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
 	_,_ = win.Connect("destroy", func() {
 		gtk.MainQuit()
@@ -107,4 +106,8 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 	gtk.Main()
 
 	return nil
+}
+
+func (s *SoftTube) getWindowTitle() string {
+	return constAppTitle + " " + constAppVersion
 }

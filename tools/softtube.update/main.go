@@ -7,8 +7,6 @@ import (
 	"regexp"
 	"sync"
 
-	crypt "github.com/hultan/softteam/crypt"
-	log "github.com/hultan/softteam/log"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
@@ -16,7 +14,7 @@ const applicationVersion string = "1.00"
 const maxUpdates = 50
 
 var (
-	logger *log.Logger
+	logger *core.Logger
 	config *core.Config
 	db     *core.Database
 )
@@ -33,7 +31,7 @@ func main() {
 	config.Load("main")
 
 	// Setup logging
-	logger = log.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Update))
+	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Update))
 	defer logger.Close()
 
 	// Start updating the softtube database
@@ -41,7 +39,7 @@ func main() {
 	defer logger.LogFinished("softtube update")
 
 	conn := config.Connection
-	crypt := crypt.Crypt{}
+	crypt := core.Crypt{}
 	password, err := crypt.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")

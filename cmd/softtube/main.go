@@ -4,13 +4,11 @@ import (
 	"path"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/hultan/softteam-tools/pkg/crypt"
-	"github.com/hultan/softteam-tools/pkg/log"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
 var (
-	logger   *log.Logger
+	logger   *core.Logger
 	config   *core.Config
 	db       *core.Database
 	softTube *SoftTube
@@ -42,7 +40,7 @@ func loadConfig() {
 
 func startLogging() {
 	// Start logging
-	logger = log.NewLog(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
+	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
 	logger.LogStart("softtube client")
 }
 
@@ -55,7 +53,7 @@ func stopLogging() {
 func openDatabase() *core.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
-	crypto := crypt.Crypt{}
+	crypto := core.Crypt{}
 	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")
@@ -85,15 +83,3 @@ func startApplication(db *core.Database) {
 		panic(err)
 	}
 }
-
-// func getExecutablePath() string {
-// 	ex, err := os.Executable()
-// 	if err != nil {
-// 		return ""
-// 	}
-// 	return filepath.Dir(ex)
-// }
-
-// func getResourcePath() string {
-// 	return path.Join(getExecutablePath(), "resources")
-// }

@@ -4,8 +4,6 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
-	gtkHelper "github.com/hultan/softteam-tools/pkg/gtk-helper"
-	"github.com/hultan/softteam-tools/pkg/resources"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
@@ -18,7 +16,7 @@ type Log struct {
 }
 
 // Load : Loads the log
-func (l *Log) Load(helper *gtkHelper.GtkHelper) {
+func (l *Log) Load(helper *GtkHelper) {
 	tree, err := helper.GetTreeView("log_treeview")
 	if err != nil {
 		logger.LogError(err)
@@ -105,7 +103,7 @@ func (l *Log) loadResources() {
 	for i := constLogDownload; i <= constLogError; i++ {
 		fileName := l.getImageFileName(i)
 		if fileName != "" {
-			res := new(resources.Resources)
+			res := new(core.Resources)
 			pic, err := gdk.PixbufNewFromFile(res.GetResourcePath(fileName))
 			if err != nil {
 				logger.LogError(err)

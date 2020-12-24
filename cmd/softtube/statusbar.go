@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gotk3/gotk3/gtk"
-	gtkHelper "github.com/hultan/softteam-tools/pkg/gtk-helper"
 )
 
 // StatusBar : The status bar of SoftTube
@@ -14,7 +13,7 @@ type StatusBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *StatusBar) Load(helper *gtkHelper.GtkHelper) error {
+func (s *StatusBar) Load(helper *GtkHelper) error {
 	label, err := helper.GetLabel("statusbar_number_of_videos")
 	if err != nil {
 		return err

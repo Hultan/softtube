@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	crypt "github.com/hultan/softteam-tools/pkg/crypt"
 	core "github.com/hultan/softtube/internal/softtube.core"
 	"io/ioutil"
 	"os"
@@ -24,7 +23,7 @@ func main() {
 
 	// Decrypt the MySQL password
 	conn := config.Connection
-	crypt := crypt.Crypt{}
+	crypt := core.Crypt{}
 	password, err := crypt.Decrypt(conn.Password)
 	if err != nil {
 		panic(err)

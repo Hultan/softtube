@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/user"
 	"path"
 	"strings"
 )
@@ -47,7 +46,7 @@ type Config struct {
 // Load : Loads a SoftTube configuration file
 func (config *Config) Load(mode string) error {
 	// Get the path to the config file
-	configPath := getConfigPath(mode)
+	configPath := config.getConfigPath(mode)
 
 	// Make sure the file exists
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -74,7 +73,7 @@ func (config *Config) Load(mode string) error {
 // Save : Saves a SoftTube configuration file
 func (config *Config) Save(mode string) {
 	// Get the path to the config file
-	configPath := getConfigPath(mode)
+	configPath := config.getConfigPath(mode)
 
 	// Open config file
 	configFile, err := os.OpenFile(configPath, os.O_TRUNC|os.O_WRONLY, 0644)
@@ -104,7 +103,7 @@ func (config *Config) Save(mode string) {
 // Get path to the config file
 // Mode = "test" returns test config path
 // otherwise returns normal config path
-func getConfigPath(mode string) string {
+func (config *Config) getConfigPath(mode string) string {
 	home := getHomeDirectory()
 
 	var configPath string
@@ -115,14 +114,4 @@ func getConfigPath(mode string) string {
 	}
 
 	return path.Join(home, configPath)
-}
-
-// Get current users home directory
-func getHomeDirectory() string {
-	u, err := user.Current()
-	if err != nil {
-		errorMessage := fmt.Sprintf("Failed to get user home directory : %s", err)
-		panic(errorMessage)
-	}
-	return u.HomeDir
 }
