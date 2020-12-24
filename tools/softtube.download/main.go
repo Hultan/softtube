@@ -14,7 +14,7 @@ import (
 var (
 	logger *core.Logger
 	config *core.Config
-	db     *softtube_database.Database
+	db     *database.Database
 )
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = softtube_database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.OpenDatabase()
 	if err != nil {
 		logger.Log("ERROR (Open database)")

@@ -17,7 +17,7 @@ const maxUpdates = 50
 var (
 	logger *core.Logger
 	config *core.Config
-	db     *softtube_database.Database
+	db     *database.Database
 )
 
 func main() {
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = softtube_database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	db.OpenDatabase()
 	defer db.CloseDatabase()
 	subs, err := db.Subscriptions.GetAll()
@@ -106,7 +106,7 @@ func main() {
 	//updateSubscription(&subs[21])
 }
 
-func updateSubscription(subscription *softtube_database.Subscription) {
+func updateSubscription(subscription *database.Subscription) {
 	logger.LogFormat("Updating channel '", subscription.Name, "'.")
 
 	// Download the subscription RSS
