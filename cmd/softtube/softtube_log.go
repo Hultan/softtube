@@ -5,6 +5,7 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	core "github.com/hultan/softtube/internal/softtube.core"
+	"github.com/hultan/softtube/internal/softtube.database"
 )
 
 // Log : Handles the GUI log
@@ -67,7 +68,7 @@ func (l *SoftTubeLog) insertLog(logType int, logMessage string, first bool) {
 	_ = l.ListStore.Set(iter, []int{0, 1, 2}, []interface{}{image, logMessage, color})
 }
 
-func (l *SoftTubeLog) getLogs() []core.Log {
+func (l *SoftTubeLog) getLogs() []database.Log {
 	logs, err := l.Parent.Database.Log.GetLatest()
 	if err != nil {
 		logger.Log("Failed to load logs!")

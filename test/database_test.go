@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/hultan/softtube/internal/softtube.database"
 	"testing"
 	"time"
 
@@ -159,13 +160,13 @@ func TestVideosInsert(t *testing.T) {
 	}
 }
 
-func openDatabase(t *testing.T) (*core.Database, error) {
+func openDatabase(t *testing.T) (*softtube_database.Database, error) {
 	config, err := getTestConfig()
 	if err != nil {
 		t.Errorf("openDatabase: Failed to get config : %s", err.Error())
 		return nil, err
 	}
-	db := core.New(config.Connection.Server, config.Connection.Port, config.Connection.Database, config.Connection.Username, config.Connection.Password)
+	db := softtube_database.New(config.Connection.Server, config.Connection.Port, config.Connection.Database, config.Connection.Username, config.Connection.Password)
 	err = db.OpenDatabase()
 	if err != nil {
 		t.Errorf("openDatabase: Failed to open database : %s", err.Error())

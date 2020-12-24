@@ -3,9 +3,8 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
+	"github.com/hultan/softtube/internal/softtube.database"
 	"time"
-
-	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
 // Feed : A subscription RSS feed
@@ -27,10 +26,10 @@ func (f *Feed) parse(rss string) {
 	xml.Unmarshal(bytes, &f)
 }
 
-func (f Feed) getVideos() []core.Video {
-	var videoList []core.Video
+func (f Feed) getVideos() []softtube_database.Video {
+	var videoList []softtube_database.Video
 	for i := 0; i < len(f.Entries); i++ {
-		var video core.Video
+		var video softtube_database.Video
 		video.ID = f.Entries[i].ID
 		video.SubscriptionID = f.ChannelID
 		video.Title = f.Entries[i].Title

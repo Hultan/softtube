@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"os/exec"
 	"path"
@@ -13,7 +14,7 @@ import (
 var (
 	logger *core.Logger
 	config *core.Config
-	db     *core.Database
+	db     *softtube_database.Database
 )
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	db = softtube_database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.OpenDatabase()
 	if err != nil {
 		logger.Log("ERROR (Open database)")

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	core "github.com/hultan/softtube/internal/softtube.core"
+	"github.com/hultan/softtube/internal/softtube.database"
 	"io/ioutil"
 	"os"
 	"path"
@@ -13,7 +14,7 @@ import (
 var (
 	cutOff = time.Now().AddDate(0, 0, -14)
 	config *core.Config
-	db     *core.Database
+	db     *softtube_database.Database
 )
 
 func main() {
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	db = softtube_database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	db.OpenDatabase()
 	defer db.CloseDatabase()
 
@@ -61,7 +62,7 @@ func cleanBackups() {
 	}
 }
 
-func cleanThumbnails(db *core.Database) {
+func cleanThumbnails(db *softtube_database.Database) {
 	root := "/softtube/thumbnails"
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
@@ -92,7 +93,7 @@ func FilenameWithoutExtension(fn string) string {
 	return strings.TrimSuffix(fn, path.Ext(fn))
 }
 
-func videoIsDownloadedAndNotWatched(db *core.Database, videoId string) bool {
+func videoIsDownloadedAndNotWatched(db *softtube_database.Database, videoId string) bool {
 	status, _ := db.Videos.GetStatus(videoId)
 	return status == 2
 }

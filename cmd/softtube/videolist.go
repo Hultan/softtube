@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"os/exec"
 	"path"
@@ -29,7 +30,7 @@ type VideoList struct {
 	FilterMode      uint
 }
 
-var videos []core.Video
+var videos []database.Video
 
 //var filterMode int = 0
 var listStore *gtk.ListStore
@@ -223,7 +224,7 @@ func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, _
 	return false
 }
 
-func (v *VideoList) deleteVideo(video *core.Video) {
+func (v *VideoList) deleteVideo(video *database.Video) {
 	pathForDeletion := v.getVideoPathForDeletion(video.ID)
 	if pathForDeletion != "" {
 		command := fmt.Sprintf("rm %s", pathForDeletion)
@@ -267,7 +268,7 @@ func (v *VideoList) deleteVideo(video *core.Video) {
 	}
 }
 
-func (v *VideoList) addVideo(video *core.Video, listStore *gtk.ListStore) {
+func (v *VideoList) addVideo(video *database.Video, listStore *gtk.ListStore) {
 	// Get color based on status
 	backgroundColor, foregroundColor := v.getColor(video)
 	// Get the duration of the video
@@ -324,7 +325,7 @@ func (v *VideoList) getYoutubePath() string {
 }
 
 // Download a youtube video
-func (v *VideoList) downloadDuration(video *core.Video) {
+func (v *VideoList) downloadDuration(video *database.Video) {
 	if video == nil {
 		return
 	}
@@ -357,7 +358,7 @@ func (v *VideoList) getProgress(status int) (int, string) {
 	return 0, ""
 }
 
-func (v *VideoList) getColor(video *core.Video) (string, string) {
+func (v *VideoList) getColor(video *database.Video) (string, string) {
 	if video.Saved {
 		return constColorSaved, "Black"
 	}
@@ -412,7 +413,7 @@ func (v *VideoList) getThumbnail(videoID string) *gdk.Pixbuf {
 	return thumbnail
 }
 
-func (v *VideoList) setAsWatched(video *core.Video, mode int) {
+func (v *VideoList) setAsWatched(video *database.Video, mode int) {
 	var status int
 	switch mode {
 	case 0:
@@ -434,7 +435,7 @@ func (v *VideoList) setAsWatched(video *core.Video, mode int) {
 	v.Refresh("")
 }
 
-func (v *VideoList) setAsSaved(video *core.Video, saved bool) {
+func (v *VideoList) setAsSaved(video *database.Video, saved bool) {
 	err := v.Parent.Database.Videos.UpdateSave(video.ID, saved)
 	if err != nil {
 		if saved {
@@ -472,7 +473,7 @@ func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
 	_ = listStore.SetValue(iter, listStoreColumnBackground, color)
 }
 
-func (v *VideoList) playVideo(video *core.Video) {
+func (v *VideoList) playVideo(video *database.Video) {
 	videoPath := v.getVideoPath(video.ID)
 	if videoPath == "" {
 		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
@@ -548,7 +549,7 @@ func (v *VideoList) getVideoPathForDeletion(videoID string) string {
 }
 
 // Download a youtube video
-func (v *VideoList) downloadVideo(video *core.Video) error {
+func (v *VideoList) downloadVideo(video *database.Video) error {
 	// Set the video to be downloaded
 	err := db.Download.Insert(video.ID)
 	if err != nil {
@@ -599,7 +600,7 @@ func (v *VideoList) downloadVideo(video *core.Video) error {
 // 	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
 // }
 
-func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *core.Video {
+func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *database.Video {
 	selection, err := treeView.GetSelection()
 	if err != nil {
 		return nil

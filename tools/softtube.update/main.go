@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/hultan/softtube/internal/softtube.database"
 	"path"
 	"regexp"
 	"sync"
@@ -16,7 +17,7 @@ const maxUpdates = 50
 var (
 	logger *core.Logger
 	config *core.Config
-	db     *core.Database
+	db     *softtube_database.Database
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	db = softtube_database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	db.OpenDatabase()
 	defer db.CloseDatabase()
 	subs, err := db.Subscriptions.GetAll()
@@ -105,7 +106,7 @@ func main() {
 	//updateSubscription(&subs[21])
 }
 
-func updateSubscription(subscription *core.Subscription) {
+func updateSubscription(subscription *softtube_database.Subscription) {
 	logger.LogFormat("Updating channel '", subscription.Name, "'.")
 
 	// Download the subscription RSS

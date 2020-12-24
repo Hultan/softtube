@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/hultan/softtube/internal/softtube.database"
 	"path"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -10,7 +11,7 @@ import (
 var (
 	logger   *core.Logger
 	config   *core.Config
-	db       *core.Database
+	db       *database.Database
 	softTube *SoftTube
 )
 
@@ -50,7 +51,7 @@ func stopLogging() {
 	logger.Close()
 }
 
-func openDatabase() *core.Database {
+func openDatabase() *database.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
 	crypto := core.Crypt{}
@@ -61,7 +62,7 @@ func openDatabase() *core.Database {
 		panic(err)
 	}
 
-	db = core.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.OpenDatabase()
 	if err!=nil {
 		return nil
@@ -73,7 +74,7 @@ func closeDatabase() {
 	db.CloseDatabase()
 }
 
-func startApplication(db *core.Database) {
+func startApplication(db *database.Database) {
 	// Create a new application.
 	softTube = new(SoftTube)
 	err := softTube.StartApplication(db)
