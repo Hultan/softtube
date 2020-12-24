@@ -36,7 +36,7 @@ var listStore *gtk.ListStore
 var filter *gtk.TreeModelFilter
 
 // Load : Loads the toolbar from the glade file
-func (v *VideoList) Load(helper *GtkHelper) error {
+func (v *VideoList) Load(helper *core.GtkHelper) error {
 	v.FilterMode = 0
 	// Get the tree view
 	treeView, err := helper.GetTreeView("video_treeview")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hultan/softtube/internal/softtube.core"
 
 	"github.com/gotk3/gotk3/gtk"
 )
@@ -13,7 +14,7 @@ type StatusBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *StatusBar) Load(helper *GtkHelper) error {
+func (s *StatusBar) Load(helper *core.GtkHelper) error {
 	label, err := helper.GetLabel("statusbar_number_of_videos")
 	if err != nil {
 		return err

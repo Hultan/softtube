@@ -8,7 +8,7 @@ import (
 )
 
 // Log : Handles the GUI log
-type Log struct {
+type SoftTubeLog struct {
 	Parent      *SoftTube
 	TreeView    *gtk.TreeView
 	ListStore   *gtk.ListStore
@@ -16,7 +16,7 @@ type Log struct {
 }
 
 // Load : Loads the log
-func (l *Log) Load(helper *GtkHelper) {
+func (l *SoftTubeLog) Load(helper *core.GtkHelper) {
 	tree, err := helper.GetTreeView("log_treeview")
 	if err != nil {
 		logger.LogError(err)
@@ -34,7 +34,7 @@ func (l *Log) Load(helper *GtkHelper) {
 }
 
 // FillLog : Fills the log with the last n logs
-func (l *Log) FillLog() {
+func (l *SoftTubeLog) FillLog() {
 	logs := l.getLogs()
 	l.setupColumns()
 	l.loadResources()
@@ -47,14 +47,14 @@ func (l *Log) FillLog() {
 }
 
 // InsertLog : Adds a log to the GUI log
-func (l *Log) InsertLog(logType int, logMessage string) {
+func (l *SoftTubeLog) InsertLog(logType int, logMessage string) {
 	// Insert into the gui log
 	l.TreeView.SetModel(nil)
 	l.insertLog(logType, logMessage, true)
 	l.TreeView.SetModel(l.ListStore)
 }
 
-func (l *Log) insertLog(logType int, logMessage string, first bool) {
+func (l *SoftTubeLog) insertLog(logType int, logMessage string, first bool) {
 	color := l.getColor(logType)
 	image := l.ImageBuffer[logType]
 	var iter *gtk.TreeIter
@@ -67,7 +67,7 @@ func (l *Log) insertLog(logType int, logMessage string, first bool) {
 	_ = l.ListStore.Set(iter, []int{0, 1, 2}, []interface{}{image, logMessage, color})
 }
 
-func (l *Log) getLogs() []core.Log {
+func (l *SoftTubeLog) getLogs() []core.Log {
 	logs, err := l.Parent.Database.Log.GetLatest()
 	if err != nil {
 		logger.Log("Failed to load logs!")
@@ -77,7 +77,7 @@ func (l *Log) getLogs() []core.Log {
 	return logs
 }
 
-func (l *Log) setupColumns() {
+func (l *SoftTubeLog) setupColumns() {
 	imageRenderer, _ := gtk.CellRendererPixbufNew()
 	imageColumn, _ := gtk.TreeViewColumnNew()
 	imageColumn.SetExpand(false)
@@ -99,7 +99,7 @@ func (l *Log) setupColumns() {
 	l.TreeView.AppendColumn(logTextColumn)
 }
 
-func (l *Log) loadResources() {
+func (l *SoftTubeLog) loadResources() {
 	for i := constLogDownload; i <= constLogError; i++ {
 		fileName := l.getImageFileName(i)
 		if fileName != "" {
@@ -113,7 +113,7 @@ func (l *Log) loadResources() {
 	}
 }
 
-func (l *Log) getImageFileName(index int) string {
+func (l *SoftTubeLog) getImageFileName(index int) string {
 	switch index {
 	case 0:
 		return "download.png"
@@ -132,7 +132,7 @@ func (l *Log) getImageFileName(index int) string {
 	}
 }
 
-func (l *Log) getColor(logType int) string {
+func (l *SoftTubeLog) getColor(logType int) string {
 	color := constColorNotDownloaded
 
 	switch logType {

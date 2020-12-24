@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softtube/internal/softtube.core"
 )
 
 // Toolbar : The toolbar for SoftTube application
@@ -21,7 +22,7 @@ type Toolbar struct {
 }
 
 // Load : Loads the toolbar
-func (t *Toolbar) Load(helper *GtkHelper) error {
+func (t *Toolbar) Load(helper *core.GtkHelper) error {
 	toggle, err := helper.GetToggleToolButton("toolbar_subscriptions")
 	if err != nil {
 		return err

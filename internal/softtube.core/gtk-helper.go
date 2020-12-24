@@ -1,8 +1,7 @@
-package main
+package core
 
 import (
 	"errors"
-	core "github.com/hultan/softtube/internal/softtube.core"
 	"os"
 	"path"
 
@@ -31,7 +30,7 @@ func exists(path string) bool {
 func GtkHelperNewFromFile(fileName string) *GtkHelper {
 	helper := new(GtkHelper)
 
-	resources := new(core.Resources)
+	resources := new(Resources)
 	exePath := resources.GetExecutablePath()
 	gladePath := path.Join(exePath, fileName)
 	if !exists(gladePath) {
@@ -60,7 +59,7 @@ func (g *GtkHelper) SetBuilder(builder *gtk.Builder) {
 // GetGladePath : Get the path to the glade external resource file
 func (g *GtkHelper) GetGladePath(fileName string) (string, error) {
 	// Check main path, works most times
-	resources := new(core.Resources)
+	resources := new(Resources)
 	if fileName == "" {
 		fileName = "main.glade"
 	}

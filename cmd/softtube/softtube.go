@@ -15,7 +15,7 @@ type SoftTube struct {
 	PopupMenu *PopupMenu
 	SearchBar *SearchBar
 	VideoList *VideoList
-	Log       *Log
+	Log       *SoftTubeLog
 }
 
 // StartApplication : Starts the SoftTube application
@@ -27,7 +27,7 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 
 	gtk.Init(nil)
 
-	helper := GtkHelperNewFromFile("main.glade")
+	helper := core.GtkHelperNewFromFile("main.glade")
 
 	win, err := helper.GetWindow("main_window")
 	if err != nil {
@@ -97,7 +97,7 @@ func (s *SoftTube) StartApplication(db *core.Database) error {
 	s.PopupMenu.SetupEvents()
 
 	// Load log
-	s.Log = &Log{Parent: s, TreeView: s.VideoList.TreeView}
+	s.Log = &SoftTubeLog{Parent: s, TreeView: s.VideoList.TreeView}
 	s.Log.Load(helper)
 	s.Log.FillLog()
 

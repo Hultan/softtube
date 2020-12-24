@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softtube/internal/softtube.core"
 )
 
 // PopupMenu : Handler the video list popupmenu
@@ -25,7 +26,7 @@ type PopupMenu struct {
 }
 
 // Load : Loads the popup menu
-func (p *PopupMenu) Load(helper *GtkHelper) error {
+func (p *PopupMenu) Load(helper *core.GtkHelper) error {
 	menu, err := helper.GetMenu("popupmenu")
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softtube/internal/softtube.core"
 )
 
 // SearchBar : The SoftTube search bar
@@ -12,7 +13,7 @@ type SearchBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *SearchBar) Load(helper *GtkHelper) error {
+func (s *SearchBar) Load(helper *core.GtkHelper) error {
 	clearButton, err := helper.GetButton("clear_search_button")
 	if err != nil {
 		return err
