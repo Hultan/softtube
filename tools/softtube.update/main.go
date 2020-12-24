@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hultan/softtube/internal/softtube.database"
+	"os"
 	"path"
 	"regexp"
 	"sync"
@@ -29,7 +30,11 @@ func main() {
 
 	// Load config file
 	config = new(core.Config)
-	config.Load("main")
+	err = config.Load("main")
+	if err != nil {
+		fmt.Println("ERROR (Open config) : ", err.Error())
+		os.Exit(1)
+	}
 
 	// Setup logging
 	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Update))
@@ -50,7 +55,12 @@ func main() {
 
 	// Create the database object, and get all subscriptions
 	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	db.OpenDatabase()
+	err = db.OpenDatabase()
+	if err != nil {
+		fmt.Println("ERROR (Open config) : ", err.Error())
+		os.Exit(1)
+	}
+
 	defer db.CloseDatabase()
 	subs, err := db.Subscriptions.GetAll()
 
@@ -124,7 +134,7 @@ func updateSubscription(subscription *database.Subscription) {
 	// Get videos in the RSS
 	videos := feed.getVideos()
 
-	// Create the waitgroup to syncronize the goroutines below
+	// Create the waitgroup to synchronize the goroutines below
 	var waitGroup sync.WaitGroup
 
 	for i := 0; i < len(videos); i++ {
@@ -187,7 +197,7 @@ func updateSubscription(subscription *database.Subscription) {
 	if err != nil {
 		logger.LogError(err)
 	}
-	db.Subscriptions.UpdateLastChecked(subscription, interval)
+	_ = db.Subscriptions.UpdateLastChecked(subscription, interval)
 
 	waitGroup.Wait()
 }

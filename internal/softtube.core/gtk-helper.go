@@ -13,6 +13,7 @@ type GtkHelper struct {
 	builder *gtk.Builder
 }
 
+//GtkHelperNew : Creates a new gtk-helper
 func GtkHelperNew(builder *gtk.Builder) *GtkHelper {
 	helper := new(GtkHelper)
 	helper.builder = builder

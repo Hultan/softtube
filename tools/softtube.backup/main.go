@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path"
 	"time"
@@ -16,10 +17,20 @@ const (
 func main() {
 	// Load config file
 	config := new(core.Config)
-	config.Load("main")
+	err := config.Load("main")
+	if err!=nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
-	backup("softtube", config.ServerPaths.Backup)
+	err = backup("softtube", config.ServerPaths.Backup)
 	//backup("softtubeTEST", config.ServerPaths.Backup)
+	if err!=nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	os.Exit(0)
 }
 
 // Backs up a mysql database

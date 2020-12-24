@@ -69,14 +69,14 @@ func main() {
 }
 
 // Download a youtube video
-func downloadVideo(videoID string, wait *sync.WaitGroup) error {
+func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// Set video status as downloading
 	err := db.Videos.UpdateStatus(videoID, constStatusDownloading)
 	if err != nil {
 		logger.Log("Failed to set video status to downloading before download!")
 		logger.LogError(err)
 		wait.Done()
-		return err
+		return
 	}
 
 	// Set the video as downloaded in database
@@ -88,7 +88,7 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 		logger.Log("Failed to delete video from table download after download!")
 		logger.LogError(err)
 		wait.Done()
-		return err
+		return
 	}
 
 	// Download the video
@@ -104,7 +104,7 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 		logger.Log(msg)
 		logger.LogError(err)
 		wait.Done()
-		return err
+		return
 	}
 
 	// Set video status as downloaded
@@ -113,11 +113,11 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) error {
 		logger.Log("Failed to set video status to downloaded after download!")
 		logger.LogError(err)
 		wait.Done()
-		return err
+		return
 	}
 
 	wait.Done()
-	return nil
+	return
 }
 
 func getYoutubePath() string {

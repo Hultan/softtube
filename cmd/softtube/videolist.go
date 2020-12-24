@@ -31,10 +31,7 @@ type VideoList struct {
 }
 
 var videos []database.Video
-
-//var filterMode int = 0
 var listStore *gtk.ListStore
-var filter *gtk.TreeModelFilter
 
 // Load : Loads the toolbar from the glade file
 func (v *VideoList) Load(helper *core.GtkHelper) error {

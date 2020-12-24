@@ -210,6 +210,7 @@ func (p *PopupMenu) SetupEvents() {
 			clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
 			if err != nil {
 				fmt.Println("Clipboard error!")
+				return
 			}
 			clipboard.SetText(video.ID)
 		}

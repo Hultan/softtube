@@ -16,7 +16,7 @@ type Crypt struct {
 }
 
 // Not so secret key!
-var key []byte = []byte("SoftTeam and SoftTube are good!!") // 32 bytes
+var key = []byte("SoftTeam and SoftTube are good!!") // 32 bytes
 
 // https://stackoverflow.com/questions/18817336/golang-encrypting-a-string-with-aes-and-base64
 

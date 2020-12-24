@@ -41,9 +41,9 @@ func (r *Resources) GetResourcesPath() string {
 }
 
 func (r *Resources) checkPathsExists(pathsToCheck []string) (string, error) {
-	for _,path := range pathsToCheck {
-		if _, err := os.Stat(path); os.IsNotExist(err) == false {
-			return path, nil
+	for _, pathToCheck := range pathsToCheck {
+		if _, err := os.Stat(pathToCheck); os.IsNotExist(err) == false {
+			return pathToCheck, nil
 		}
 	}
 	return "", errors.New("paths do not exist")

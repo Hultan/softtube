@@ -23,7 +23,7 @@ type Entry struct {
 
 func (f *Feed) parse(rss string) {
 	bytes := []byte(rss)
-	xml.Unmarshal(bytes, &f)
+	_ = xml.Unmarshal(bytes, &f)
 }
 
 func (f Feed) getVideos() []database.Video {

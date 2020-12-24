@@ -20,7 +20,11 @@ var (
 func main() {
 	// Load config file
 	config = new(core.Config)
-	config.Load("main")
+	err := config.Load("main")
+	if err!=nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
 	// Decrypt the MySQL password
 	conn := config.Connection
@@ -32,7 +36,12 @@ func main() {
 
 	// Create the database object, and get all subscriptions
 	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	db.OpenDatabase()
+	err = db.OpenDatabase()
+	if err!=nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
 	defer db.CloseDatabase()
 
 	cleanBackups()
@@ -51,12 +60,13 @@ func cleanBackups() {
 		info, err := os.Stat(fileName)
 		if err != nil {
 			// Ignore file
+			continue
 		}
 		if !info.IsDir() {
-			time := info.ModTime()
-			if time.Before(cutOff) {
+			modTime := info.ModTime()
+			if modTime.Before(cutOff) {
 				fmt.Println("Removing old backup:", fileName)
-				os.Remove(fileName)
+				_ = os.Remove(fileName)
 			}
 		}
 	}
@@ -76,13 +86,14 @@ func cleanThumbnails(db *database.Database) {
 		info, err := os.Stat(fileName)
 		if err != nil {
 			// Ignore file
+			continue
 		}
 		if !info.IsDir() {
-			time := info.ModTime()
-			if time.Before(cutOff) {
+			modTime := info.ModTime()
+			if modTime.Before(cutOff) {
 				videoId := FilenameWithoutExtension(file.Name())
 				if !videoIsDownloadedAndNotWatched(db, videoId) {
-					os.Remove(fileName)
+					_ = os.Remove(fileName)
 				}
 			}
 		}

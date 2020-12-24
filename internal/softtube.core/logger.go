@@ -22,9 +22,9 @@ func NewLog(path string) *Logger {
 	// Check if the log file is too large
 	if size > constMaxLogFileSize {
 		// Remove old bak file
-		os.Remove(path + ".bak")
+		_ = os.Remove(path + ".bak")
 		// Rename log file to log file.bak
-		os.Rename(path, path+".bak")
+		_ = os.Rename(path, path+".bak")
 	}
 	// Create a new log object
 	l := Logger{path, nil}
@@ -44,7 +44,7 @@ func NewLog(path string) *Logger {
 
 // Close the log file
 func (l *Logger) Close() {
-	l.File.Close()
+	_ = l.File.Close()
 }
 
 // LogStart : Write beginning of log message
