@@ -51,3 +51,6 @@ const constSetAsNotSaved = "Set as not saved"
 const constSetAsWatched = "Set as watched"
 const constSetAsUnwatched = "Set as unwatched"
 const constSetAsNotDownloaded = "Set as not downloaded"
+
+const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'"
+const constThumbnailLocation string = "%s/%s"

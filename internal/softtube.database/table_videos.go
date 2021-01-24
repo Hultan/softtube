@@ -12,6 +12,12 @@ type VideosTable struct {
 	Connection *sql.DB
 }
 
+const sqlStatementGetFailedDownloads = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, 
+										Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
+									FROM Videos 
+									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id
+									WHERE Videos.status = 1
+									ORDER BY added desc`
 const sqlStatementVideoExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
 const sqlStatementGetStatus = "SELECT status FROM Videos WHERE id=?"
 const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
@@ -234,13 +240,20 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 }
 
 // GetVideos : Gets a list of the latest videos
-func (v VideosTable) GetVideos() ([]Video, error) {
+func (v VideosTable) GetVideos(failed bool) ([]Video, error) {
 	// Check that database is opened
 	if v.Connection == nil {
 		return nil, errors.New("database not opened")
 	}
 
-	rows, err := v.Connection.Query(sqlStatementGetLatest)
+	var sql string
+	if failed {
+		sql = sqlStatementGetFailedDownloads
+	} else {
+		sql = sqlStatementGetLatest
+	}
+
+	rows, err := v.Connection.Query(sql)
 	if err != nil {
 		return []Video{}, err
 	}

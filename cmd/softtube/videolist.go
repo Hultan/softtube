@@ -117,7 +117,7 @@ func (v *VideoList) Refresh(text string) {
 
 	db := v.Parent.Database
 	if text == "" {
-		videos, err = db.Videos.GetVideos()
+		videos, err = db.Videos.GetVideos(false)
 	} else {
 		videos, err = db.Videos.Search(text)
 	}
@@ -343,6 +343,24 @@ func (v *VideoList) downloadDuration(video *database.Video) {
 
 		_ = v.Parent.Database.Videos.UpdateDuration(video.ID, duration)
 	}()
+}
+
+// Get the thumbnail of a youtube video
+func (v *VideoList) downloadThumbnail(video *database.Video) (string, error) {
+	// %s/%s.jpg
+	thumbPath := fmt.Sprintf(constThumbnailLocation, config.ServerPaths.Thumbnails, video.ID)
+
+	// Don't download thumbnail if it already exists
+	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+		// youtube-dl --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'
+		command := fmt.Sprintf(constThumbnailCommand, v.getYoutubePath(), thumbPath, video.ID)
+		cmd := exec.Command("/bin/bash", "-c", command)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return string(output), err
+		}
+	}
+	return "", nil
 }
 
 func (v *VideoList) getProgress(status int) (int, string) {

@@ -1,14 +1,4 @@
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
-github.com/gotk3/gotk3 v0.4.0 h1:TIuhyQitGeRTxOQIV3AJlYtEWWJpC74JHwAIsxlH8MU=
-github.com/gotk3/gotk3 v0.4.0/go.mod h1:Eew3QBwAOBTrfFFDmsDE5wZWbcagBL1NUslj1GhRveo=
-github.com/gotk3/gotk3 v0.4.1-0.20200919055744-5c37c8051f06 h1:H+vnMHYamP+gF78TYWskm2LIABrrbWJ4ItGv/J42P4s=
-github.com/gotk3/gotk3 v0.4.1-0.20200919055744-5c37c8051f06/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
 github.com/gotk3/gotk3 v0.5.1 h1:zIZM2K4gmkGz1idEFVUPTQfAK/pnWoLKrlIjLOc4kzo=
 github.com/gotk3/gotk3 v0.5.1/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
-github.com/hultan/softteam v0.1.2 h1:fw7tA7nDxMvpgAjFEckYXYKhTE7xBcSlU0RuxhcRve4=
-github.com/hultan/softteam v0.1.2/go.mod h1:QEXMKw8q+S4qRoL0REfFtTa9e8d8Kj9KHFq/U2skAPY=
-github.com/hultan/softteam-tools v1.2.2 h1:3K80JRsMP6+UgYUtg0SirVYeZPDz7gTms9oIQKCVLQ4=
-github.com/hultan/softteam-tools v1.2.2/go.mod h1:PxNInslnmARlAlqpYK/DhUGndmWVRU8HAh/Ir8RL9mI=
-github.com/hultan/softteam-tools v1.2.4 h1:P6PidHyLD/bMmz/FmCHPkoRdh5GksKE801YSgEU36Uk=
-github.com/hultan/softteam-tools v1.2.4/go.mod h1:PxNInslnmARlAlqpYK/DhUGndmWVRU8HAh/Ir8RL9mI=
