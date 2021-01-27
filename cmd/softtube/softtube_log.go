@@ -65,7 +65,14 @@ func (l *SoftTubeLog) insertLog(logType int, logMessage string, first bool) {
 	} else {
 		iter = l.ListStore.InsertBefore(nil)
 	}
-	_ = l.ListStore.Set(iter, []int{0, 1, 2}, []interface{}{image, logMessage, color})
+	_ = l.ListStore.Set(iter, []int{0, 1, 2}, []interface{}{image, l.shortenString(logMessage), color})
+}
+
+func (l *SoftTubeLog) shortenString(text string) string {
+	if len(text)>50 {
+		return text[:47] + "..."
+	}
+	return text
 }
 
 func (l *SoftTubeLog) getLogs() []database.Log {

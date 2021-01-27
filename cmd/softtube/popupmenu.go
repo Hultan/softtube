@@ -202,7 +202,7 @@ func (p *PopupMenu) SetupEvents() {
 				p.PopupDeleteAll.SetVisible(false)
 				p.PopupUnwatch.SetSensitive(false)
 				p.PopupUnwatch.SetLabel(constSetAsWatched)
-				p.PopupSave.SetSensitive(false)
+				p.PopupSave.SetSensitive(true)
 				p.PopupSave.SetLabel(constSetAsNotSaved)
 				p.PopupSubscriptions.SetSensitive(true)
 				p.PopupToWatch.SetSensitive(true)
