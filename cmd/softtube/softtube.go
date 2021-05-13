@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
-	core "github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
@@ -28,13 +27,9 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	gtk.Init(nil)
 
-	helper := core.GtkHelperNewFromFile("main.glade")
+	builder := newSoftBuilder("main.glade")
 
-	win, err := helper.GetWindow("main_window")
-	if err != nil {
-		logger.LogError(err)
-		panic(err)
-	}
+	win := builder.getObject("main_window").(*gtk.Window)
 	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
 	_,_ = win.Connect("destroy", func() {
@@ -44,7 +39,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load tool bar
 	s.Toolbar = &Toolbar{Parent: s}
-	err = s.Toolbar.Load(helper)
+	err := s.Toolbar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -53,7 +48,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load status bar
 	s.StatusBar = &StatusBar{Parent: s}
-	err = s.StatusBar.Load(helper)
+	err = s.StatusBar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -61,7 +56,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load menu bar
 	s.MenuBar = &MenuBar{Parent: s}
-	err = s.MenuBar.Load(helper)
+	err = s.MenuBar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -70,7 +65,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load search bar
 	s.SearchBar = &SearchBar{Parent: s}
-	err = s.SearchBar.Load(helper)
+	err = s.SearchBar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -79,7 +74,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load video list
 	s.VideoList = &VideoList{Parent: s}
-	err = s.VideoList.Load(helper)
+	err = s.VideoList.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -90,7 +85,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load popup menu bar
 	s.PopupMenu = &PopupMenu{Parent: s}
-	err = s.PopupMenu.Load(helper)
+	err = s.PopupMenu.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)
@@ -99,7 +94,7 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	// Load log
 	s.Log = &SoftTubeLog{Parent: s, TreeView: s.VideoList.TreeView}
-	s.Log.Load(helper)
+	s.Log.Load(builder)
 	s.Log.FillLog()
 
 	// Show the Window and all of its components.

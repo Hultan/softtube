@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/hultan/softtube/internal/softtube.core"
 )
 
 // Toolbar : The toolbar for SoftTube application
@@ -22,65 +21,35 @@ type Toolbar struct {
 }
 
 // Load : Loads the toolbar
-func (t *Toolbar) Load(helper *core.GtkHelper) error {
-	toggle, err := helper.GetToggleToolButton("toolbar_subscriptions")
-	if err != nil {
-		return err
-	}
+func (t *Toolbar) Load(builder *SoftBuilder) error {
+	toggle := builder.getObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
 	t.ToolbarSubscriptions = toggle
 
-	toggle, err = helper.GetToggleToolButton("toolbar_to_watch")
-	if err != nil {
-		return err
-	}
+	toggle = builder.getObject("toolbar_to_watch").(*gtk.ToggleToolButton)
 	t.ToolbarToWatch = toggle
 
-	toggle, err = helper.GetToggleToolButton("toolbar_to_delete")
-	if err != nil {
-		return err
-	}
+	toggle = builder.getObject("toolbar_to_delete").(*gtk.ToggleToolButton)
 	t.ToolbarToDelete = toggle
 
-	toggle, err = helper.GetToggleToolButton("toolbar_saved")
-	if err != nil {
-		return err
-	}
+	toggle = builder.getObject("toolbar_saved").(*gtk.ToggleToolButton)
 	t.ToolbarSaved = toggle
 
-	tool, err := helper.GetToolButton("toolbar_scroll_to_start")
-	if err != nil {
-		return err
-	}
+	tool := builder.getObject("toolbar_scroll_to_start").(*gtk.ToolButton)
 	t.ToolbarScrollToStart = tool
 
-	tool, err = helper.GetToolButton("toolbar_scroll_to_end")
-	if err != nil {
-		return err
-	}
+	tool = builder.getObject("toolbar_scroll_to_end").(*gtk.ToolButton)
 	t.ToolbarScrollToEnd = tool
 
-	toggleTool, err := helper.GetToggleToolButton("toolbar_keep_scroll_to_end")
-	if err != nil {
-		return err
-	}
-	t.ToolbarKeepScrollToEnd = toggleTool
+	toggle = builder.getObject("toolbar_keep_scroll_to_end").(*gtk.ToggleToolButton)
+	t.ToolbarKeepScrollToEnd = toggle
 
-	tool, err = helper.GetToolButton("toolbar_refresh_button")
-	if err != nil {
-		return err
-	}
+	tool = builder.getObject("toolbar_refresh_button").(*gtk.ToolButton)
 	t.ToolbarRefresh = tool
 
-	tool, err = helper.GetToolButton("toolbar_delete_all_button")
-	if err != nil {
-		return err
-	}
+	tool = builder.getObject("toolbar_delete_all_button").(*gtk.ToolButton)
 	t.ToolbarDeleteAll = tool
 
-	tool, err = helper.GetToolButton("toolbar_quit_button")
-	if err != nil {
-		return err
-	}
+	tool = builder.getObject("toolbar_quit_button").(*gtk.ToolButton)
 	t.ToolbarQuit = tool
 
 	return nil
