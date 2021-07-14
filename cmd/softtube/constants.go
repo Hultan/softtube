@@ -2,7 +2,7 @@ package main
 
 //const constAppID = "com.github.hultan.softtube"
 const constAppTitle = "SoftTube"
-const constAppVersion = "2.15"
+const constAppVersion = "2.20"
 const constDateLayout = "2006-01-02"
 
 // LISTSTORE COLUMNS
@@ -38,6 +38,7 @@ const constFilterModeSubscriptions = 0
 const constFilterModeToWatch = 1
 const constFilterModeToDelete = 2
 const constFilterModeSaved = 3
+const constFilterModeDownloads = 4
 
 const constLogDownload = 0
 const constLogPlay = 1

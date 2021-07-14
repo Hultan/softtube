@@ -193,6 +193,10 @@ func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, _
 	switch v.FilterMode {
 	case constFilterModeSubscriptions:
 		return true
+	case constFilterModeDownloads:
+		if color == constColorDownloading {
+			return true
+		}
 	case constFilterModeToWatch:
 		if color == constColorDownloaded {
 			return true

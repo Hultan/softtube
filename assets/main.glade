@@ -124,6 +124,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="menu_view_downloads">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Downloads</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkRadioMenuItem" id="menu_view_to_watch">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -217,6 +225,18 @@
                 <property name="label" translatable="yes">Subscriptions</property>
                 <property name="use_underline">True</property>
                 <property name="active">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleToolButton" id="toolbar_failed">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Downloads</property>
+                <property name="use_underline">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -692,6 +712,14 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Subscriptions</property>
+                <property name="use_underline">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="popup_view_failed">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Downloads</property>
                 <property name="use_underline">True</property>
               </object>
             </child>

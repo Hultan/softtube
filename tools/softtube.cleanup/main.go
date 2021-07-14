@@ -12,37 +12,37 @@ import (
 )
 
 var (
-	cutOff = time.Now().AddDate(0, 0, -14)
+	cutOff = time.Now().AddDate(0, 0, -30)
 	config *core.Config
 	db     *database.Database
 )
 
 func main() {
-	// Load config file
-	config = new(core.Config)
-	err := config.Load("main")
-	if err!=nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	// Decrypt the MySQL password
-	conn := config.Connection
-	crypt := core.Crypt{}
-	password, err := crypt.Decrypt(conn.Password)
-	if err != nil {
-		panic(err)
-	}
-
-	// Create the database object, and get all subscriptions
-	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	err = db.OpenDatabase()
-	if err!=nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	defer db.CloseDatabase()
+	//// Load config file
+	//config = new(core.Config)
+	//err := config.Load("main")
+	//if err!=nil {
+	//	fmt.Println(err.Error())
+	//	os.Exit(1)
+	//}
+	//
+	//// Decrypt the MySQL password
+	//conn := config.Connection
+	//crypt := core.Crypt{}
+	//password, err := crypt.Decrypt(conn.Password)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//// Create the database object, and get all subscriptions
+	//db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	//err = db.OpenDatabase()
+	//if err!=nil {
+	//	fmt.Println(err.Error())
+	//	os.Exit(1)
+	//}
+	//
+	//defer db.CloseDatabase()
 
 	cleanBackups()
 	cleanThumbnails(db)
@@ -78,7 +78,6 @@ func cleanThumbnails(db *database.Database) {
 	if err != nil {
 		panic(err)
 	}
-
 
 	for _, file := range files {
 		fileName := path.Join(root, file.Name())
