@@ -164,7 +164,7 @@ func (v *VideoList) getVideoPathForDeletion(videoID string) string {
 }
 
 // Download a youtube video
-func (v *VideoList) downloadVideo(video *database.Video) error {
+func (v *VideoList) downloadVideo(video *database.Video, markAsDownloading bool) error {
 	// Set the video to be downloaded
 	err := db.Download.Insert(video.ID)
 	if err != nil {
@@ -173,8 +173,10 @@ func (v *VideoList) downloadVideo(video *database.Video) error {
 		return err
 	}
 
-	// Mark the selected video with downloading color
-	v.setRowColor(v.TreeView, constColorDownloading)
+	if markAsDownloading {
+		// Mark the selected video with downloading color
+		v.setRowColor(v.TreeView, constColorDownloading)
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(3)

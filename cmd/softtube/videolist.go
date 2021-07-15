@@ -244,7 +244,7 @@ func (v *VideoList) rowActivated(treeView *gtk.TreeView) {
 	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
 		v.playVideo(video)
 	} else if video.Status == constStatusNotDownloaded {
-		err := v.downloadVideo(video)
+		err := v.downloadVideo(video, true)
 		if err != nil {
 			logger.LogError(err)
 		}

@@ -195,14 +195,14 @@ func (p *PopupMenu) SetupEvents() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
-			_ = p.Parent.VideoList.downloadVideo(video)
+			_ = p.Parent.VideoList.downloadVideo(video, true)
 		}
 	})
 	_, _ = p.PopupRedownloadVideo.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
-			_ = p.Parent.VideoList.downloadVideo(video)
+			_ = p.Parent.VideoList.downloadVideo(video, false)
 		}
 	})
 	_, _ = p.PopupRedownloadVideos.Connect("activate", func() {
@@ -214,7 +214,7 @@ func (p *PopupMenu) SetupEvents() {
 		for key, _ := range videos {
 			video := &videos[key]
 			if video != nil {
-				_ = p.Parent.VideoList.downloadVideo(video)
+				_ = p.Parent.VideoList.downloadVideo(video, false)
 			}
 		}
 	})
