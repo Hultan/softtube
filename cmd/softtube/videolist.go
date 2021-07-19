@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"path/filepath"
@@ -29,14 +30,14 @@ var videos []database.Video
 var listStore *gtk.ListStore
 
 // Load : Loads the toolbar from the glade file
-func (v *VideoList) Load(builder *SoftBuilder) error {
+func (v *VideoList) Load(builder *framework.GtkBuilder) error {
 	v.FilterMode = 0
 	// Get the tree view
-	treeView := builder.getObject("video_treeview").(*gtk.TreeView)
+	treeView := builder.GetObject("video_treeview").(*gtk.TreeView)
 	v.TreeView = treeView
 
 	// Get the scrolled window surrounding the treeview
-	scroll := builder.getObject("scrolled_window").(*gtk.ScrolledWindow)
+	scroll := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
 	v.ScrolledWindow = scroll
 
 	return nil
@@ -45,10 +46,7 @@ func (v *VideoList) Load(builder *SoftBuilder) error {
 // SetupEvents : Setup the list events
 func (v *VideoList) SetupEvents() {
 	// Send in the videolist as a user data parameter to the event
-	_, err := v.TreeView.Connect("row_activated", v.rowActivated)
-	if err != nil {
-		logger.LogError(err)
-	}
+	_ = v.TreeView.Connect("row_activated", v.rowActivated)
 }
 
 // SetupColumns : Sets up the listview columns
@@ -180,7 +178,7 @@ func (v *VideoList) Refresh(text string) {
 // Private functions
 //
 
-func (v *VideoList) filterFunc(model *gtk.TreeModelFilter, iter *gtk.TreeIter, _ ...interface{}) bool {
+func (v *VideoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	value, err := model.GetValue(iter, listStoreColumnBackground)
 	if err != nil {
 		logger.LogError(err)

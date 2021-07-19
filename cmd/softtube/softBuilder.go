@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softteam/framework"
 )
 
 type SoftBuilder struct {
@@ -16,13 +18,17 @@ func newSoftBuilder(fileName string) *SoftBuilder {
 }
 
 func (s *SoftBuilder) createBuilder(gladeFileName string) {
-	gladePath, err := getResourcePath(gladeFileName)
-	if err != nil {
+	fw := framework.NewFramework()
+	gladePath := fw.Resource.GetResourcePath(gladeFileName)
+	if gladePath == "" {
+		err := errors.New("resource path not found")
+		logger.LogError(err)
 		panic(err)
 	}
 
 	builder, err := gtk.BuilderNewFromFile(gladePath)
 	if err != nil {
+		logger.LogError(err)
 		panic(err)
 	}
 

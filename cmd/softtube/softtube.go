@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
@@ -27,19 +28,24 @@ func (s *SoftTube) StartApplication(db *database.Database) error {
 
 	gtk.Init(nil)
 
-	builder := newSoftBuilder("main.glade")
+	fw := framework.NewFramework()
+	builder, err := fw.Gtk.CreateBuilder("main.glade")
+	if err != nil {
+		logger.LogError(err)
+		return err
+	}
 
-	win := builder.getObject("main_window").(*gtk.Window)
+	win := builder.GetObject("main_window").(*gtk.Window)
 	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
-	_,_ = win.Connect("destroy", func() {
+	_ = win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
 	win.SetIconName("video-display")
 
 	// Load tool bar
 	s.Toolbar = &Toolbar{Parent: s}
-	err := s.Toolbar.Load(builder)
+	err = s.Toolbar.Load(builder)
 	if err != nil {
 		logger.LogError(err)
 		panic(err)

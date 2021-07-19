@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softteam/framework"
 )
 
 // PopupMenu : Handler the video list popupmenu
@@ -30,59 +31,59 @@ type PopupMenu struct {
 }
 
 // Load : Loads the popup menu
-func (p *PopupMenu) Load(builder *SoftBuilder) error {
-	menu := builder.getObject("popupmenu").(*gtk.Menu)
+func (p *PopupMenu) Load(builder *framework.GtkBuilder) error {
+	menu := builder.GetObject("popupmenu").(*gtk.Menu)
 	p.PopupMenu = menu
 
-	menuItem := builder.getObject("popup_refresh").(*gtk.MenuItem)
+	menuItem := builder.GetObject("popup_refresh").(*gtk.MenuItem)
 	p.PopupRefresh = menuItem
 
-	menuItem = builder.getObject("popup_download").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_download").(*gtk.MenuItem)
 	p.PopupDownload = menuItem
 
-	menuItem = builder.getObject("popup_redownload").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_redownload").(*gtk.MenuItem)
 	p.PopupRedownload = menuItem
 
-	menuItem = builder.getObject("popup_redownload_failedvideo").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_redownload_failedvideo").(*gtk.MenuItem)
 	p.PopupRedownloadVideo = menuItem
 
-	menuItem = builder.getObject("popup_redownload_failedvideos").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_redownload_failedvideos").(*gtk.MenuItem)
 	p.PopupRedownloadVideos = menuItem
 
-	menuItem = builder.getObject("popup_play").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_play").(*gtk.MenuItem)
 	p.PopupPlay = menuItem
 
-	menuItem = builder.getObject("popup_get_duration").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_get_duration").(*gtk.MenuItem)
 	p.PopupGetDuration = menuItem
 
-	menuItem = builder.getObject("popup_get_videoid").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_get_videoid").(*gtk.MenuItem)
 	p.PopupGetVideoID = menuItem
 
-	menuItem = builder.getObject("popup_get_thumbnail").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_get_thumbnail").(*gtk.MenuItem)
 	p.PopupGetThumbnail = menuItem
 
-	menuItem = builder.getObject("popup_delete_all").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_delete_all").(*gtk.MenuItem)
 	p.PopupDeleteAll = menuItem
 
-	menuItem = builder.getObject("popup_unwatch").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_unwatch").(*gtk.MenuItem)
 	p.PopupUnwatch = menuItem
 
-	menuItem = builder.getObject("popup_save").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_save").(*gtk.MenuItem)
 	p.PopupSave = menuItem
 
-	menuItem = builder.getObject("popup_view_subscriptions").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_view_subscriptions").(*gtk.MenuItem)
 	p.PopupViewSubscriptions = menuItem
 
-	menuItem = builder.getObject("popup_view_failed").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_view_failed").(*gtk.MenuItem)
 	p.PopupViewDownloads = menuItem
 
-	menuItem = builder.getObject("popup_view_to_watch").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_view_to_watch").(*gtk.MenuItem)
 	p.PopupViewToWatch = menuItem
 
-	menuItem = builder.getObject("popup_view_to_delete").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
 	p.PopupViewToDelete = menuItem
 
-	menuItem = builder.getObject("popup_view_saved").(*gtk.MenuItem)
+	menuItem = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
 	p.PopupViewSaved = menuItem
 
 	return nil
@@ -90,7 +91,7 @@ func (p *PopupMenu) Load(builder *SoftBuilder) error {
 
 // SetupEvents : Setup the toolbar events
 func (p *PopupMenu) SetupEvents() {
-	_, _ = p.Parent.VideoList.TreeView.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
+	_ = p.Parent.VideoList.TreeView.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
 		buttonEvent := gdk.EventButtonNewFromEvent(event)
 		if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
 			videoSelected := p.Parent.VideoList.getSelectedVideo(p.Parent.VideoList.TreeView) != nil
@@ -187,25 +188,25 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupRefresh.Connect("activate", func() {
+	_ = p.PopupRefresh.Connect("activate", func() {
 		p.Parent.VideoList.Refresh("")
 	})
 
-	_, _ = p.PopupDownload.Connect("activate", func() {
+	_ = p.PopupDownload.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
 			_ = p.Parent.VideoList.downloadVideo(video, true)
 		}
 	})
-	_, _ = p.PopupRedownloadVideo.Connect("activate", func() {
+	_ = p.PopupRedownloadVideo.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
 			_ = p.Parent.VideoList.downloadVideo(video, false)
 		}
 	})
-	_, _ = p.PopupRedownloadVideos.Connect("activate", func() {
+	_ = p.PopupRedownloadVideos.Connect("activate", func() {
 		videos, err := db.Videos.GetVideos(true)
 		if err != nil {
 			logger.LogError(err)
@@ -219,7 +220,7 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupPlay.Connect("activate", func() {
+	_ = p.PopupPlay.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
@@ -227,7 +228,7 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupGetDuration.Connect("activate", func() {
+	_ = p.PopupGetDuration.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
@@ -235,7 +236,7 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupGetVideoID.Connect("activate", func() {
+	_ = p.PopupGetVideoID.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
@@ -248,7 +249,7 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupGetThumbnail.Connect("activate", func() {
+	_ = p.PopupGetThumbnail.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
@@ -256,11 +257,11 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupDeleteAll.Connect("activate", func() {
+	_ = p.PopupDeleteAll.Connect("activate", func() {
 		p.Parent.VideoList.DeleteWatchedVideos()
 	})
 
-	_, _ = p.PopupSave.Connect("activate", func() {
+	_ = p.PopupSave.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
@@ -269,7 +270,7 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_, _ = p.PopupUnwatch.Connect("activate", func() {
+	_ = p.PopupUnwatch.Connect("activate", func() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
@@ -288,19 +289,19 @@ func (p *PopupMenu) SetupEvents() {
 			p.Parent.VideoList.setVideoAsWatched(video, mode)
 		}
 	})
-	_, _ = p.PopupViewSubscriptions.Connect("activate", func() {
+	_ = p.PopupViewSubscriptions.Connect("activate", func() {
 		p.Parent.VideoList.SetFilterMode(constFilterModeSubscriptions)
 	})
-	_, _ = p.PopupViewDownloads.Connect("activate", func() {
+	_ = p.PopupViewDownloads.Connect("activate", func() {
 		p.Parent.VideoList.SetFilterMode(constFilterModeDownloads)
 	})
-	_, _ = p.PopupViewToWatch.Connect("activate", func() {
+	_ = p.PopupViewToWatch.Connect("activate", func() {
 		p.Parent.VideoList.SetFilterMode(constFilterModeToWatch)
 	})
-	_, _ = p.PopupViewToDelete.Connect("activate", func() {
+	_ = p.PopupViewToDelete.Connect("activate", func() {
 		p.Parent.VideoList.SetFilterMode(constFilterModeToDelete)
 	})
-	_, _ = p.PopupViewSaved.Connect("activate", func() {
+	_ = p.PopupViewSaved.Connect("activate", func() {
 		p.Parent.VideoList.SetFilterMode(constFilterModeSaved)
 	})
 }

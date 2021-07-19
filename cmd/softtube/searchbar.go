@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softteam/framework"
 )
 
 // SearchBar : The SoftTube search bar
@@ -12,11 +13,11 @@ type SearchBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *SearchBar) Load(builder *SoftBuilder) error {
-	clearButton := builder.getObject("clear_search_button").(*gtk.Button)
+func (s *SearchBar) Load(builder *framework.GtkBuilder) error {
+	clearButton := builder.GetObject("clear_search_button").(*gtk.Button)
 	s.ClearButton = clearButton
 
-	searchEntry := builder.getObject("search_entry").(*gtk.Entry)
+	searchEntry := builder.GetObject("search_entry").(*gtk.Entry)
 	s.SearchEntry = searchEntry
 
 	return nil
@@ -24,11 +25,11 @@ func (s *SearchBar) Load(builder *SoftBuilder) error {
 
 // SetupEvents : Setup the toolbar events
 func (s *SearchBar) SetupEvents() {
-	_,_ = s.ClearButton.Connect("clicked", func() {
+	_ = s.ClearButton.Connect("clicked", func() {
 		s.Parent.SearchBar.SearchEntry.SetText("")
 		s.Parent.VideoList.Refresh("")
 	})
-	_,_ = s.SearchEntry.Connect("activate", func() {
+	_ = s.SearchEntry.Connect("activate", func() {
 		text, _ := s.Parent.SearchBar.SearchEntry.GetText()
 		s.Parent.VideoList.Search(text)
 	})

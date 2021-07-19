@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
@@ -16,8 +18,8 @@ type SoftTubeLog struct {
 }
 
 // Load : Loads the log
-func (l *SoftTubeLog) Load(builder *SoftBuilder) {
-	tree := builder.getObject("log_treeview").(*gtk.TreeView)
+func (l *SoftTubeLog) Load(builder *framework.GtkBuilder) {
+	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
 	l.TreeView = tree
 
 	listStore, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
@@ -105,10 +107,11 @@ func (l *SoftTubeLog) setupColumns() {
 func (l *SoftTubeLog) loadResources() {
 	for i := constLogDownload; i <= constLogError; i++ {
 		fileName := l.getImageFileName(i)
+		fw := framework.NewFramework()
 		if fileName != "" {
-			path, err := getResourcePath(fileName)
-			if err != nil {
-				logger.LogError(err)
+			path := fw.Resource.GetResourcePath(fileName)
+			if path == "" {
+				logger.LogError(errors.New("resource path not found"))
 			}
 			pic, err := gdk.PixbufNewFromFile(path)
 			if err != nil {

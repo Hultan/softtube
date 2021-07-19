@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softteam/framework"
 )
 
 // MenuBar : The SoftTube menu bar
@@ -12,11 +13,11 @@ type MenuBar struct {
 }
 
 // Load : Loads the toolbar
-func (m *MenuBar) Load(builder *SoftBuilder) error {
-	menuItem := builder.getObject("menu_file_quit").(*gtk.MenuItem)
+func (m *MenuBar) Load(builder *framework.GtkBuilder) error {
+	menuItem := builder.GetObject("menu_file_quit").(*gtk.MenuItem)
 	m.MenuFileQuit = menuItem
 
-	menuItem = builder.getObject("menu_help_about").(*gtk.MenuItem)
+	menuItem = builder.GetObject("menu_help_about").(*gtk.MenuItem)
 	m.MenuHelpAbout = menuItem
 
 	return nil
@@ -24,9 +25,9 @@ func (m *MenuBar) Load(builder *SoftBuilder) error {
 
 // SetupEvents : Setup the toolbar events
 func (m *MenuBar) SetupEvents() {
-	_,_ = m.MenuFileQuit.Connect("activate", func() {
+	_= m.MenuFileQuit.Connect("activate", func() {
 		gtk.MainQuit()
 	})
-	_,_ = m.MenuHelpAbout.Connect("activate", func() {
+	_ = m.MenuHelpAbout.Connect("activate", func() {
 	})
 }
