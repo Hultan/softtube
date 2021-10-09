@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/gotk3/gotk3/gdk"
-	"github.com/gotk3/gotk3/gtk"
-	database "github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"sync"
+
+	"github.com/gotk3/gotk3/gdk"
+	"github.com/gotk3/gotk3/gtk"
+
+	database "github.com/hultan/softtube/internal/softtube.database"
 )
 
 func (v *VideoList) deleteVideo(video *database.Video) {
@@ -86,7 +88,6 @@ func (v *VideoList) addVideo(video *database.Video, listStore *gtk.ListStore) {
 		logger.LogError(err)
 	}
 }
-
 
 func (v *VideoList) playVideo(video *database.Video) {
 	videoPath := v.getVideoPath(video.ID)
@@ -212,11 +213,6 @@ func (v *VideoList) downloadVideo(video *database.Video, markAsDownloading bool)
 	return nil
 }
 
-// Not used???
-// func (v *VideoList) getYoutubePath() string {
-// 	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
-// }
-
 func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *database.Video {
 	selection, err := treeView.GetSelection()
 	if err != nil {
@@ -243,7 +239,6 @@ func (v *VideoList) getSelectedVideo(treeView *gtk.TreeView) *database.Video {
 
 	return nil
 }
-
 
 func (v *VideoList) setVideoAsWatched(video *database.Video, mode int) {
 	var status int
@@ -280,7 +275,6 @@ func (v *VideoList) setVideoAsSaved(video *database.Video, saved bool) {
 	// v.setRowColor(v.Treeview, constColorSaved)
 	v.Refresh("")
 }
-
 
 func (v *VideoList) getVideoThumbnailPath(videoID string) string {
 	thumbnailPath := "/" + path.Join(config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
@@ -327,7 +321,6 @@ func (v *VideoList) downloadVideoDuration(video *database.Video) {
 	}
 
 	go func() {
-		// youtube-dl --get-duration -- '%s'
 		command := fmt.Sprintf(constVideoDurationCommand, v.getYoutubePath(), video.ID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
@@ -351,7 +344,6 @@ func (v *VideoList) downloadVideoThumbnail(video *database.Video) (string, error
 
 	// Don't download thumbnail if it already exists
 	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-		// youtube-dl --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'
 		command := fmt.Sprintf(constThumbnailCommand, v.getYoutubePath(), thumbPath, video.ID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()

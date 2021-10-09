@@ -1,18 +1,19 @@
 //
-// youtube-dl
+// youtube-dl (yt-dlp)
 //
 package main
 
 import (
 	"bytes"
 	"fmt"
-	core "github.com/hultan/softtube/internal/softtube.core"
 	"net/http"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"time"
+
+	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
 type youtube struct {
@@ -26,7 +27,7 @@ func (y youtube) getDuration(videoID string, logger *core.Logger) error {
 		if y.checkDuration(videoID, duration) {
 			return nil
 		}
-		if err != nil || duration == ""{
+		if err != nil || duration == "" {
 			switch i {
 			case 0:
 				logger.Log("Failed to get duration (" + videoID + "), trying again in 5 seconds!")
@@ -75,7 +76,6 @@ func (y youtube) updateDuration(videoID, duration string, logger *core.Logger) {
 
 // Get the duration of a youtube video
 func (y youtube) getDurationInternal(videoID string) (string, error) {
-	// youtube-dl --get-duration -- '%s'
 	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
@@ -88,9 +88,9 @@ func (y youtube) getDurationInternal(videoID string) (string, error) {
 // Get the thumbnail of a youtube video
 func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger) error {
 
-	for i:=0;i<3;i++ {
+	for i := 0; i < 3; i++ {
 		output, err := y.getThumbnailInternal(videoID, thumbnailPath)
-		if err!=nil {
+		if err != nil {
 			switch i {
 			case 0:
 				logger.Log("Failed to download thumbnail (" + videoID + "), trying again in 5 seconds!")
@@ -118,7 +118,6 @@ func (y youtube) getThumbnailInternal(videoID, thumbnailPath string) (string, er
 
 	// Don't download thumbnail if it already exists
 	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-		// youtube-dl --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'
 		command := fmt.Sprintf(constThumbnailCommand, y.getYoutubePath(), thumbPath, videoID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
@@ -155,5 +154,5 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 }
 
 func (y youtube) getYoutubePath() string {
-	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
+	return path.Join(config.ServerPaths.YoutubeDL, "yt-dlp")
 }

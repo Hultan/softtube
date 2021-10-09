@@ -2,13 +2,14 @@ package main
 
 import (
 	"database/sql"
-	"github.com/hultan/softteam/framework"
-	"github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/softtube.database"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
@@ -220,7 +221,7 @@ func (v *VideoList) removeInvalidDurations(duration sql.NullString) string {
 }
 
 func (v *VideoList) getYoutubePath() string {
-	return "youtube-dl"
+	return "yt-dlp"
 }
 
 func (v *VideoList) getProgress(status int) (int, string) {

@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"os/exec"
 	"path"
 	"sync"
+
+	"github.com/hultan/softtube/internal/softtube.database"
 
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
@@ -121,5 +122,5 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 }
 
 func getYoutubePath() string {
-	return path.Join(config.ServerPaths.YoutubeDL, "youtube-dl")
+	return path.Join(config.ServerPaths.YoutubeDL, "yt-dlp")
 }
