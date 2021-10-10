@@ -37,7 +37,7 @@ func loadConfig() {
 	// Load config file
 	config = new(core.Config)
 	err := config.Load("main")
-	if err!=nil {
+	if err != nil {
 		panic("failed to load config")
 	}
 }
@@ -67,7 +67,7 @@ func openDatabase() *database.Database {
 
 	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.OpenDatabase()
-	if err!=nil {
+	if err != nil {
 		return nil
 	}
 	return db
@@ -79,8 +79,12 @@ func closeDatabase() {
 
 func startApplication() {
 	// Create a new application.
-	softTube = new(softtube.SoftTube)
-	err := softTube.StartApplication(db, config, logger)
+	softTube = &softtube.SoftTube{
+		Config: config,
+		Logger: logger,
+		DB:     db,
+	}
+	err := softTube.StartApplication()
 	if err != nil {
 		logger.Log("Failed to start application!")
 		logger.LogError(err)

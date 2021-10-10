@@ -26,8 +26,8 @@ func (a *activityLog) Load(builder *framework.GtkBuilder) {
 
 	store, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
-		a.parent.logger.Log("Failed to create liststore!")
-		a.parent.logger.LogError(err)
+		a.parent.Logger.Log("Failed to create liststore!")
+		a.parent.Logger.LogError(err)
 		panic(err)
 	}
 	a.listStore = store
@@ -76,10 +76,10 @@ func (a *activityLog) shortenString(text string) string {
 }
 
 func (a *activityLog) getLogs() []database.Log {
-	logs, err := a.parent.db.Log.GetLatest()
+	logs, err := a.parent.DB.Log.GetLatest()
 	if err != nil {
-		a.parent.logger.Log("Failed to load logs!")
-		a.parent.logger.LogError(err)
+		a.parent.Logger.Log("Failed to load logs!")
+		a.parent.Logger.LogError(err)
 		return nil
 	}
 	return logs
@@ -114,11 +114,11 @@ func (a *activityLog) loadResources() {
 		if fileName != "" {
 			path := fw.Resource.GetResourcePath(fileName)
 			if path == "" {
-				a.parent.logger.LogError(errors.New("resource path not found"))
+				a.parent.Logger.LogError(errors.New("resource path not found"))
 			}
 			pic, err := gdk.PixbufNewFromFile(path)
 			if err != nil {
-				a.parent.logger.LogError(err)
+				a.parent.Logger.LogError(err)
 			}
 			a.imageBuffer[i] = pic
 		}

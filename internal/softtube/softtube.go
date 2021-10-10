@@ -10,9 +10,9 @@ import (
 
 // SoftTube : The SoftTube application object
 type SoftTube struct {
-	config *core.Config
-	logger *core.Logger
-	db     *database.Database
+	Config *core.Config
+	Logger *core.Logger
+	DB     *database.Database
 
 	toolbar     *toolbar
 	statusBar   *statusBar
@@ -24,20 +24,16 @@ type SoftTube struct {
 }
 
 // StartApplication : Starts the SoftTube application
-func (s *SoftTube) StartApplication(d *database.Database, c *core.Config, l *core.Logger) error {
-	s.db = d
-	s.config = c
-	s.logger = l
-
-	s.logger.Log("SoftTube client startup")
-	defer s.logger.Log("SoftTube client shutdown")
+func (s *SoftTube) StartApplication() error {
+	s.Logger.Log("SoftTube client startup")
+	defer s.Logger.Log("SoftTube client shutdown")
 
 	gtk.Init(nil)
 
 	fw := framework.NewFramework()
 	builder, err := fw.Gtk.CreateBuilder("main.glade")
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		return err
 	}
 
@@ -63,7 +59,7 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	s.toolbar = &toolbar{parent: s}
 	err := s.toolbar.Load(builder)
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		panic(err)
 	}
 
@@ -71,7 +67,7 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	s.statusBar = &statusBar{parent: s}
 	err = s.statusBar.Load(builder)
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		panic(err)
 	}
 
@@ -79,7 +75,7 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	s.menuBar = &menuBar{parent: s}
 	err = s.menuBar.Load(builder)
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		panic(err)
 	}
 
@@ -87,7 +83,7 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	s.searchBar = &searchBar{parent: s}
 	err = s.searchBar.Load(builder)
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		panic(err)
 	}
 
@@ -95,7 +91,7 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	s.videoList = &videoList{parent: s}
 	err = s.videoList.Load(builder)
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		panic(err)
 	}
 
@@ -105,7 +101,7 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	s.popupMenu = &popupMenu{parent: s}
 	err = s.popupMenu.Load(builder)
 	if err != nil {
-		s.logger.LogError(err)
+		s.Logger.LogError(err)
 		panic(err)
 	}
 

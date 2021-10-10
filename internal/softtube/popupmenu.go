@@ -211,9 +211,9 @@ func (p *popupMenu) SetupEvents() {
 		}
 	})
 	_ = p.popupRedownloadVideos.Connect("activate", func() {
-		videos, err := p.parent.db.Videos.GetVideos(true)
+		videos, err := p.parent.DB.Videos.GetVideos(true)
 		if err != nil {
-			p.parent.logger.LogError(err)
+			p.parent.Logger.LogError(err)
 			return
 		}
 		for key, _ := range videos {
