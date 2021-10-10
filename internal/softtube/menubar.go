@@ -20,6 +20,7 @@ func (m *menuBar) Load(builder *framework.GtkBuilder) error {
 
 	menuItem = builder.GetObject("menu_help_about").(*gtk.MenuItem)
 	m.menuHelpAbout = menuItem
+	m.SetupEvents()
 
 	return nil
 }

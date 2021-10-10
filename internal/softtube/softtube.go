@@ -49,14 +49,23 @@ func (s *SoftTube) StartApplication(d *database.Database, c *core.Config, l *cor
 	})
 	win.SetIconName("video-display")
 
+	s.setupControls(builder)
+
+	// Show the Window and all of its components.
+	win.ShowAll()
+	gtk.Main()
+
+	return nil
+}
+
+func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 	// Load tool bar
 	s.toolbar = &toolbar{parent: s}
-	err = s.toolbar.Load(builder)
+	err := s.toolbar.Load(builder)
 	if err != nil {
 		s.logger.LogError(err)
 		panic(err)
 	}
-	s.toolbar.SetupEvents()
 
 	// Load status bar
 	s.statusBar = &statusBar{parent: s}
@@ -73,7 +82,6 @@ func (s *SoftTube) StartApplication(d *database.Database, c *core.Config, l *cor
 		s.logger.LogError(err)
 		panic(err)
 	}
-	s.menuBar.SetupEvents()
 
 	// Load search bar
 	s.searchBar = &searchBar{parent: s}
@@ -82,7 +90,6 @@ func (s *SoftTube) StartApplication(d *database.Database, c *core.Config, l *cor
 		s.logger.LogError(err)
 		panic(err)
 	}
-	s.searchBar.SetupEvents()
 
 	// Load video list
 	s.videoList = &videoList{parent: s}
@@ -91,8 +98,7 @@ func (s *SoftTube) StartApplication(d *database.Database, c *core.Config, l *cor
 		s.logger.LogError(err)
 		panic(err)
 	}
-	s.videoList.SetupColumns()
-	s.videoList.SetupEvents()
+
 	s.videoList.Refresh("")
 
 	// Load popup menu bar
@@ -102,18 +108,10 @@ func (s *SoftTube) StartApplication(d *database.Database, c *core.Config, l *cor
 		s.logger.LogError(err)
 		panic(err)
 	}
-	s.popupMenu.SetupEvents()
 
 	// Load log
 	s.activityLog = &activityLog{parent: s, treeView: s.videoList.treeView}
 	s.activityLog.Load(builder)
-	s.activityLog.FillLog()
-
-	// Show the Window and all of its components.
-	win.ShowAll()
-	gtk.Main()
-
-	return nil
 }
 
 func (s *SoftTube) getWindowTitle() string {

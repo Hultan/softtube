@@ -11,7 +11,7 @@ import (
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
-// activityLog : Handles the GUI log
+// activityLog : Handles the SoftTube activity log
 type activityLog struct {
 	parent      *SoftTube
 	treeView    *gtk.TreeView
@@ -24,13 +24,14 @@ func (a *activityLog) Load(builder *framework.GtkBuilder) {
 	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
 	a.treeView = tree
 
-	listStore, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
+	store, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
 		a.parent.logger.Log("Failed to create liststore!")
 		a.parent.logger.LogError(err)
 		panic(err)
 	}
-	a.listStore = listStore
+	a.listStore = store
+	a.FillLog()
 }
 
 // FillLog : Fills the log with the last n logs
@@ -46,8 +47,8 @@ func (a *activityLog) FillLog() {
 	a.treeView.SetModel(a.listStore)
 }
 
-// InsertLog : Adds a log to the GUI log
-func (a *activityLog) InsertLog(logType int, logMessage string) {
+// AddLog : Adds a log to the GUI log
+func (a *activityLog) AddLog(logType int, logMessage string) {
 	// Insert into the gui log
 	a.treeView.SetModel(nil)
 	a.insertLog(logType, logMessage, true)

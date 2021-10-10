@@ -40,7 +40,7 @@ func (v *videoList) deleteVideo(video *database.Video) {
 
 		go func() {
 			// Log that the video has been deleted in the GUI
-			v.parent.activityLog.InsertLog(constLogDelete, video.Title)
+			v.parent.activityLog.AddLog(constLogDelete, video.Title)
 			wg.Done()
 		}()
 
@@ -126,7 +126,7 @@ func (v *videoList) playVideo(video *database.Video) {
 
 	go func() {
 		// Log that the video has been deleted in the GUI
-		v.parent.activityLog.InsertLog(constLogPlay, video.Title)
+		v.parent.activityLog.AddLog(constLogPlay, video.Title)
 		wg.Done()
 	}()
 
@@ -198,7 +198,7 @@ func (v *videoList) downloadVideo(video *database.Video, markAsDownloading bool)
 
 	go func() {
 		// Log that the video has been deleted in the GUI
-		v.parent.activityLog.InsertLog(constLogDownload, video.Title)
+		v.parent.activityLog.AddLog(constLogDownload, video.Title)
 		wg.Done()
 	}()
 

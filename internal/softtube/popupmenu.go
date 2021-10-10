@@ -88,6 +88,8 @@ func (p *popupMenu) Load(builder *framework.GtkBuilder) error {
 	menuItem = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
 	p.popupViewSaved = menuItem
 
+	p.SetupEvents()
+
 	return nil
 }
 

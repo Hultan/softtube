@@ -22,7 +22,7 @@ const constVideoDurationCommand = "%s --get-duration -- '%s'"
 type videoList struct {
 	parent          *SoftTube
 	treeView        *gtk.TreeView
-	scrolledWindow  *gtk.ScrolledWindow
+	scroll          *scroll
 	keepScrollToEnd bool
 	filterMode      uint
 }
@@ -38,46 +38,18 @@ func (v *videoList) Load(builder *framework.GtkBuilder) error {
 	v.treeView = treeView
 
 	// Get the scrolled window surrounding the treeview
-	scroll := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
-	v.scrolledWindow = scroll
+	s := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
+	v.scroll = &scroll{s}
+
+	helper := &treeViewHelper{videoList: v}
+	helper.Setup()
 
 	return nil
-}
-
-// SetupEvents : Setup the list events
-func (v *videoList) SetupEvents() {
-	// Send in the videolist as a user data parameter to the event
-	_ = v.treeView.Connect("row_activated", v.rowActivated)
-}
-
-// SetupColumns : Sets up the listview columns
-func (v videoList) SetupColumns() {
-	helper := new(treeviewHelper)
-	v.treeView.AppendColumn(helper.CreateImageColumn("Image"))
-	v.treeView.AppendColumn(helper.CreateTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
-	v.treeView.AppendColumn(helper.CreateTextColumn("Date", listStoreColumnDate, 90, 300))
-	v.treeView.AppendColumn(helper.CreateTextColumn("Title", listStoreColumnTitle, 0, 600))
-	v.treeView.AppendColumn(helper.CreateTextColumn("Duration", listStoreColumnDuration, 90, 300))
-	v.treeView.AppendColumn(helper.CreateProgressColumn("Progress"))
 }
 
 // Search : Searches for a video
 func (v *videoList) Search(text string) {
 	v.Refresh(text)
-}
-
-// ScrollToStart : Scrolls to the start of the list
-func (v *videoList) ScrollToStart() {
-	var adjustment = v.scrolledWindow.GetVAdjustment()
-	adjustment.SetValue(adjustment.GetLower())
-	v.scrolledWindow.Show()
-}
-
-// ScrollToEnd : Scrolls to the end of the list
-func (v *videoList) ScrollToEnd() {
-	var adjustment = v.scrolledWindow.GetVAdjustment()
-	adjustment.SetValue(adjustment.GetUpper())
-	v.scrolledWindow.Show()
 }
 
 // SetFilterMode : Changes filter mode
@@ -157,11 +129,7 @@ func (v *videoList) Refresh(text string) {
 		go func() {
 
 			time.Sleep(50 * time.Millisecond)
-			v.ScrollToEnd()
-			//select {
-			//case <-time.After(50 * time.Millisecond):
-			//	v.ScrollToEnd()
-			//}
+			v.scroll.toEnd()
 		}()
 	}
 

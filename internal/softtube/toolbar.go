@@ -58,6 +58,8 @@ func (t *toolbar) Load(builder *framework.GtkBuilder) error {
 	tool = builder.GetObject("toolbar_quit_button").(*gtk.ToolButton)
 	t.toolbarQuit = tool
 
+	t.SetupEvents()
+
 	return nil
 }
 
@@ -131,21 +133,21 @@ func (t *toolbar) SetupEvents() {
 	})
 	_ = t.toolbarScrollToStart.Connect("clicked", func() {
 		s := t.parent
-		s.videoList.ScrollToStart()
+		s.videoList.scroll.toStart()
 	})
 	_ = t.toolbarScrollToEnd.Connect("clicked", func() {
 		s := t.parent
-		s.videoList.ScrollToEnd()
+		s.videoList.scroll.toEnd()
 	})
 	_ = t.toolbarKeepScrollToEnd.Connect("clicked", func() {
 		if t.toolbarKeepScrollToEnd.GetActive() {
 			s := t.parent
 			s.videoList.keepScrollToEnd = true
-			s.videoList.ScrollToEnd()
+			s.videoList.scroll.toEnd()
 		} else {
 			s := t.parent
 			s.videoList.keepScrollToEnd = false
-			s.videoList.ScrollToStart()
+			s.videoList.scroll.toStart()
 		}
 	})
 }
