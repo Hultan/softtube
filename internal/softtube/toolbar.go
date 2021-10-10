@@ -63,7 +63,7 @@ func (t *toolbar) Load(builder *framework.GtkBuilder) error {
 	return nil
 }
 
-// SetupEvents : Setup the toolbar events
+// SetupEvents : Set up the toolbar events
 func (t *toolbar) SetupEvents() {
 	_ = t.toolbarQuit.Connect("clicked", func() {
 		gtk.MainQuit()

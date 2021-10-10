@@ -246,14 +246,14 @@ func (v VideosTable) GetVideos(failed bool) ([]Video, error) {
 		return nil, errors.New("database not opened")
 	}
 
-	var sql string
+	var sqlString string
 	if failed {
-		sql = sqlStatementGetFailedDownloads
+		sqlString = sqlStatementGetFailedDownloads
 	} else {
-		sql = sqlStatementGetLatest
+		sqlString = sqlStatementGetLatest
 	}
 
-	rows, err := v.Connection.Query(sql)
+	rows, err := v.Connection.Query(sqlString)
 	if err != nil {
 		return []Video{}, err
 	}

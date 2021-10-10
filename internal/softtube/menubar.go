@@ -25,7 +25,7 @@ func (m *menuBar) Load(builder *framework.GtkBuilder) error {
 	return nil
 }
 
-// SetupEvents : Setup the toolbar events
+// SetupEvents : Set up the toolbar events
 func (m *menuBar) SetupEvents() {
 	_ = m.menuFileQuit.Connect("activate", func() {
 		gtk.MainQuit()

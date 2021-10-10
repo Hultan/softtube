@@ -11,15 +11,14 @@ type treeViewHelper struct {
 	videoList *videoList
 }
 
-// Setup : Setup the video list
+// Setup : Set up the video list
 func (t *treeViewHelper) Setup() {
 	t.setupEvents()
 	t.setupColumns()
 }
 
-// setupEvents : Setup the list events
+// setupEvents : Set up the list events
 func (t *treeViewHelper) setupEvents() {
-	// Send in the videolist as a user data parameter to the event
 	_ = t.videoList.treeView.Connect("row_activated", t.videoList.rowActivated)
 }
 

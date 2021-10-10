@@ -14,15 +14,20 @@ import (
 	database "github.com/hultan/softtube/internal/softtube.database"
 )
 
-func (v *videoList) deleteVideo(video *database.Video) {
-	pathForDeletion := v.getVideoPathForDeletion(video.ID)
+const youtubeDLPath = "yt-dlp"
+
+type video struct {
+	videoList *videoList
+}
+
+func (v *video) delete(video *database.Video) {
+	pathForDeletion := v.getPathForDeletion(video.ID)
 	if pathForDeletion != "" {
 		command := fmt.Sprintf("rm %s", pathForDeletion)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		// Starts a sub process that deletes the video
 		err := cmd.Start()
 		if err != nil {
-			//panic(err)
 		}
 
 		var wg sync.WaitGroup
@@ -30,26 +35,26 @@ func (v *videoList) deleteVideo(video *database.Video) {
 
 		go func() {
 			// Log that the video has been deleted in the database
-			err = v.parent.db.Log.Insert(constLogDelete, video.Title)
+			err = v.videoList.parent.DB.Log.Insert(constLogDelete, video.Title)
 			if err != nil {
-				v.parent.logger.Log("Failed to log video as watched!")
-				v.parent.logger.LogError(err)
+				v.videoList.parent.Logger.Log("Failed to log video as watched!")
+				v.videoList.parent.Logger.LogError(err)
 			}
 			wg.Done()
 		}()
 
 		go func() {
 			// Log that the video has been deleted in the GUI
-			v.parent.activityLog.AddLog(constLogDelete, video.Title)
+			v.videoList.parent.activityLog.AddLog(constLogDelete, video.Title)
 			wg.Done()
 		}()
 
 		go func() {
 			// Set video status as deleted
-			err = v.parent.db.Videos.UpdateStatus(video.ID, constStatusDeleted)
+			err = v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDeleted)
 			if err != nil {
-				v.parent.logger.Log("Failed to set video status to deleted!")
-				v.parent.logger.LogError(err)
+				v.videoList.parent.Logger.Log("Failed to set video status to deleted!")
+				v.videoList.parent.Logger.LogError(err)
 			}
 			wg.Done()
 		}()
@@ -58,16 +63,16 @@ func (v *videoList) deleteVideo(video *database.Video) {
 	}
 }
 
-func (v *videoList) addVideo(video *database.Video, listStore *gtk.ListStore) {
+func (v *video) add(video *database.Video, listStore *gtk.ListStore) {
 	// Get color based on status
-	backgroundColor, foregroundColor := v.getColor(video)
+	backgroundColor, foregroundColor := v.videoList.color.getColor(video)
 	// Get the duration of the video
-	duration := v.removeInvalidDurations(video.Duration)
+	duration := v.videoList.removeInvalidDurations(video.Duration)
 
 	// Get progress
-	progress, progressText := v.getProgress(video.Status)
+	progress, progressText := v.videoList.getProgress(video.Status)
 	// Get thumbnail
-	thumbnail := v.getVideoThumbnail(video.ID)
+	thumbnail := v.getThumbnail(video.ID)
 
 	// Append video to list
 	iter := listStore.Append()
@@ -84,16 +89,16 @@ func (v *videoList) addVideo(video *database.Video, listStore *gtk.ListStore) {
 			foregroundColor})
 
 	if err != nil {
-		v.parent.logger.Log("Failed to add row!")
-		v.parent.logger.LogError(err)
+		v.videoList.parent.Logger.Log("Failed to add row!")
+		v.videoList.parent.Logger.LogError(err)
 	}
 }
 
-func (v *videoList) playVideo(video *database.Video) {
-	videoPath := v.getVideoPath(video.ID)
+func (v *video) play(video *database.Video) {
+	videoPath := v.getPath(video.ID)
 	if videoPath == "" {
 		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
-		v.parent.logger.Log(msg)
+		v.videoList.parent.Logger.Log(msg)
 		return
 	}
 
@@ -105,57 +110,57 @@ func (v *videoList) playVideo(video *database.Video) {
 	// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
 	err := cmd.Run()
 	if err != nil {
-		v.parent.logger.LogError(err)
+		v.videoList.parent.Logger.LogError(err)
 	}
 
 	// Mark the selected video with watched color
-	v.setRowColor(v.treeView, constColorWatched)
+	v.videoList.color.setRowColor(v.videoList.treeView, constColorWatched)
 
 	var wg sync.WaitGroup
 	wg.Add(3)
 
 	go func() {
 		// Log that the video has been deleted in the database
-		err = v.parent.db.Log.Insert(constLogPlay, video.Title)
+		err = v.videoList.parent.DB.Log.Insert(constLogPlay, video.Title)
 		if err != nil {
-			v.parent.logger.Log("Failed to log video as watched!")
-			v.parent.logger.LogError(err)
+			v.videoList.parent.Logger.Log("Failed to log video as watched!")
+			v.videoList.parent.Logger.LogError(err)
 		}
 		wg.Done()
 	}()
 
 	go func() {
 		// Log that the video has been deleted in the GUI
-		v.parent.activityLog.AddLog(constLogPlay, video.Title)
+		v.videoList.parent.activityLog.AddLog(constLogPlay, video.Title)
 		wg.Done()
 	}()
 
 	go func() {
 		// Set video status as watched
-		err = v.parent.db.Videos.UpdateStatus(video.ID, constStatusWatched)
+		err = v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusWatched)
 		if err != nil {
-			v.parent.logger.Log("Failed to set video status to watched!")
-			v.parent.logger.LogError(err)
+			v.videoList.parent.Logger.Log("Failed to set video status to watched!")
+			v.videoList.parent.Logger.LogError(err)
 		}
 		wg.Done()
 	}()
 	wg.Wait()
 
-	v.Refresh("")
+	v.videoList.Refresh("")
 }
 
-func (v *videoList) getVideoPath(videoID string) string {
-	tryPath := path.Join(v.parent.config.ClientPaths.Videos, videoID+".mkv")
+func (v *video) getPath(videoID string) string {
+	tryPath := path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+".mkv")
 	if _, err := os.Stat(tryPath); err == nil {
 		return tryPath
 	}
 
-	tryPath = path.Join(v.parent.config.ClientPaths.Videos, videoID+".mp4")
+	tryPath = path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+".mp4")
 	if _, err := os.Stat(tryPath); err == nil {
 		return tryPath
 	}
 
-	tryPath = path.Join(v.parent.config.ClientPaths.Videos, videoID+".webm")
+	tryPath = path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+".webm")
 	if _, err := os.Stat(tryPath); err == nil {
 		return tryPath
 	}
@@ -163,24 +168,24 @@ func (v *videoList) getVideoPath(videoID string) string {
 	return ""
 }
 
-func (v *videoList) getVideoPathForDeletion(videoID string) string {
-	tryPath := path.Join(v.parent.config.ClientPaths.Videos, videoID+"*")
+func (v *video) getPathForDeletion(videoID string) string {
+	tryPath := path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+"*")
 	return tryPath
 }
 
 // Download a youtube video
-func (v *videoList) downloadVideo(video *database.Video, markAsDownloading bool) error {
+func (v *video) download(video *database.Video, markAsDownloading bool) error {
 	// Set the video to be downloaded
-	err := v.parent.db.Download.Insert(video.ID)
+	err := v.videoList.parent.DB.Download.Insert(video.ID)
 	if err != nil {
-		v.parent.logger.Log("Failed to set video to be downloaded!")
-		v.parent.logger.LogError(err)
+		v.videoList.parent.Logger.Log("Failed to set video to be downloaded!")
+		v.videoList.parent.Logger.LogError(err)
 		return err
 	}
 
 	if markAsDownloading {
 		// Mark the selected video with downloading color
-		v.setRowColor(v.treeView, constColorDownloading)
+		v.videoList.color.setRowColor(v.videoList.treeView, constColorDownloading)
 	}
 
 	var wg sync.WaitGroup
@@ -188,26 +193,26 @@ func (v *videoList) downloadVideo(video *database.Video, markAsDownloading bool)
 
 	go func() {
 		// Log that the video has been requested to be downloaded in the database
-		err = v.parent.db.Log.Insert(constLogDownload, video.Title)
+		err = v.videoList.parent.DB.Log.Insert(constLogDownload, video.Title)
 		if err != nil {
-			v.parent.logger.Log("Failed to log video as watched!")
-			v.parent.logger.LogError(err)
+			v.videoList.parent.Logger.Log("Failed to log video as watched!")
+			v.videoList.parent.Logger.LogError(err)
 		}
 		wg.Done()
 	}()
 
 	go func() {
 		// Log that the video has been deleted in the GUI
-		v.parent.activityLog.AddLog(constLogDownload, video.Title)
+		v.videoList.parent.activityLog.AddLog(constLogDownload, video.Title)
 		wg.Done()
 	}()
 
 	go func() {
 		// Set video status as downloading
-		err = v.parent.db.Videos.UpdateStatus(video.ID, constStatusDownloading)
+		err = v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDownloading)
 		if err != nil {
-			v.parent.logger.Log("Failed to set video status to downloading!")
-			v.parent.logger.LogError(err)
+			v.videoList.parent.Logger.Log("Failed to set video status to downloading!")
+			v.videoList.parent.Logger.LogError(err)
 		}
 		wg.Done()
 	}()
@@ -217,7 +222,7 @@ func (v *videoList) downloadVideo(video *database.Video, markAsDownloading bool)
 	return nil
 }
 
-func (v *videoList) getSelectedVideo(treeView *gtk.TreeView) *database.Video {
+func (v *video) getSelected(treeView *gtk.TreeView) *database.Video {
 	selection, err := treeView.GetSelection()
 	if err != nil {
 		return nil
@@ -244,7 +249,7 @@ func (v *videoList) getSelectedVideo(treeView *gtk.TreeView) *database.Video {
 	return nil
 }
 
-func (v *videoList) setVideoAsWatched(video *database.Video, mode int) {
+func (v *video) setAsWatched(video *database.Video, mode int) {
 	var status int
 	switch mode {
 	case 0:
@@ -257,60 +262,59 @@ func (v *videoList) setVideoAsWatched(video *database.Video, mode int) {
 		status = constStatusDownloaded
 		break
 	}
-	err := v.parent.db.Videos.UpdateStatus(video.ID, status)
+	err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, status)
 	if err != nil {
-		v.parent.logger.LogFormat("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
-		v.parent.logger.LogError(err)
+		v.videoList.parent.Logger.LogFormat("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
+		v.videoList.parent.Logger.LogError(err)
 	}
-	// v.setRowColor(v.Treeview, constColorSaved)
-	v.Refresh("")
+	// v.videoList.setRowColor(v.videoList.Treeview, constColorSaved)
+	v.videoList.Refresh("")
 }
 
-func (v *videoList) setVideoAsSaved(video *database.Video, saved bool) {
-	err := v.parent.db.Videos.UpdateSave(video.ID, saved)
+func (v *video) setAsSaved(video *database.Video, saved bool) {
+	err := v.videoList.parent.DB.Videos.UpdateSave(video.ID, saved)
 	if err != nil {
 		if saved {
-			v.parent.logger.LogFormat("Failed to set video as saved! %s", video.ID)
+			v.videoList.parent.Logger.LogFormat("Failed to set video as saved! %s", video.ID)
 		} else {
-			v.parent.logger.LogFormat("Failed to set video as unsaved! %s", video.ID)
+			v.videoList.parent.Logger.LogFormat("Failed to set video as unsaved! %s", video.ID)
 		}
-		v.parent.logger.LogError(err)
+		v.videoList.parent.Logger.LogError(err)
 	}
-	// v.setRowColor(v.Treeview, constColorSaved)
-	v.Refresh("")
+	// v.videoList.setRowColor(v.videoList.Treeview, constColorSaved)
+	v.videoList.Refresh("")
 }
 
-func (v *videoList) getVideoThumbnailPath(videoID string) string {
-	thumbnailPath := "/" + path.Join(v.parent.config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
+func (v *video) getThumbnailPath(videoID string) string {
+	thumbnailPath := "/" + path.Join(v.videoList.parent.Config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
 	if _, err := os.Stat(thumbnailPath); err == nil {
 		return thumbnailPath
 	}
-	thumbnailPath = "/" + path.Join(v.parent.config.ClientPaths.Thumbnails, fmt.Sprintf("%s.webp", videoID))
+	thumbnailPath = "/" + path.Join(v.videoList.parent.Config.ClientPaths.Thumbnails, fmt.Sprintf("%s.webp", videoID))
 	if _, err := os.Stat(thumbnailPath); err == nil {
 		// YouTube started to return *.webp thumbnails instead of *.jpg thumbnails sometimes
 		// Go can't read them, and getThumbnail fails to get a PixBuf, so return "" for now
 		return ""
-		//return thumbnailPath
 	}
 	return ""
 }
 
-func (v *videoList) getVideoThumbnail(videoID string) *gdk.Pixbuf {
-	thumbnailPath := v.getVideoThumbnailPath(videoID)
+func (v *video) getThumbnail(videoID string) *gdk.Pixbuf {
+	thumbnailPath := v.getThumbnailPath(videoID)
 	if thumbnailPath == "" {
 		return nil
 	}
 
 	thumbnail, err := gdk.PixbufNewFromFile(thumbnailPath)
 	if err != nil {
-		v.renameJPG2WEBP(thumbnailPath)
-		v.parent.logger.LogError(err)
+		v.videoList.renameJPG2WEBP(thumbnailPath)
+		v.videoList.parent.Logger.LogError(err)
 		thumbnail = nil
 	} else {
 		thumbnail, err = thumbnail.ScaleSimple(160, 90, gdk.INTERP_BILINEAR)
 		if err != nil {
 			msg := fmt.Sprintf("Failed to scale thumnail (%s)!", thumbnailPath)
-			v.parent.logger.Log(msg)
+			v.videoList.parent.Logger.Log(msg)
 			thumbnail = nil
 		}
 	}
@@ -319,13 +323,13 @@ func (v *videoList) getVideoThumbnail(videoID string) *gdk.Pixbuf {
 }
 
 // Download a youtube video
-func (v *videoList) downloadVideoDuration(video *database.Video) {
+func (v *video) downloadDuration(video *database.Video) {
 	if video == nil {
 		return
 	}
 
 	go func() {
-		command := fmt.Sprintf(constVideoDurationCommand, v.getYoutubePath(), video.ID)
+		command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, video.ID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
@@ -333,22 +337,22 @@ func (v *videoList) downloadVideoDuration(video *database.Video) {
 		}
 		duration := string(output)
 		if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(duration, "ERROR: This live event") {
-			// Is it a live streaming event?
+			// Is it a live-streaming event?
 			duration = "LIVE"
 		}
 
-		_ = v.parent.db.Videos.UpdateDuration(video.ID, duration)
+		_ = v.videoList.parent.DB.Videos.UpdateDuration(video.ID, duration)
 	}()
 }
 
-// Get the thumbnail of a youtube video
-func (v *videoList) downloadVideoThumbnail(video *database.Video) (string, error) {
+// Get the thumbnail of a YouTube video
+func (v *video) downloadThumbnail(video *database.Video) (string, error) {
 	// %s/%s.jpg
-	thumbPath := fmt.Sprintf(constThumbnailLocation, v.parent.config.ServerPaths.Thumbnails, video.ID)
+	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, video.ID)
 
 	// Don't download thumbnail if it already exists
 	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-		command := fmt.Sprintf(constThumbnailCommand, v.getYoutubePath(), thumbPath, video.ID)
+		command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, video.ID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
 		if err != nil {

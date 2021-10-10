@@ -23,6 +23,8 @@ type videoList struct {
 	parent          *SoftTube
 	treeView        *gtk.TreeView
 	scroll          *scroll
+	video           *video
+	color           *color
 	keepScrollToEnd bool
 	filterMode      uint
 }
@@ -41,7 +43,10 @@ func (v *videoList) Load(builder *framework.GtkBuilder) error {
 	s := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
 	v.scroll = &scroll{s}
 
-	helper := &treeViewHelper{videoList: v}
+	v.video = &video{v}
+	v.color = &color{v}
+
+	helper := &treeViewHelper{v}
 	helper.Setup()
 
 	return nil
@@ -61,10 +66,10 @@ func (v *videoList) SetFilterMode(mode uint) {
 // DeleteWatchedVideos : Deletes all watched videos from disk
 func (v *videoList) DeleteWatchedVideos() {
 	for i := 0; i < len(videos); i++ {
-		video := videos[i]
-		if video.Status == constStatusWatched && !video.Saved {
+		vid := videos[i]
+		if vid.Status == constStatusWatched && !vid.Saved {
 			// Delete the video from disk
-			v.deleteVideo(&video)
+			v.video.delete(&vid)
 		}
 	}
 
@@ -108,7 +113,7 @@ func (v *videoList) Refresh(text string) {
 
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]
-		v.addVideo(&video, listStore)
+		v.video.add(&video, listStore)
 	}
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
@@ -187,10 +192,6 @@ func (v *videoList) removeInvalidDurations(duration sql.NullString) string {
 	return duration.String
 }
 
-func (v *videoList) getYoutubePath() string {
-	return "yt-dlp"
-}
-
 func (v *videoList) getProgress(status int) (int, string) {
 	if status == constStatusWatched {
 		return 100, "watched"
@@ -202,7 +203,7 @@ func (v *videoList) getProgress(status int) (int, string) {
 }
 
 func (v *videoList) rowActivated(treeView *gtk.TreeView) {
-	video := v.getSelectedVideo(treeView)
+	video := v.video.getSelected(treeView)
 	if video == nil {
 		return
 	}
@@ -212,11 +213,11 @@ func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 		video.Status == constStatusSaved {
 
 		go func() {
-			v.playVideo(video)
+			v.video.play(video)
 		}()
 
 	} else if video.Status == constStatusNotDownloaded {
-		err := v.downloadVideo(video, true)
+		err := v.video.download(video, true)
 		if err != nil {
 			v.parent.Logger.LogError(err)
 		}
@@ -232,33 +233,3 @@ func (v *videoList) renameJPG2WEBP(thumbnailPath string) {
 		_ = os.Rename(thumbnailPath, newName)
 	}
 }
-
-func (v *videoList) setRowColor(treeView *gtk.TreeView, color string) {
-	selection, _ := treeView.GetSelection()
-	rows := selection.GetSelectedRows(listStore)
-	if rows == nil {
-		return
-	}
-	treePath := rows.Data().(*gtk.TreePath)
-	iter, _ := listStore.GetIter(treePath)
-	_ = listStore.SetValue(iter, listStoreColumnBackground, color)
-}
-
-//func (v *videoList) setTooltips() {
-//	iter, _ := listStore.GetIterFirst()
-//	for ;iter != nil; {
-//		videoIDValue, err := listStore.GetValue(iter, 6)
-//		if err!=nil {
-//			continue
-//		}
-//		//path, err := listStore.GetPath(iter)
-//		//if err!=nil {
-//		//	continue
-//		//}
-//		videoID, err := videoIDValue.GetString()
-//		fmt.Println(videoID)
-//		//tool := gtk.Tooltip{videoID}
-//		//v.treeView.SetTooltipCell(videoID, path, v.treeView.GetColumn(0),0)
-//		_ = listStore.IterNext(iter)
-//	}
-//}

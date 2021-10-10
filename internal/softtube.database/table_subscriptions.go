@@ -95,11 +95,3 @@ func (s Subscription) NeedsUpdate() bool {
 	result := next.Before(now)
 	return result
 }
-//
-//func localTime(datetime time.Time) time.Time {
-//	loc, err := time.LoadLocation("Europe/Stockholm")
-//	if err != nil {
-//		panic(err)
-//	}
-//	return datetime.In(loc)
-//}

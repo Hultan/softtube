@@ -25,7 +25,7 @@ func (s *searchBar) Load(builder *framework.GtkBuilder) error {
 	return nil
 }
 
-// SetupEvents : Setup the toolbar events
+// SetupEvents : Set up the toolbar events
 func (s *searchBar) SetupEvents() {
 	_ = s.clearButton.Connect("clicked", func() {
 		s.parent.searchBar.searchEntry.SetText("")

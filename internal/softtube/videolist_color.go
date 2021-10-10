@@ -3,14 +3,20 @@ package softtube
 import (
 	"strings"
 
+	"github.com/gotk3/gotk3/gtk"
+
 	database "github.com/hultan/softtube/internal/softtube.database"
 )
 
-func (v *videoList) getColor(video *database.Video) (string, string) {
+type color struct {
+	videoList *videoList
+}
+
+func (c *color) getColor(video *database.Video) (string, string) {
 	if video.Saved {
 		return constColorSaved, "Black"
 	}
-	duration := v.removeInvalidDurations(video.Duration)
+	duration := c.videoList.removeInvalidDurations(video.Duration)
 	if strings.Trim(duration, " ") == "LIVE" {
 		// If duration is LIVE, lets change color to live color
 		return constColorLive, "Black"
@@ -28,4 +34,15 @@ func (v *videoList) getColor(video *database.Video) (string, string) {
 	} else {
 		return constColorNotDownloaded, "White"
 	}
+}
+
+func (c *color) setRowColor(treeView *gtk.TreeView, color string) {
+	selection, _ := treeView.GetSelection()
+	rows := selection.GetSelectedRows(listStore)
+	if rows == nil {
+		return
+	}
+	treePath := rows.Data().(*gtk.TreePath)
+	iter, _ := listStore.GetIter(treePath)
+	_ = listStore.SetValue(iter, listStoreColumnBackground, color)
 }

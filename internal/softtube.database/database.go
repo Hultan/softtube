@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -55,6 +56,6 @@ func (d *Database) CloseDatabase() {
 
 // getConnectionString : Returns the connections string
 func (d *Database) getConnectionString() string {
-	//"user:pwd@tcp(server:port)/database"
+	// "user:pwd@tcp(server:port)/database"
 	return fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", d.Username, d.Password, d.Server, d.Port, d.Database)
 }
