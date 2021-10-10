@@ -2,17 +2,19 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+
 	"github.com/hultan/softteam/framework"
 )
 
 // PopupMenu : Handler the video list popupmenu
 type PopupMenu struct {
-	Parent                *SoftTube
-	PopupMenu             *gtk.Menu
-	PopupRefresh          *gtk.MenuItem
-	PopupDownload         *gtk.MenuItem
+	Parent                 *SoftTube
+	PopupMenu              *gtk.Menu
+	PopupRefresh           *gtk.MenuItem
+	PopupDownload          *gtk.MenuItem
 	PopupRedownload        *gtk.MenuItem
 	PopupRedownloadVideo   *gtk.MenuItem
 	PopupRedownloadVideos  *gtk.MenuItem
@@ -224,7 +226,9 @@ func (p *PopupMenu) SetupEvents() {
 		treeview := p.Parent.VideoList.TreeView
 		video := p.Parent.VideoList.getSelectedVideo(treeview)
 		if video != nil {
-			p.Parent.VideoList.playVideo(video)
+			go func() {
+				p.Parent.VideoList.playVideo(video)
+			}()
 		}
 	})
 

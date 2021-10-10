@@ -240,8 +240,14 @@ func (v *VideoList) rowActivated(treeView *gtk.TreeView) {
 		return
 	}
 
-	if video.Status == constStatusDownloaded || video.Status == constStatusWatched || video.Status == constStatusSaved {
-		v.playVideo(video)
+	if video.Status == constStatusDownloaded ||
+		video.Status == constStatusWatched ||
+		video.Status == constStatusSaved {
+
+		go func() {
+			v.playVideo(video)
+		}()
+
 	} else if video.Status == constStatusNotDownloaded {
 		err := v.downloadVideo(video, true)
 		if err != nil {
@@ -263,6 +269,9 @@ func (v *VideoList) renameJPG2WEBP(thumbnailPath string) {
 func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
 	selection, _ := treeView.GetSelection()
 	rows := selection.GetSelectedRows(listStore)
+	if rows == nil {
+		return
+	}
 	treePath := rows.Data().(*gtk.TreePath)
 	iter, _ := listStore.GetIter(treePath)
 	_ = listStore.SetValue(iter, listStoreColumnBackground, color)

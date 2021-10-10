@@ -96,10 +96,14 @@ func (v *VideoList) playVideo(video *database.Video) {
 		logger.Log(msg)
 		return
 	}
+
 	command := fmt.Sprintf("smplayer '%s'", videoPath)
 	cmd := exec.Command("/bin/bash", "-c", command)
+
 	// Starts a sub process (smplayer)
-	err := cmd.Start()
+	// Use run (since we are using a go routine), otherwise use Start and Wait together
+	// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
+	err := cmd.Run()
 	if err != nil {
 		logger.LogError(err)
 	}
