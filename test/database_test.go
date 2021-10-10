@@ -1,9 +1,10 @@
 package test
 
 import (
-	"github.com/hultan/softtube/internal/softtube.database"
 	"testing"
 	"time"
+
+	"github.com/hultan/softtube/internal/softtube.database"
 
 	core "github.com/hultan/softtube/internal/softtube.core"
 )

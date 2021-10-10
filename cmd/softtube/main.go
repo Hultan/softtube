@@ -22,7 +22,7 @@ func main() {
 	// Load the config file
 	loadConfig()
 
-	// Setup the client logging
+	// Set up the client logging
 	startLogging()
 	defer stopLogging()
 
