@@ -18,14 +18,14 @@ func main() {
 	// Load config file
 	config := new(core.Config)
 	err := config.Load("main")
-	if err!=nil {
+	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
 	err = backup("softtube", config.ServerPaths.Backup)
-	//backup("softtubeTEST", config.ServerPaths.Backup)
-	if err!=nil {
+	// backup("softtubeTEST", config.ServerPaths.Backup)
+	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}

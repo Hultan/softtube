@@ -19,7 +19,7 @@ import (
 type youtube struct {
 }
 
-// Get the duration of a youtube video
+// Get the duration of a YouTube video
 func (y youtube) getDuration(videoID string, logger *core.Logger) error {
 
 	for i := 0; i < 3; i++ {
@@ -56,7 +56,7 @@ func (y youtube) getDuration(videoID string, logger *core.Logger) error {
 
 func (y youtube) checkDuration(videoID, duration string) bool {
 	if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(duration, "ERROR: This live event") {
-		// Is it a live streaming event?
+		// Is it a live-streaming event?
 		// Save duration in the database
 		y.updateDuration(videoID, "LIVE", logger)
 		return true
@@ -74,7 +74,7 @@ func (y youtube) updateDuration(videoID, duration string, logger *core.Logger) {
 	}
 }
 
-// Get the duration of a youtube video
+// Get the duration of a YouTube video
 func (y youtube) getDurationInternal(videoID string) (string, error) {
 	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
@@ -85,7 +85,7 @@ func (y youtube) getDurationInternal(videoID string) (string, error) {
 	return string(output), nil
 }
 
-// Get the thumbnail of a youtube video
+// Get the thumbnail of a YouTube video
 func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger) error {
 
 	for i := 0; i < 3; i++ {
@@ -111,7 +111,7 @@ func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger
 	return nil
 }
 
-// Get the thumbnail of a youtube video
+// Get the thumbnail of a YouTube video
 func (y youtube) getThumbnailInternal(videoID, thumbnailPath string) (string, error) {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, thumbnailPath, videoID)

@@ -3,11 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/hultan/softtube/internal/softtube.database"
 	"os"
 	"path"
 	"regexp"
 	"sync"
+
+	"github.com/hultan/softtube/internal/softtube.database"
 
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
@@ -113,7 +114,7 @@ func main() {
 
 	waitGroup.Wait()
 
-	//updateSubscription(&subs[21])
+	// updateSubscription(&subs[21])
 }
 
 func updateSubscription(subscription *database.Subscription) {

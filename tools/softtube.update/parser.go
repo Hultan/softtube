@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	database "github.com/hultan/softtube/internal/softtube.database"
 	"time"
+
+	database "github.com/hultan/softtube/internal/softtube.database"
 )
 
 // Feed : A subscription RSS feed

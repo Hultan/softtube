@@ -2,47 +2,47 @@ package main
 
 import (
 	"fmt"
-	core "github.com/hultan/softtube/internal/softtube.core"
-	"github.com/hultan/softtube/internal/softtube.database"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/hultan/softtube/internal/softtube.database"
 )
 
 var (
 	cutOff = time.Now().AddDate(0, 0, -30)
-	config *core.Config
-	db     *database.Database
+	// config *core.Config
+	db *database.Database
 )
 
 func main() {
-	//// Load config file
-	//config = new(core.Config)
-	//err := config.Load("main")
-	//if err!=nil {
+	// // Load config file
+	// config = new(core.Config)
+	// err := config.Load("main")
+	// if err!=nil {
 	//	fmt.Println(err.Error())
 	//	os.Exit(1)
-	//}
+	// }
 	//
-	//// Decrypt the MySQL password
-	//conn := config.Connection
-	//crypt := core.Crypt{}
-	//password, err := crypt.Decrypt(conn.Password)
-	//if err != nil {
+	// // Decrypt the MySQL password
+	// conn := config.Connection
+	// crypt := core.Crypt{}
+	// password, err := crypt.Decrypt(conn.Password)
+	// if err != nil {
 	//	panic(err)
-	//}
+	// }
 	//
-	//// Create the database object, and get all subscriptions
-	//db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	//err = db.OpenDatabase()
-	//if err!=nil {
+	// // Create the database object, and get all subscriptions
+	// db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	// err = db.OpenDatabase()
+	// if err!=nil {
 	//	fmt.Println(err.Error())
 	//	os.Exit(1)
-	//}
+	// }
 	//
-	//defer db.CloseDatabase()
+	// defer db.CloseDatabase()
 
 	cleanBackups()
 	cleanThumbnails(db)
