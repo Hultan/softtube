@@ -18,76 +18,76 @@ import (
 
 const constVideoDurationCommand = "%s --get-duration -- '%s'"
 
-// VideoList : The SoftTube video list
-type VideoList struct {
-	Parent          *SoftTube
-	TreeView        *gtk.TreeView
-	ScrolledWindow  *gtk.ScrolledWindow
-	KeepScrollToEnd bool
-	FilterMode      uint
+// videoList : The SoftTube video list
+type videoList struct {
+	parent          *SoftTube
+	treeView        *gtk.TreeView
+	scrolledWindow  *gtk.ScrolledWindow
+	keepScrollToEnd bool
+	filterMode      uint
 }
 
 var videos []database.Video
 var listStore *gtk.ListStore
 
 // Load : Loads the toolbar from the glade file
-func (v *VideoList) Load(builder *framework.GtkBuilder) error {
-	v.FilterMode = 0
+func (v *videoList) Load(builder *framework.GtkBuilder) error {
+	v.filterMode = 0
 	// Get the tree view
 	treeView := builder.GetObject("video_treeview").(*gtk.TreeView)
-	v.TreeView = treeView
+	v.treeView = treeView
 
 	// Get the scrolled window surrounding the treeview
 	scroll := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
-	v.ScrolledWindow = scroll
+	v.scrolledWindow = scroll
 
 	return nil
 }
 
 // SetupEvents : Setup the list events
-func (v *VideoList) SetupEvents() {
+func (v *videoList) SetupEvents() {
 	// Send in the videolist as a user data parameter to the event
-	_ = v.TreeView.Connect("row_activated", v.rowActivated)
+	_ = v.treeView.Connect("row_activated", v.rowActivated)
 }
 
 // SetupColumns : Sets up the listview columns
-func (v VideoList) SetupColumns() {
-	helper := new(TreeviewHelper)
-	v.TreeView.AppendColumn(helper.CreateImageColumn("Image"))
-	v.TreeView.AppendColumn(helper.CreateTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
-	v.TreeView.AppendColumn(helper.CreateTextColumn("Date", listStoreColumnDate, 90, 300))
-	v.TreeView.AppendColumn(helper.CreateTextColumn("Title", listStoreColumnTitle, 0, 600))
-	v.TreeView.AppendColumn(helper.CreateTextColumn("Duration", listStoreColumnDuration, 90, 300))
-	v.TreeView.AppendColumn(helper.CreateProgressColumn("Progress"))
+func (v videoList) SetupColumns() {
+	helper := new(treeviewHelper)
+	v.treeView.AppendColumn(helper.CreateImageColumn("Image"))
+	v.treeView.AppendColumn(helper.CreateTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
+	v.treeView.AppendColumn(helper.CreateTextColumn("Date", listStoreColumnDate, 90, 300))
+	v.treeView.AppendColumn(helper.CreateTextColumn("Title", listStoreColumnTitle, 0, 600))
+	v.treeView.AppendColumn(helper.CreateTextColumn("Duration", listStoreColumnDuration, 90, 300))
+	v.treeView.AppendColumn(helper.CreateProgressColumn("Progress"))
 }
 
 // Search : Searches for a video
-func (v *VideoList) Search(text string) {
+func (v *videoList) Search(text string) {
 	v.Refresh(text)
 }
 
 // ScrollToStart : Scrolls to the start of the list
-func (v *VideoList) ScrollToStart() {
-	var adjustment = v.ScrolledWindow.GetVAdjustment()
+func (v *videoList) ScrollToStart() {
+	var adjustment = v.scrolledWindow.GetVAdjustment()
 	adjustment.SetValue(adjustment.GetLower())
-	v.ScrolledWindow.Show()
+	v.scrolledWindow.Show()
 }
 
 // ScrollToEnd : Scrolls to the end of the list
-func (v *VideoList) ScrollToEnd() {
-	var adjustment = v.ScrolledWindow.GetVAdjustment()
+func (v *videoList) ScrollToEnd() {
+	var adjustment = v.scrolledWindow.GetVAdjustment()
 	adjustment.SetValue(adjustment.GetUpper())
-	v.ScrolledWindow.Show()
+	v.scrolledWindow.Show()
 }
 
 // SetFilterMode : Changes filter mode
-func (v *VideoList) SetFilterMode(mode uint) {
-	v.FilterMode = mode
+func (v *videoList) SetFilterMode(mode uint) {
+	v.filterMode = mode
 	v.Refresh("")
 }
 
 // DeleteWatchedVideos : Deletes all watched videos from disk
-func (v *VideoList) DeleteWatchedVideos() {
+func (v *videoList) DeleteWatchedVideos() {
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]
 		if video.Status == constStatusWatched && !video.Saved {
@@ -100,17 +100,16 @@ func (v *VideoList) DeleteWatchedVideos() {
 }
 
 // Refresh : Refreshes the video list
-func (v *VideoList) Refresh(text string) {
+func (v *videoList) Refresh(text string) {
 	var err error
 
-	db := v.Parent.Database
 	if text == "" {
-		videos, err = db.Videos.GetVideos(false)
+		videos, err = v.parent.db.Videos.GetVideos(false)
 	} else {
-		videos, err = db.Videos.Search(text)
+		videos, err = v.parent.db.Videos.Search(text)
 	}
 	if err != nil {
-		logger.LogError(err)
+		v.parent.logger.LogError(err)
 		return
 	}
 
@@ -118,7 +117,7 @@ func (v *VideoList) Refresh(text string) {
 		listStore.Clear()
 	}
 
-	v.TreeView.SetModel(nil)
+	v.treeView.SetModel(nil)
 	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), // Thumbnail
 		glib.TYPE_STRING, // Subscription name
 		glib.TYPE_STRING, // Added date
@@ -130,8 +129,8 @@ func (v *VideoList) Refresh(text string) {
 		glib.TYPE_STRING, // Progress text
 		glib.TYPE_STRING) // Foreground color
 	if err != nil {
-		logger.Log("Failed to create list store!")
-		logger.LogError(err)
+		v.parent.logger.Log("Failed to create list store!")
+		v.parent.logger.LogError(err)
 		panic(err)
 	}
 
@@ -142,16 +141,16 @@ func (v *VideoList) Refresh(text string) {
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
 	if err != nil {
-		logger.LogError(err)
+		v.parent.logger.LogError(err)
 		return
 	}
 	filter.SetVisibleFunc(v.filterFunc)
-	v.TreeView.SetModel(filter)
+	v.treeView.SetModel(filter)
 
 	count := filter.IterNChildren(nil)
-	v.Parent.StatusBar.UpdateVideoCount(count)
+	v.parent.statusBar.UpdateVideoCount(count)
 
-	if v.KeepScrollToEnd {
+	if v.keepScrollToEnd {
 		// For some reason, we can't scroll to end in the
 		// UI thread so create a goroutine that does the
 		// scrolling down 50 milliseconds later
@@ -179,17 +178,17 @@ func (v *VideoList) Refresh(text string) {
 // Private functions
 //
 
-func (v *VideoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
+func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	value, err := model.GetValue(iter, listStoreColumnBackground)
 	if err != nil {
-		logger.LogError(err)
+		v.parent.logger.LogError(err)
 	}
 	color, err := value.GetString()
 	if err != nil {
-		logger.LogError(err)
+		v.parent.logger.LogError(err)
 	}
 
-	switch v.FilterMode {
+	switch v.filterMode {
 	case constFilterModeSubscriptions:
 		return true
 	case constFilterModeDownloads:
@@ -213,18 +212,18 @@ func (v *VideoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	return false
 }
 
-func (v *VideoList) removeInvalidDurations(duration sql.NullString) string {
+func (v *videoList) removeInvalidDurations(duration sql.NullString) string {
 	if duration.Valid && len(strings.Trim(duration.String, " \n")) <= 1 {
 		return ""
 	}
 	return duration.String
 }
 
-func (v *VideoList) getYoutubePath() string {
+func (v *videoList) getYoutubePath() string {
 	return "yt-dlp"
 }
 
-func (v *VideoList) getProgress(status int) (int, string) {
+func (v *videoList) getProgress(status int) (int, string) {
 	if status == constStatusWatched {
 		return 100, "watched"
 	} else if status == constStatusDownloaded {
@@ -234,7 +233,7 @@ func (v *VideoList) getProgress(status int) (int, string) {
 	return 0, ""
 }
 
-func (v *VideoList) rowActivated(treeView *gtk.TreeView) {
+func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 	video := v.getSelectedVideo(treeView)
 	if video == nil {
 		return
@@ -251,14 +250,14 @@ func (v *VideoList) rowActivated(treeView *gtk.TreeView) {
 	} else if video.Status == constStatusNotDownloaded {
 		err := v.downloadVideo(video, true)
 		if err != nil {
-			logger.LogError(err)
+			v.parent.logger.LogError(err)
 		}
 	}
 }
 
 // Some .webp images are erroneously named .jpg, so
 // rename them so that the converter can take care of them
-func (v *VideoList) renameJPG2WEBP(thumbnailPath string) {
+func (v *videoList) renameJPG2WEBP(thumbnailPath string) {
 	extension := filepath.Ext(thumbnailPath)
 	if extension == ".jpg" {
 		newName := thumbnailPath[:len(thumbnailPath)-len(extension)] + ".webp"
@@ -266,7 +265,7 @@ func (v *VideoList) renameJPG2WEBP(thumbnailPath string) {
 	}
 }
 
-func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
+func (v *videoList) setRowColor(treeView *gtk.TreeView, color string) {
 	selection, _ := treeView.GetSelection()
 	rows := selection.GetSelectedRows(listStore)
 	if rows == nil {
@@ -277,7 +276,7 @@ func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
 	_ = listStore.SetValue(iter, listStoreColumnBackground, color)
 }
 
-//func (v *VideoList) setTooltips() {
+//func (v *videoList) setTooltips() {
 //	iter, _ := listStore.GetIterFirst()
 //	for ;iter != nil; {
 //		videoIDValue, err := listStore.GetValue(iter, 6)
@@ -291,7 +290,7 @@ func (v *VideoList) setRowColor(treeView *gtk.TreeView, color string) {
 //		videoID, err := videoIDValue.GetString()
 //		fmt.Println(videoID)
 //		//tool := gtk.Tooltip{videoID}
-//		//v.TreeView.SetTooltipCell(videoID, path, v.TreeView.GetColumn(0),0)
+//		//v.treeView.SetTooltipCell(videoID, path, v.treeView.GetColumn(0),0)
 //		_ = listStore.IterNext(iter)
 //	}
 //}

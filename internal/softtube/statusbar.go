@@ -2,25 +2,27 @@ package softtube
 
 import (
 	"fmt"
+
 	"github.com/gotk3/gotk3/gtk"
+
 	"github.com/hultan/softteam/framework"
 )
 
-// StatusBar : The status bar of SoftTube
-type StatusBar struct {
-	Parent     *SoftTube
-	VideoCount *gtk.Label
+// statusBar : The status bar of SoftTube
+type statusBar struct {
+	parent     *SoftTube
+	videoCount *gtk.Label
 }
 
 // Load : Loads the toolbar
-func (s *StatusBar) Load(builder *framework.GtkBuilder) error {
+func (s *statusBar) Load(builder *framework.GtkBuilder) error {
 	label := builder.GetObject("statusbar_number_of_videos").(*gtk.Label)
-	s.VideoCount = label
+	s.videoCount = label
 
 	return nil
 }
 
 // UpdateVideoCount : Update the video count in the status bar
-func (s *StatusBar) UpdateVideoCount(numberOfVideos int) {
-	s.VideoCount.SetText(fmt.Sprintf("Number of videos : %d", numberOfVideos))
+func (s *statusBar) UpdateVideoCount(numberOfVideos int) {
+	s.videoCount.SetText(fmt.Sprintf("Number of videos : %d", numberOfVideos))
 }

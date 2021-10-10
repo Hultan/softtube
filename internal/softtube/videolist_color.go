@@ -1,11 +1,12 @@
 package softtube
 
 import (
-	database "github.com/hultan/softtube/internal/softtube.database"
 	"strings"
+
+	database "github.com/hultan/softtube/internal/softtube.database"
 )
 
-func (v *VideoList) getColor(video *database.Video) (string, string) {
+func (v *videoList) getColor(video *database.Video) (string, string) {
 	if video.Saved {
 		return constColorSaved, "Black"
 	}

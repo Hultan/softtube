@@ -2,32 +2,33 @@ package softtube
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+
 	"github.com/hultan/softteam/framework"
 )
 
-// MenuBar : The SoftTube menu bar
-type MenuBar struct {
-	Parent        *SoftTube
-	MenuFileQuit  *gtk.MenuItem
-	MenuHelpAbout *gtk.MenuItem
+// menuBar : The SoftTube menu bar
+type menuBar struct {
+	parent        *SoftTube
+	menuFileQuit  *gtk.MenuItem
+	menuHelpAbout *gtk.MenuItem
 }
 
 // Load : Loads the toolbar
-func (m *MenuBar) Load(builder *framework.GtkBuilder) error {
+func (m *menuBar) Load(builder *framework.GtkBuilder) error {
 	menuItem := builder.GetObject("menu_file_quit").(*gtk.MenuItem)
-	m.MenuFileQuit = menuItem
+	m.menuFileQuit = menuItem
 
 	menuItem = builder.GetObject("menu_help_about").(*gtk.MenuItem)
-	m.MenuHelpAbout = menuItem
+	m.menuHelpAbout = menuItem
 
 	return nil
 }
 
 // SetupEvents : Setup the toolbar events
-func (m *MenuBar) SetupEvents() {
-	_= m.MenuFileQuit.Connect("activate", func() {
+func (m *menuBar) SetupEvents() {
+	_ = m.menuFileQuit.Connect("activate", func() {
 		gtk.MainQuit()
 	})
-	_ = m.MenuHelpAbout.Connect("activate", func() {
+	_ = m.menuHelpAbout.Connect("activate", func() {
 	})
 }

@@ -9,240 +9,240 @@ import (
 	"github.com/hultan/softteam/framework"
 )
 
-// PopupMenu : Handler the video list popupmenu
-type PopupMenu struct {
-	Parent                *SoftTube
-	PopupMenu             *gtk.Menu
-	PopupRefresh          *gtk.MenuItem
-	PopupDownload         *gtk.MenuItem
-	PopupRedownload        *gtk.MenuItem
-	PopupRedownloadVideo   *gtk.MenuItem
-	PopupRedownloadVideos  *gtk.MenuItem
-	PopupPlay              *gtk.MenuItem
-	PopupGetDuration       *gtk.MenuItem
-	PopupGetVideoID        *gtk.MenuItem
-	PopupGetThumbnail      *gtk.MenuItem
-	PopupDeleteAll         *gtk.MenuItem
-	PopupUnwatch           *gtk.MenuItem
-	PopupSave              *gtk.MenuItem
-	PopupViewSubscriptions *gtk.MenuItem
-	PopupViewDownloads     *gtk.MenuItem
-	PopupViewToWatch       *gtk.MenuItem
-	PopupViewToDelete      *gtk.MenuItem
-	PopupViewSaved         *gtk.MenuItem
+// popupMenu : Handler the video list popupmenu
+type popupMenu struct {
+	parent                 *SoftTube
+	popupMenu              *gtk.Menu
+	popupRefresh           *gtk.MenuItem
+	popupDownload          *gtk.MenuItem
+	popupRedownload        *gtk.MenuItem
+	popupRedownloadVideo   *gtk.MenuItem
+	popupRedownloadVideos  *gtk.MenuItem
+	popupPlay              *gtk.MenuItem
+	popupGetDuration       *gtk.MenuItem
+	popupGetVideoID        *gtk.MenuItem
+	popupGetThumbnail      *gtk.MenuItem
+	popupDeleteAll         *gtk.MenuItem
+	popupUnwatch           *gtk.MenuItem
+	popupSave              *gtk.MenuItem
+	popupViewSubscriptions *gtk.MenuItem
+	popupViewDownloads     *gtk.MenuItem
+	popupViewToWatch       *gtk.MenuItem
+	popupViewToDelete      *gtk.MenuItem
+	popupViewSaved         *gtk.MenuItem
 }
 
 // Load : Loads the popup menu
-func (p *PopupMenu) Load(builder *framework.GtkBuilder) error {
+func (p *popupMenu) Load(builder *framework.GtkBuilder) error {
 	menu := builder.GetObject("popupmenu").(*gtk.Menu)
-	p.PopupMenu = menu
+	p.popupMenu = menu
 
 	menuItem := builder.GetObject("popup_refresh").(*gtk.MenuItem)
-	p.PopupRefresh = menuItem
+	p.popupRefresh = menuItem
 
 	menuItem = builder.GetObject("popup_download").(*gtk.MenuItem)
-	p.PopupDownload = menuItem
+	p.popupDownload = menuItem
 
 	menuItem = builder.GetObject("popup_redownload").(*gtk.MenuItem)
-	p.PopupRedownload = menuItem
+	p.popupRedownload = menuItem
 
 	menuItem = builder.GetObject("popup_redownload_failedvideo").(*gtk.MenuItem)
-	p.PopupRedownloadVideo = menuItem
+	p.popupRedownloadVideo = menuItem
 
 	menuItem = builder.GetObject("popup_redownload_failedvideos").(*gtk.MenuItem)
-	p.PopupRedownloadVideos = menuItem
+	p.popupRedownloadVideos = menuItem
 
 	menuItem = builder.GetObject("popup_play").(*gtk.MenuItem)
-	p.PopupPlay = menuItem
+	p.popupPlay = menuItem
 
 	menuItem = builder.GetObject("popup_get_duration").(*gtk.MenuItem)
-	p.PopupGetDuration = menuItem
+	p.popupGetDuration = menuItem
 
 	menuItem = builder.GetObject("popup_get_videoid").(*gtk.MenuItem)
-	p.PopupGetVideoID = menuItem
+	p.popupGetVideoID = menuItem
 
 	menuItem = builder.GetObject("popup_get_thumbnail").(*gtk.MenuItem)
-	p.PopupGetThumbnail = menuItem
+	p.popupGetThumbnail = menuItem
 
 	menuItem = builder.GetObject("popup_delete_all").(*gtk.MenuItem)
-	p.PopupDeleteAll = menuItem
+	p.popupDeleteAll = menuItem
 
 	menuItem = builder.GetObject("popup_unwatch").(*gtk.MenuItem)
-	p.PopupUnwatch = menuItem
+	p.popupUnwatch = menuItem
 
 	menuItem = builder.GetObject("popup_save").(*gtk.MenuItem)
-	p.PopupSave = menuItem
+	p.popupSave = menuItem
 
 	menuItem = builder.GetObject("popup_view_subscriptions").(*gtk.MenuItem)
-	p.PopupViewSubscriptions = menuItem
+	p.popupViewSubscriptions = menuItem
 
 	menuItem = builder.GetObject("popup_view_failed").(*gtk.MenuItem)
-	p.PopupViewDownloads = menuItem
+	p.popupViewDownloads = menuItem
 
 	menuItem = builder.GetObject("popup_view_to_watch").(*gtk.MenuItem)
-	p.PopupViewToWatch = menuItem
+	p.popupViewToWatch = menuItem
 
 	menuItem = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
-	p.PopupViewToDelete = menuItem
+	p.popupViewToDelete = menuItem
 
 	menuItem = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
-	p.PopupViewSaved = menuItem
+	p.popupViewSaved = menuItem
 
 	return nil
 }
 
 // SetupEvents : Setup the toolbar events
-func (p *PopupMenu) SetupEvents() {
-	_ = p.Parent.VideoList.TreeView.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
+func (p *popupMenu) SetupEvents() {
+	_ = p.parent.videoList.treeView.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
 		buttonEvent := gdk.EventButtonNewFromEvent(event)
 		if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
-			videoSelected := p.Parent.VideoList.getSelectedVideo(p.Parent.VideoList.TreeView) != nil
-			switch p.Parent.VideoList.FilterMode {
+			videoSelected := p.parent.videoList.getSelectedVideo(p.parent.videoList.treeView) != nil
+			switch p.parent.videoList.filterMode {
 			case constFilterModeSubscriptions:
-				p.PopupDownload.SetSensitive(videoSelected)
-				p.PopupRedownload.SetSensitive(true)
-				p.PopupRedownloadVideo.SetSensitive(videoSelected)
-				p.PopupPlay.SetSensitive(false)
-				p.PopupGetDuration.SetSensitive(videoSelected)
-				p.PopupGetVideoID.SetSensitive(videoSelected)
-				p.PopupGetThumbnail.SetSensitive(videoSelected)
-				p.PopupDeleteAll.SetVisible(false)
-				p.PopupUnwatch.SetSensitive(videoSelected)
-				p.PopupUnwatch.SetLabel(constSetAsNotDownloaded)
-				p.PopupSave.SetSensitive(false)
-				p.PopupSave.SetLabel(constSetAsSaved)
-				p.PopupViewSubscriptions.SetSensitive(false)
-				p.PopupViewDownloads.SetSensitive(true)
-				p.PopupViewToWatch.SetSensitive(true)
-				p.PopupViewToDelete.SetSensitive(true)
-				p.PopupViewSaved.SetSensitive(true)
+				p.popupDownload.SetSensitive(videoSelected)
+				p.popupRedownload.SetSensitive(true)
+				p.popupRedownloadVideo.SetSensitive(videoSelected)
+				p.popupPlay.SetSensitive(false)
+				p.popupGetDuration.SetSensitive(videoSelected)
+				p.popupGetVideoID.SetSensitive(videoSelected)
+				p.popupGetThumbnail.SetSensitive(videoSelected)
+				p.popupDeleteAll.SetVisible(false)
+				p.popupUnwatch.SetSensitive(videoSelected)
+				p.popupUnwatch.SetLabel(constSetAsNotDownloaded)
+				p.popupSave.SetSensitive(false)
+				p.popupSave.SetLabel(constSetAsSaved)
+				p.popupViewSubscriptions.SetSensitive(false)
+				p.popupViewDownloads.SetSensitive(true)
+				p.popupViewToWatch.SetSensitive(true)
+				p.popupViewToDelete.SetSensitive(true)
+				p.popupViewSaved.SetSensitive(true)
 			case constFilterModeDownloads:
-				p.PopupDownload.SetSensitive(false)
-				p.PopupRedownload.SetSensitive(true)
-				p.PopupRedownloadVideo.SetSensitive(videoSelected)
-				p.PopupPlay.SetSensitive(false)
-				p.PopupGetDuration.SetSensitive(videoSelected)
-				p.PopupGetVideoID.SetSensitive(videoSelected)
-				p.PopupGetThumbnail.SetSensitive(videoSelected)
-				p.PopupDeleteAll.SetVisible(false)
-				p.PopupUnwatch.SetSensitive(true)
-				p.PopupUnwatch.SetLabel(constSetAsNotDownloaded)
-				p.PopupSave.SetSensitive(false)
-				p.PopupSave.SetLabel(constSetAsSaved)
-				p.PopupViewSubscriptions.SetSensitive(true)
-				p.PopupViewDownloads.SetSensitive(false)
-				p.PopupViewToWatch.SetSensitive(true)
-				p.PopupViewToDelete.SetSensitive(true)
-				p.PopupViewSaved.SetSensitive(true)
+				p.popupDownload.SetSensitive(false)
+				p.popupRedownload.SetSensitive(true)
+				p.popupRedownloadVideo.SetSensitive(videoSelected)
+				p.popupPlay.SetSensitive(false)
+				p.popupGetDuration.SetSensitive(videoSelected)
+				p.popupGetVideoID.SetSensitive(videoSelected)
+				p.popupGetThumbnail.SetSensitive(videoSelected)
+				p.popupDeleteAll.SetVisible(false)
+				p.popupUnwatch.SetSensitive(true)
+				p.popupUnwatch.SetLabel(constSetAsNotDownloaded)
+				p.popupSave.SetSensitive(false)
+				p.popupSave.SetLabel(constSetAsSaved)
+				p.popupViewSubscriptions.SetSensitive(true)
+				p.popupViewDownloads.SetSensitive(false)
+				p.popupViewToWatch.SetSensitive(true)
+				p.popupViewToDelete.SetSensitive(true)
+				p.popupViewSaved.SetSensitive(true)
 			case constFilterModeToWatch:
-				p.PopupDownload.SetSensitive(false)
-				p.PopupRedownload.SetSensitive(false)
-				p.PopupPlay.SetSensitive(videoSelected)
-				p.PopupGetDuration.SetSensitive(false)
-				p.PopupGetVideoID.SetSensitive(videoSelected)
-				p.PopupGetThumbnail.SetSensitive(false)
-				p.PopupDeleteAll.SetVisible(false)
-				p.PopupUnwatch.SetSensitive(videoSelected)
-				p.PopupUnwatch.SetLabel(constSetAsWatched)
-				p.PopupSave.SetSensitive(videoSelected)
-				p.PopupSave.SetLabel(constSetAsSaved)
-				p.PopupViewSubscriptions.SetSensitive(true)
-				p.PopupViewDownloads.SetSensitive(true)
-				p.PopupViewToWatch.SetSensitive(false)
-				p.PopupViewToDelete.SetSensitive(true)
-				p.PopupViewSaved.SetSensitive(true)
+				p.popupDownload.SetSensitive(false)
+				p.popupRedownload.SetSensitive(false)
+				p.popupPlay.SetSensitive(videoSelected)
+				p.popupGetDuration.SetSensitive(false)
+				p.popupGetVideoID.SetSensitive(videoSelected)
+				p.popupGetThumbnail.SetSensitive(false)
+				p.popupDeleteAll.SetVisible(false)
+				p.popupUnwatch.SetSensitive(videoSelected)
+				p.popupUnwatch.SetLabel(constSetAsWatched)
+				p.popupSave.SetSensitive(videoSelected)
+				p.popupSave.SetLabel(constSetAsSaved)
+				p.popupViewSubscriptions.SetSensitive(true)
+				p.popupViewDownloads.SetSensitive(true)
+				p.popupViewToWatch.SetSensitive(false)
+				p.popupViewToDelete.SetSensitive(true)
+				p.popupViewSaved.SetSensitive(true)
 			case constFilterModeToDelete:
-				p.PopupDownload.SetSensitive(false)
-				p.PopupRedownload.SetSensitive(false)
-				p.PopupPlay.SetSensitive(videoSelected)
-				p.PopupGetDuration.SetSensitive(false)
-				p.PopupGetVideoID.SetSensitive(videoSelected)
-				p.PopupGetThumbnail.SetSensitive(false)
-				p.PopupDeleteAll.SetVisible(true)
-				p.PopupUnwatch.SetSensitive(videoSelected)
-				p.PopupUnwatch.SetLabel(constSetAsUnwatched)
-				p.PopupSave.SetSensitive(videoSelected)
-				p.PopupSave.SetLabel(constSetAsSaved)
-				p.PopupViewSubscriptions.SetSensitive(true)
-				p.PopupViewDownloads.SetSensitive(true)
-				p.PopupViewToWatch.SetSensitive(true)
-				p.PopupViewToDelete.SetSensitive(false)
-				p.PopupViewSaved.SetSensitive(true)
+				p.popupDownload.SetSensitive(false)
+				p.popupRedownload.SetSensitive(false)
+				p.popupPlay.SetSensitive(videoSelected)
+				p.popupGetDuration.SetSensitive(false)
+				p.popupGetVideoID.SetSensitive(videoSelected)
+				p.popupGetThumbnail.SetSensitive(false)
+				p.popupDeleteAll.SetVisible(true)
+				p.popupUnwatch.SetSensitive(videoSelected)
+				p.popupUnwatch.SetLabel(constSetAsUnwatched)
+				p.popupSave.SetSensitive(videoSelected)
+				p.popupSave.SetLabel(constSetAsSaved)
+				p.popupViewSubscriptions.SetSensitive(true)
+				p.popupViewDownloads.SetSensitive(true)
+				p.popupViewToWatch.SetSensitive(true)
+				p.popupViewToDelete.SetSensitive(false)
+				p.popupViewSaved.SetSensitive(true)
 			case constFilterModeSaved:
-				p.PopupDownload.SetSensitive(false)
-				p.PopupRedownload.SetSensitive(false)
-				p.PopupPlay.SetSensitive(videoSelected)
-				p.PopupGetDuration.SetSensitive(false)
-				p.PopupGetVideoID.SetSensitive(videoSelected)
-				p.PopupGetThumbnail.SetSensitive(true)
-				p.PopupDeleteAll.SetVisible(false)
-				p.PopupUnwatch.SetSensitive(false)
-				p.PopupUnwatch.SetLabel(constSetAsWatched)
-				p.PopupSave.SetSensitive(true)
-				p.PopupSave.SetLabel(constSetAsNotSaved)
-				p.PopupViewSubscriptions.SetSensitive(true)
-				p.PopupViewDownloads.SetSensitive(true)
-				p.PopupViewToWatch.SetSensitive(true)
-				p.PopupViewToDelete.SetSensitive(true)
-				p.PopupViewSaved.SetSensitive(false)
+				p.popupDownload.SetSensitive(false)
+				p.popupRedownload.SetSensitive(false)
+				p.popupPlay.SetSensitive(videoSelected)
+				p.popupGetDuration.SetSensitive(false)
+				p.popupGetVideoID.SetSensitive(videoSelected)
+				p.popupGetThumbnail.SetSensitive(true)
+				p.popupDeleteAll.SetVisible(false)
+				p.popupUnwatch.SetSensitive(false)
+				p.popupUnwatch.SetLabel(constSetAsWatched)
+				p.popupSave.SetSensitive(true)
+				p.popupSave.SetLabel(constSetAsNotSaved)
+				p.popupViewSubscriptions.SetSensitive(true)
+				p.popupViewDownloads.SetSensitive(true)
+				p.popupViewToWatch.SetSensitive(true)
+				p.popupViewToDelete.SetSensitive(true)
+				p.popupViewSaved.SetSensitive(false)
 			}
-			p.PopupMenu.PopupAtPointer(event)
+			p.popupMenu.PopupAtPointer(event)
 		}
 	})
 
-	_ = p.PopupRefresh.Connect("activate", func() {
-		p.Parent.VideoList.Refresh("")
+	_ = p.popupRefresh.Connect("activate", func() {
+		p.parent.videoList.Refresh("")
 	})
 
-	_ = p.PopupDownload.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupDownload.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
-			_ = p.Parent.VideoList.downloadVideo(video, true)
+			_ = p.parent.videoList.downloadVideo(video, true)
 		}
 	})
-	_ = p.PopupRedownloadVideo.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupRedownloadVideo.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
-			_ = p.Parent.VideoList.downloadVideo(video, false)
+			_ = p.parent.videoList.downloadVideo(video, false)
 		}
 	})
-	_ = p.PopupRedownloadVideos.Connect("activate", func() {
-		videos, err := p.Parent.Database.Videos.GetVideos(true)
+	_ = p.popupRedownloadVideos.Connect("activate", func() {
+		videos, err := p.parent.db.Videos.GetVideos(true)
 		if err != nil {
-			logger.LogError(err)
+			p.parent.logger.LogError(err)
 			return
 		}
 		for key, _ := range videos {
 			video := &videos[key]
 			if video != nil {
-				_ = p.Parent.VideoList.downloadVideo(video, false)
+				_ = p.parent.videoList.downloadVideo(video, false)
 			}
 		}
 	})
 
-	_ = p.PopupPlay.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupPlay.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
 			go func() {
-				p.Parent.VideoList.playVideo(video)
+				p.parent.videoList.playVideo(video)
 			}()
 		}
 	})
 
-	_ = p.PopupGetDuration.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupGetDuration.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
-			p.Parent.VideoList.downloadVideoDuration(video)
+			p.parent.videoList.downloadVideoDuration(video)
 		}
 	})
 
-	_ = p.PopupGetVideoID.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupGetVideoID.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
 			clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
 			if err != nil {
@@ -253,33 +253,33 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 
-	_ = p.PopupGetThumbnail.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupGetThumbnail.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
-			p.Parent.VideoList.downloadVideoThumbnail(video)
+			p.parent.videoList.downloadVideoThumbnail(video)
 		}
 	})
 
-	_ = p.PopupDeleteAll.Connect("activate", func() {
-		p.Parent.VideoList.DeleteWatchedVideos()
+	_ = p.popupDeleteAll.Connect("activate", func() {
+		p.parent.videoList.DeleteWatchedVideos()
 	})
 
-	_ = p.PopupSave.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupSave.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
-			mode := p.PopupSave.GetLabel() == constSetAsSaved
-			p.Parent.VideoList.setVideoAsSaved(video, mode)
+			mode := p.popupSave.GetLabel() == constSetAsSaved
+			p.parent.videoList.setVideoAsSaved(video, mode)
 		}
 	})
 
-	_ = p.PopupUnwatch.Connect("activate", func() {
-		treeview := p.Parent.VideoList.TreeView
-		video := p.Parent.VideoList.getSelectedVideo(treeview)
+	_ = p.popupUnwatch.Connect("activate", func() {
+		treeview := p.parent.videoList.treeView
+		video := p.parent.videoList.getSelectedVideo(treeview)
 		if video != nil {
 			var mode int
-			switch p.PopupUnwatch.GetLabel() {
+			switch p.popupUnwatch.GetLabel() {
 			case constSetAsNotDownloaded:
 				mode = 0
 				break
@@ -290,22 +290,22 @@ func (p *PopupMenu) SetupEvents() {
 				mode = 2
 				break
 			}
-			p.Parent.VideoList.setVideoAsWatched(video, mode)
+			p.parent.videoList.setVideoAsWatched(video, mode)
 		}
 	})
-	_ = p.PopupViewSubscriptions.Connect("activate", func() {
-		p.Parent.VideoList.SetFilterMode(constFilterModeSubscriptions)
+	_ = p.popupViewSubscriptions.Connect("activate", func() {
+		p.parent.videoList.SetFilterMode(constFilterModeSubscriptions)
 	})
-	_ = p.PopupViewDownloads.Connect("activate", func() {
-		p.Parent.VideoList.SetFilterMode(constFilterModeDownloads)
+	_ = p.popupViewDownloads.Connect("activate", func() {
+		p.parent.videoList.SetFilterMode(constFilterModeDownloads)
 	})
-	_ = p.PopupViewToWatch.Connect("activate", func() {
-		p.Parent.VideoList.SetFilterMode(constFilterModeToWatch)
+	_ = p.popupViewToWatch.Connect("activate", func() {
+		p.parent.videoList.SetFilterMode(constFilterModeToWatch)
 	})
-	_ = p.PopupViewToDelete.Connect("activate", func() {
-		p.Parent.VideoList.SetFilterMode(constFilterModeToDelete)
+	_ = p.popupViewToDelete.Connect("activate", func() {
+		p.parent.videoList.SetFilterMode(constFilterModeToDelete)
 	})
-	_ = p.PopupViewSaved.Connect("activate", func() {
-		p.Parent.VideoList.SetFilterMode(constFilterModeSaved)
+	_ = p.popupViewSaved.Connect("activate", func() {
+		p.parent.videoList.SetFilterMode(constFilterModeSaved)
 	})
 }

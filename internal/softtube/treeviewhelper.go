@@ -6,12 +6,12 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
-// TreeviewHelper : A helper class for a gtk treeview
-type TreeviewHelper struct {
+// treeviewHelper : A helper class for a gtk treeview
+type treeviewHelper struct {
 }
 
 // CreateTextColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *TreeviewHelper) CreateTextColumn(title string, id int, width int, weight int) *gtk.TreeViewColumn {
+func (t *treeviewHelper) CreateTextColumn(title string, id int, width int, weight int) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererTextNew()
 	if err != nil {
 		log.Fatal("Unable to create text cell renderer:", err)
@@ -34,7 +34,7 @@ func (t *TreeviewHelper) CreateTextColumn(title string, id int, width int, weigh
 }
 
 // CreateImageColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *TreeviewHelper) CreateImageColumn(title string) *gtk.TreeViewColumn {
+func (t *treeviewHelper) CreateImageColumn(title string) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererPixbufNew()
 	if err != nil {
 		log.Fatal("Unable to create pixbuf cell renderer:", err)
@@ -54,7 +54,7 @@ func (t *TreeviewHelper) CreateImageColumn(title string) *gtk.TreeViewColumn {
 }
 
 // CreateProgressColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *TreeviewHelper) CreateProgressColumn(title string) *gtk.TreeViewColumn {
+func (t *treeviewHelper) CreateProgressColumn(title string) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererProgressNew()
 	if err != nil {
 		log.Fatal("Unable to create progress cell renderer:", err)

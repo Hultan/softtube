@@ -2,87 +2,89 @@ package softtube
 
 import (
 	"errors"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
+
 	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
-// Log : Handles the GUI log
-type SoftTubeLog struct {
-	Parent      *SoftTube
-	TreeView    *gtk.TreeView
-	ListStore   *gtk.ListStore
-	ImageBuffer [6]*gdk.Pixbuf // Images for download, play, delete, set watched/unwatched and error
+// activityLog : Handles the GUI log
+type activityLog struct {
+	parent      *SoftTube
+	treeView    *gtk.TreeView
+	listStore   *gtk.ListStore
+	imageBuffer [6]*gdk.Pixbuf // Images for download, play, delete, set watched/unwatched and error
 }
 
 // Load : Loads the log
-func (l *SoftTubeLog) Load(builder *framework.GtkBuilder) {
+func (a *activityLog) Load(builder *framework.GtkBuilder) {
 	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
-	l.TreeView = tree
+	a.treeView = tree
 
 	listStore, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
-		logger.Log("Failed to create liststore!")
-		logger.LogError(err)
+		a.parent.logger.Log("Failed to create liststore!")
+		a.parent.logger.LogError(err)
 		panic(err)
 	}
-	l.ListStore = listStore
+	a.listStore = listStore
 }
 
 // FillLog : Fills the log with the last n logs
-func (l *SoftTubeLog) FillLog() {
-	logs := l.getLogs()
-	l.setupColumns()
-	l.loadResources()
+func (a *activityLog) FillLog() {
+	logs := a.getLogs()
+	a.setupColumns()
+	a.loadResources()
 
-	l.TreeView.SetModel(nil)
+	a.treeView.SetModel(nil)
 	for _, logItem := range logs {
-		l.insertLog(logItem.Type, logItem.Message, false)
+		a.insertLog(logItem.Type, logItem.Message, false)
 	}
-	l.TreeView.SetModel(l.ListStore)
+	a.treeView.SetModel(a.listStore)
 }
 
 // InsertLog : Adds a log to the GUI log
-func (l *SoftTubeLog) InsertLog(logType int, logMessage string) {
+func (a *activityLog) InsertLog(logType int, logMessage string) {
 	// Insert into the gui log
-	l.TreeView.SetModel(nil)
-	l.insertLog(logType, logMessage, true)
-	l.TreeView.SetModel(l.ListStore)
+	a.treeView.SetModel(nil)
+	a.insertLog(logType, logMessage, true)
+	a.treeView.SetModel(a.listStore)
 }
 
-func (l *SoftTubeLog) insertLog(logType int, logMessage string, first bool) {
-	color := l.getColor(logType)
-	image := l.ImageBuffer[logType]
+func (a *activityLog) insertLog(logType int, logMessage string, first bool) {
+	color := a.getColor(logType)
+	image := a.imageBuffer[logType]
 	var iter *gtk.TreeIter
 
 	if first {
-		iter = l.ListStore.InsertAfter(nil)
+		iter = a.listStore.InsertAfter(nil)
 	} else {
-		iter = l.ListStore.InsertBefore(nil)
+		iter = a.listStore.InsertBefore(nil)
 	}
-	_ = l.ListStore.Set(iter, []int{0, 1, 2}, []interface{}{image, l.shortenString(logMessage), color})
+	_ = a.listStore.Set(iter, []int{0, 1, 2}, []interface{}{image, a.shortenString(logMessage), color})
 }
 
-func (l *SoftTubeLog) shortenString(text string) string {
-	if len(text)>50 {
+func (a *activityLog) shortenString(text string) string {
+	if len(text) > 50 {
 		return text[:47] + "..."
 	}
 	return text
 }
 
-func (l *SoftTubeLog) getLogs() []database.Log {
-	logs, err := l.Parent.Database.Log.GetLatest()
+func (a *activityLog) getLogs() []database.Log {
+	logs, err := a.parent.db.Log.GetLatest()
 	if err != nil {
-		logger.Log("Failed to load logs!")
-		logger.LogError(err)
+		a.parent.logger.Log("Failed to load logs!")
+		a.parent.logger.LogError(err)
 		return nil
 	}
 	return logs
 }
 
-func (l *SoftTubeLog) setupColumns() {
+func (a *activityLog) setupColumns() {
 	imageRenderer, _ := gtk.CellRendererPixbufNew()
 	imageColumn, _ := gtk.TreeViewColumnNew()
 	imageColumn.SetExpand(false)
@@ -91,7 +93,7 @@ func (l *SoftTubeLog) setupColumns() {
 	imageColumn.SetTitle("Type")
 	imageColumn.PackStart(imageRenderer, true)
 	imageColumn.AddAttribute(imageRenderer, "pixbuf", 0)
-	l.TreeView.AppendColumn(imageColumn)
+	a.treeView.AppendColumn(imageColumn)
 
 	logTextRenderer, _ := gtk.CellRendererTextNew()
 	logTextColumn, _ := gtk.TreeViewColumnNew()
@@ -101,28 +103,28 @@ func (l *SoftTubeLog) setupColumns() {
 	logTextColumn.PackStart(logTextRenderer, true)
 	logTextColumn.AddAttribute(logTextRenderer, "text", 1)
 	logTextColumn.AddAttribute(logTextRenderer, "background", 2)
-	l.TreeView.AppendColumn(logTextColumn)
+	a.treeView.AppendColumn(logTextColumn)
 }
 
-func (l *SoftTubeLog) loadResources() {
+func (a *activityLog) loadResources() {
 	for i := constLogDownload; i <= constLogError; i++ {
-		fileName := l.getImageFileName(i)
+		fileName := a.getImageFileName(i)
 		fw := framework.NewFramework()
 		if fileName != "" {
 			path := fw.Resource.GetResourcePath(fileName)
 			if path == "" {
-				logger.LogError(errors.New("resource path not found"))
+				a.parent.logger.LogError(errors.New("resource path not found"))
 			}
 			pic, err := gdk.PixbufNewFromFile(path)
 			if err != nil {
-				logger.LogError(err)
+				a.parent.logger.LogError(err)
 			}
-			l.ImageBuffer[i] = pic
+			a.imageBuffer[i] = pic
 		}
 	}
 }
 
-func (l *SoftTubeLog) getImageFileName(index int) string {
+func (a *activityLog) getImageFileName(index int) string {
 	switch index {
 	case 0:
 		return "download.png"
@@ -141,7 +143,7 @@ func (l *SoftTubeLog) getImageFileName(index int) string {
 	}
 }
 
-func (l *SoftTubeLog) getColor(logType int) string {
+func (a *activityLog) getColor(logType int) string {
 	color := constColorNotDownloaded
 
 	switch logType {
