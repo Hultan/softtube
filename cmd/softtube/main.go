@@ -1,10 +1,13 @@
 package main
 
 import (
-	"github.com/hultan/softtube/internal/softtube.database"
 	"path"
 
+	"github.com/hultan/softtube/internal/softtube.database"
+
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/hultan/softtube/internal/softtube"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
@@ -12,7 +15,7 @@ var (
 	logger   *core.Logger
 	config   *core.Config
 	db       *database.Database
-	softTube *SoftTube
+	softTube *softtube.SoftTube
 )
 
 func main() {
@@ -27,7 +30,7 @@ func main() {
 	_ = openDatabase()
 	defer closeDatabase()
 
-	startApplication(db)
+	startApplication()
 }
 
 func loadConfig() {
@@ -74,10 +77,10 @@ func closeDatabase() {
 	db.CloseDatabase()
 }
 
-func startApplication(db *database.Database) {
+func startApplication() {
 	// Create a new application.
-	softTube = new(SoftTube)
-	err := softTube.StartApplication(db)
+	softTube = new(softtube.SoftTube)
+	err := softTube.StartApplication(db, config, logger)
 	if err != nil {
 		logger.Log("Failed to start application!")
 		logger.LogError(err)

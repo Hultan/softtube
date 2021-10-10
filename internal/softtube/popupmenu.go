@@ -1,4 +1,4 @@
-package main
+package softtube
 
 import (
 	"fmt"
@@ -11,10 +11,10 @@ import (
 
 // PopupMenu : Handler the video list popupmenu
 type PopupMenu struct {
-	Parent                 *SoftTube
-	PopupMenu              *gtk.Menu
-	PopupRefresh           *gtk.MenuItem
-	PopupDownload          *gtk.MenuItem
+	Parent                *SoftTube
+	PopupMenu             *gtk.Menu
+	PopupRefresh          *gtk.MenuItem
+	PopupDownload         *gtk.MenuItem
 	PopupRedownload        *gtk.MenuItem
 	PopupRedownloadVideo   *gtk.MenuItem
 	PopupRedownloadVideos  *gtk.MenuItem
@@ -209,7 +209,7 @@ func (p *PopupMenu) SetupEvents() {
 		}
 	})
 	_ = p.PopupRedownloadVideos.Connect("activate", func() {
-		videos, err := db.Videos.GetVideos(true)
+		videos, err := p.Parent.Database.Videos.GetVideos(true)
 		if err != nil {
 			logger.LogError(err)
 			return

@@ -1,4 +1,4 @@
-package main
+package softtube
 
 import (
 	"fmt"

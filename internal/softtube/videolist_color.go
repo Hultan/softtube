@@ -1,4 +1,4 @@
-package main
+package softtube
 
 import (
 	database "github.com/hultan/softtube/internal/softtube.database"

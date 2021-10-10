@@ -1,4 +1,4 @@
-package main
+package softtube
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func (v *VideoList) deleteVideo(video *database.Video) {
 
 		go func() {
 			// Log that the video has been deleted in the database
-			err = db.Log.Insert(constLogDelete, video.Title)
+			err = v.Parent.Database.Log.Insert(constLogDelete, video.Title)
 			if err != nil {
 				logger.Log("Failed to log video as watched!")
 				logger.LogError(err)
@@ -46,7 +46,7 @@ func (v *VideoList) deleteVideo(video *database.Video) {
 
 		go func() {
 			// Set video status as deleted
-			err = db.Videos.UpdateStatus(video.ID, constStatusDeleted)
+			err = v.Parent.Database.Videos.UpdateStatus(video.ID, constStatusDeleted)
 			if err != nil {
 				logger.Log("Failed to set video status to deleted!")
 				logger.LogError(err)
@@ -116,7 +116,7 @@ func (v *VideoList) playVideo(video *database.Video) {
 
 	go func() {
 		// Log that the video has been deleted in the database
-		err = db.Log.Insert(constLogPlay, video.Title)
+		err = v.Parent.Database.Log.Insert(constLogPlay, video.Title)
 		if err != nil {
 			logger.Log("Failed to log video as watched!")
 			logger.LogError(err)
@@ -132,7 +132,7 @@ func (v *VideoList) playVideo(video *database.Video) {
 
 	go func() {
 		// Set video status as watched
-		err = db.Videos.UpdateStatus(video.ID, constStatusWatched)
+		err = v.Parent.Database.Videos.UpdateStatus(video.ID, constStatusWatched)
 		if err != nil {
 			logger.Log("Failed to set video status to watched!")
 			logger.LogError(err)
@@ -171,7 +171,7 @@ func (v *VideoList) getVideoPathForDeletion(videoID string) string {
 // Download a youtube video
 func (v *VideoList) downloadVideo(video *database.Video, markAsDownloading bool) error {
 	// Set the video to be downloaded
-	err := db.Download.Insert(video.ID)
+	err := v.Parent.Database.Download.Insert(video.ID)
 	if err != nil {
 		logger.Log("Failed to set video to be downloaded!")
 		logger.LogError(err)
@@ -188,7 +188,7 @@ func (v *VideoList) downloadVideo(video *database.Video, markAsDownloading bool)
 
 	go func() {
 		// Log that the video has been requested to be downloaded in the database
-		err = db.Log.Insert(constLogDownload, video.Title)
+		err = v.Parent.Database.Log.Insert(constLogDownload, video.Title)
 		if err != nil {
 			logger.Log("Failed to log video as watched!")
 			logger.LogError(err)
@@ -204,7 +204,7 @@ func (v *VideoList) downloadVideo(video *database.Video, markAsDownloading bool)
 
 	go func() {
 		// Set video status as downloading
-		err = db.Videos.UpdateStatus(video.ID, constStatusDownloading)
+		err = v.Parent.Database.Videos.UpdateStatus(video.ID, constStatusDownloading)
 		if err != nil {
 			logger.Log("Failed to set video status to downloading!")
 			logger.LogError(err)

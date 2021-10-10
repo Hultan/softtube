@@ -1,14 +1,21 @@
-package main
+package softtube
 
 import (
 	"github.com/gotk3/gotk3/gtk"
+
 	"github.com/hultan/softteam/framework"
+	core "github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
+)
+
+var (
+	config    *core.Config
+	logger    *core.Logger
 )
 
 // SoftTube : The SoftTube application object
 type SoftTube struct {
-	Database *database.Database
+	Database  *database.Database
 
 	Toolbar   *Toolbar
 	StatusBar *StatusBar
@@ -20,11 +27,13 @@ type SoftTube struct {
 }
 
 // StartApplication : Starts the SoftTube application
-func (s *SoftTube) StartApplication(db *database.Database) error {
+func (s *SoftTube) StartApplication(db *database.Database, c *core.Config, l *core.Logger) error {
 	logger.Log("SoftTube client startup")
 	defer logger.Log("SoftTube client shutdown")
 
 	s.Database = db
+	config = c
+	logger = l
 
 	gtk.Init(nil)
 

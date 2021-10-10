@@ -1,4 +1,4 @@
-package main
+package softtube
 
 //const constAppID = "com.github.hultan.softtube"
 const constAppTitle = "SoftTube"
