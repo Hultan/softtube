@@ -15,7 +15,7 @@ const (
 )
 
 func main() {
-	// Load config file
+	// Init config file
 	config := new(core.Config)
 	err := config.Load("main")
 	if err != nil {

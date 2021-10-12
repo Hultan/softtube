@@ -178,7 +178,7 @@ func openDatabase(t *testing.T) (*database.Database, error) {
 }
 
 func getTestConfig() (*core.Config, error) {
-	// Load config file
+	// Init config file
 	config := new(core.Config)
 	err := config.Load("test")
 

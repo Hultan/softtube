@@ -14,7 +14,7 @@ type menuBar struct {
 }
 
 // Load : Loads the toolbar
-func (m *menuBar) Load(builder *framework.GtkBuilder) error {
+func (m *menuBar) Init(builder *framework.GtkBuilder) error {
 	menuItem := builder.GetObject("menu_file_quit").(*gtk.MenuItem)
 	m.menuFileQuit = menuItem
 

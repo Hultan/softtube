@@ -55,41 +55,41 @@ func (s *SoftTube) StartApplication() error {
 }
 
 func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
-	// Load tool bar
+	// Init toolbar
 	s.toolbar = &toolbar{parent: s}
-	err := s.toolbar.Load(builder)
+	err := s.toolbar.Init(builder)
 	if err != nil {
 		s.Logger.LogError(err)
 		panic(err)
 	}
 
-	// Load status bar
+	// Init status bar
 	s.statusBar = &statusBar{parent: s}
-	err = s.statusBar.Load(builder)
+	err = s.statusBar.Init(builder)
 	if err != nil {
 		s.Logger.LogError(err)
 		panic(err)
 	}
 
-	// Load menu bar
+	// Init menu bar
 	s.menuBar = &menuBar{parent: s}
-	err = s.menuBar.Load(builder)
+	err = s.menuBar.Init(builder)
 	if err != nil {
 		s.Logger.LogError(err)
 		panic(err)
 	}
 
-	// Load search bar
+	// Init search bar
 	s.searchBar = &searchBar{parent: s}
-	err = s.searchBar.Load(builder)
+	err = s.searchBar.Init(builder)
 	if err != nil {
 		s.Logger.LogError(err)
 		panic(err)
 	}
 
-	// Load video list
+	// Init video list
 	s.videoList = &videoList{parent: s}
-	err = s.videoList.Load(builder)
+	err = s.videoList.Init(builder)
 	if err != nil {
 		s.Logger.LogError(err)
 		panic(err)
@@ -97,17 +97,17 @@ func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
 
 	s.videoList.Refresh("")
 
-	// Load popup menu bar
+	// Init popup menu bar
 	s.popupMenu = &popupMenu{parent: s}
-	err = s.popupMenu.Load(builder)
+	err = s.popupMenu.Init(builder)
 	if err != nil {
 		s.Logger.LogError(err)
 		panic(err)
 	}
 
-	// Load log
+	// Init log
 	s.activityLog = &activityLog{parent: s, treeView: s.videoList.treeView}
-	s.activityLog.Load(builder)
+	s.activityLog.Init(builder)
 }
 
 func (s *SoftTube) getWindowTitle() string {

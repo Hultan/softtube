@@ -15,7 +15,7 @@ type statusBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *statusBar) Load(builder *framework.GtkBuilder) error {
+func (s *statusBar) Init(builder *framework.GtkBuilder) error {
 	label := builder.GetObject("statusbar_number_of_videos").(*gtk.Label)
 	s.videoCount = label
 

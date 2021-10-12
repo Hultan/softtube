@@ -7,6 +7,7 @@ import (
 	"path"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -95,33 +96,42 @@ func (v *video) add(video *database.Video, listStore *gtk.ListStore) {
 }
 
 func (v *video) play(video *database.Video) {
-	videoPath := v.getPath(video.ID)
-	if videoPath == "" {
-		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
-		v.videoList.parent.Logger.Log(msg)
-		return
-	}
+	fmt.Println("Enter play!")
 
-	command := fmt.Sprintf("smplayer '%s'", videoPath)
-	cmd := exec.Command("/bin/bash", "-c", command)
+	var wg sync.WaitGroup
+	wg.Add(4)
 
-	// Starts a sub process (smplayer)
-	// Use run (since we are using a go routine), otherwise use Start and Wait together
-	// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
-	err := cmd.Run()
-	if err != nil {
-		v.videoList.parent.Logger.LogError(err)
-	}
+	go func() {
+		videoPath := v.getPath(video.ID)
+		if videoPath == "" {
+			msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
+			v.videoList.parent.Logger.Log(msg)
+			return
+		}
+
+		command := fmt.Sprintf("smplayer '%s'", videoPath)
+		cmd := exec.Command("/bin/bash", "-c", command)
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+			Pgid:    0,
+		}
+		// Starts a sub process (smplayer)
+		// Did not get this to work, but read the following, and maybe I can get
+		// this to work in the future
+		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
+		err := cmd.Start()
+		if err != nil {
+			v.videoList.parent.Logger.LogError(err)
+		}
+		wg.Done()
+	}()
 
 	// Mark the selected video with watched color
 	v.videoList.color.setRowColor(v.videoList.treeView, constColorWatched)
 
-	var wg sync.WaitGroup
-	wg.Add(3)
-
 	go func() {
 		// Log that the video has been deleted in the database
-		err = v.videoList.parent.DB.Log.Insert(constLogPlay, video.Title)
+		err := v.videoList.parent.DB.Log.Insert(constLogPlay, video.Title)
 		if err != nil {
 			v.videoList.parent.Logger.Log("Failed to log video as watched!")
 			v.videoList.parent.Logger.LogError(err)
@@ -137,7 +147,7 @@ func (v *video) play(video *database.Video) {
 
 	go func() {
 		// Set video status as watched
-		err = v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusWatched)
+		err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusWatched)
 		if err != nil {
 			v.videoList.parent.Logger.Log("Failed to set video status to watched!")
 			v.videoList.parent.Logger.LogError(err)
@@ -147,6 +157,8 @@ func (v *video) play(video *database.Video) {
 	wg.Wait()
 
 	v.videoList.Refresh("")
+	fmt.Println("Leaving play!")
+
 }
 
 func (v *video) getPath(videoID string) string {

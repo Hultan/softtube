@@ -18,9 +18,9 @@ var (
 )
 
 func main() {
-	// // Load config file
+	// // Init config file
 	// config = new(core.Config)
-	// err := config.Load("main")
+	// err := config.Init("main")
 	// if err!=nil {
 	//	fmt.Println(err.Error())
 	//	os.Exit(1)
@@ -28,8 +28,8 @@ func main() {
 	//
 	// // Decrypt the MySQL password
 	// conn := config.Connection
-	// crypt := core.Crypt{}
-	// password, err := crypt.Decrypt(conn.Password)
+	// fw := framework.NewFramwork()
+	// password, err := fw.Crypto.Decrypt(conn.Password)
 	// if err != nil {
 	//	panic(err)
 	// }

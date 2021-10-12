@@ -24,7 +24,7 @@ type toolbar struct {
 }
 
 // Load : Loads the toolbar
-func (t *toolbar) Load(builder *framework.GtkBuilder) error {
+func (t *toolbar) Init(builder *framework.GtkBuilder) error {
 	toggle := builder.GetObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
 	t.toolbarSubscriptions = toggle
 

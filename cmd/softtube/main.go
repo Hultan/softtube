@@ -3,6 +3,7 @@ package main
 import (
 	"path"
 
+	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -19,7 +20,7 @@ var (
 )
 
 func main() {
-	// Load the config file
+	// Init the config file
 	loadConfig()
 
 	// Set up the client logging
@@ -34,7 +35,7 @@ func main() {
 }
 
 func loadConfig() {
-	// Load config file
+	// Init config file
 	config = new(core.Config)
 	err := config.Load("main")
 	if err != nil {
@@ -57,8 +58,8 @@ func stopLogging() {
 func openDatabase() *database.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
-	crypto := core.Crypt{}
-	password, err := crypto.Decrypt(conn.Password)
+	fw := framework.NewFramework()
+	password, err := fw.Crypto.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")
 		logger.LogError(err)

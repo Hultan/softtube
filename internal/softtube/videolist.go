@@ -2,6 +2,7 @@ package softtube
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -33,7 +34,7 @@ var videos []database.Video
 var listStore *gtk.ListStore
 
 // Load : Loads the toolbar from the glade file
-func (v *videoList) Load(builder *framework.GtkBuilder) error {
+func (v *videoList) Init(builder *framework.GtkBuilder) error {
 	v.filterMode = 0
 	// Get the tree view
 	treeView := builder.GetObject("video_treeview").(*gtk.TreeView)
@@ -203,25 +204,25 @@ func (v *videoList) getProgress(status int) (int, string) {
 }
 
 func (v *videoList) rowActivated(treeView *gtk.TreeView) {
-	video := v.video.getSelected(treeView)
-	if video == nil {
+	fmt.Println("Enter rowactivated!")
+	vid := v.video.getSelected(treeView)
+	if vid == nil {
 		return
 	}
 
-	if video.Status == constStatusDownloaded ||
-		video.Status == constStatusWatched ||
-		video.Status == constStatusSaved {
+	if vid.Status == constStatusDownloaded ||
+		vid.Status == constStatusWatched ||
+		vid.Status == constStatusSaved {
 
-		go func() {
-			v.video.play(video)
-		}()
+		v.video.play(vid)
 
-	} else if video.Status == constStatusNotDownloaded {
-		err := v.video.download(video, true)
+	} else if vid.Status == constStatusNotDownloaded {
+		err := v.video.download(vid, true)
 		if err != nil {
 			v.parent.Logger.LogError(err)
 		}
 	}
+	fmt.Println("Leaving rowactivated!")
 }
 
 // Some .webp images are erroneously named .jpg, so

@@ -14,7 +14,7 @@ type searchBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *searchBar) Load(builder *framework.GtkBuilder) error {
+func (s *searchBar) Init(builder *framework.GtkBuilder) error {
 	clearButton := builder.GetObject("clear_search_button").(*gtk.Button)
 	s.clearButton = clearButton
 

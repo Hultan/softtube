@@ -7,6 +7,7 @@ import (
 	"path"
 	"sync"
 
+	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	core "github.com/hultan/softtube/internal/softtube.core"
@@ -19,7 +20,7 @@ var (
 )
 
 func main() {
-	// Load config file
+	// Init config file
 	config = new(core.Config)
 	err := config.Load("main")
 	if err != nil {
@@ -37,8 +38,8 @@ func main() {
 
 	// Decrypt the MySQL password
 	conn := config.Connection
-	crypto := core.Crypt{}
-	password, err := crypto.Decrypt(conn.Password)
+	fw := framework.NewFramework()
+	password, err := fw.Crypto.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")
 		logger.LogError(err)

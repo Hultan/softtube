@@ -19,8 +19,8 @@ type activityLog struct {
 	imageBuffer [6]*gdk.Pixbuf // Images for download, play, delete, set watched/unwatched and error
 }
 
-// Load : Loads the log
-func (a *activityLog) Load(builder *framework.GtkBuilder) {
+// Init : Loads the log
+func (a *activityLog) Init(builder *framework.GtkBuilder) {
 	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
 	a.treeView = tree
 

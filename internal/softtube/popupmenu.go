@@ -32,8 +32,8 @@ type popupMenu struct {
 	popupViewSaved         *gtk.MenuItem
 }
 
-// Load : Loads the popup menu
-func (p *popupMenu) Load(builder *framework.GtkBuilder) error {
+// Init : Loads the popup menu
+func (p *popupMenu) Init(builder *framework.GtkBuilder) error {
 	menu := builder.GetObject("popupmenu").(*gtk.Menu)
 	p.popupMenu = menu
 
@@ -228,9 +228,7 @@ func (p *popupMenu) SetupEvents() {
 		treeview := p.parent.videoList.treeView
 		vid := p.parent.videoList.video.getSelected(treeview)
 		if vid != nil {
-			go func() {
-				p.parent.videoList.video.play(vid)
-			}()
+			p.parent.videoList.video.play(vid)
 		}
 	})
 

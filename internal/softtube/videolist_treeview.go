@@ -24,16 +24,16 @@ func (t *treeViewHelper) setupEvents() {
 
 // setupColumns : Sets up the listview columns
 func (t *treeViewHelper) setupColumns() {
-	t.videoList.treeView.AppendColumn(t.CreateImageColumn("Image"))
-	t.videoList.treeView.AppendColumn(t.CreateTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
-	t.videoList.treeView.AppendColumn(t.CreateTextColumn("Date", listStoreColumnDate, 90, 300))
-	t.videoList.treeView.AppendColumn(t.CreateTextColumn("Title", listStoreColumnTitle, 0, 600))
-	t.videoList.treeView.AppendColumn(t.CreateTextColumn("Duration", listStoreColumnDuration, 90, 300))
-	t.videoList.treeView.AppendColumn(t.CreateProgressColumn("Progress"))
+	t.videoList.treeView.AppendColumn(t.createImageColumn("Image"))
+	t.videoList.treeView.AppendColumn(t.createTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
+	t.videoList.treeView.AppendColumn(t.createTextColumn("Date", listStoreColumnDate, 90, 300))
+	t.videoList.treeView.AppendColumn(t.createTextColumn("Title", listStoreColumnTitle, 0, 600))
+	t.videoList.treeView.AppendColumn(t.createTextColumn("Duration", listStoreColumnDuration, 90, 300))
+	t.videoList.treeView.AppendColumn(t.createProgressColumn("Progress"))
 }
 
-// CreateTextColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *treeViewHelper) CreateTextColumn(title string, id int, width int, weight int) *gtk.TreeViewColumn {
+// createTextColumn : Add a column to the tree view (during the initialization of the tree view)
+func (t *treeViewHelper) createTextColumn(title string, id int, width int, weight int) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererTextNew()
 	if err != nil {
 		log.Fatal("Unable to create text cell renderer:", err)
@@ -55,8 +55,8 @@ func (t *treeViewHelper) CreateTextColumn(title string, id int, width int, weigh
 	return column
 }
 
-// CreateImageColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *treeViewHelper) CreateImageColumn(title string) *gtk.TreeViewColumn {
+// createImageColumn : Add a column to the tree view (during the initialization of the tree view)
+func (t *treeViewHelper) createImageColumn(title string) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererPixbufNew()
 	if err != nil {
 		log.Fatal("Unable to create pixbuf cell renderer:", err)
@@ -75,8 +75,8 @@ func (t *treeViewHelper) CreateImageColumn(title string) *gtk.TreeViewColumn {
 	return column
 }
 
-// CreateProgressColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *treeViewHelper) CreateProgressColumn(title string) *gtk.TreeViewColumn {
+// createProgressColumn : Add a column to the tree view (during the initialization of the tree view)
+func (t *treeViewHelper) createProgressColumn(title string) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererProgressNew()
 	if err != nil {
 		log.Fatal("Unable to create progress cell renderer:", err)
