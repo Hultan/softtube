@@ -89,7 +89,7 @@ func (y youtube) getDurationInternal(videoID string) (string, error) {
 func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger) error {
 
 	for i := 0; i < 3; i++ {
-		output, err := y.getThumbnailInternal(videoID, thumbnailPath)
+		output, err := y.getThumbnailInternal(thumbnailPath, videoID)
 		if err != nil {
 			switch i {
 			case 0:
@@ -112,7 +112,7 @@ func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger
 }
 
 // Get the thumbnail of a YouTube video
-func (y youtube) getThumbnailInternal(videoID, thumbnailPath string) (string, error) {
+func (y youtube) getThumbnailInternal(thumbnailPath, videoID string) (string, error) {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, thumbnailPath, videoID)
 

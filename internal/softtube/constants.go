@@ -1,7 +1,7 @@
 package softtube
 
 const constAppTitle = "SoftTube"
-const constAppVersion = "2.60"
+const constAppVersion = "2.61"
 const constDateLayout = "2006-01-02"
 
 // LISTSTORE COLUMNS

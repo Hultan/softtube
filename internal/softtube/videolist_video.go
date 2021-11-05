@@ -101,6 +101,7 @@ func (v *video) play(video *database.Video) {
 	var wg sync.WaitGroup
 	wg.Add(4)
 
+	// Start Video Player
 	go func() {
 		videoPath := v.getPath(video.ID)
 		if videoPath == "" {
@@ -109,7 +110,7 @@ func (v *video) play(video *database.Video) {
 			return
 		}
 
-		command := fmt.Sprintf("smplayer '%s'", videoPath)
+		command := fmt.Sprintf("smplayer '%s' &", videoPath)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			Setpgid: true,
@@ -119,7 +120,7 @@ func (v *video) play(video *database.Video) {
 		// Did not get this to work, but read the following, and maybe I can get
 		// this to work in the future
 		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
-		err := cmd.Start()
+		err := cmd.Run()
 		if err != nil {
 			v.videoList.parent.Logger.LogError(err)
 		}
