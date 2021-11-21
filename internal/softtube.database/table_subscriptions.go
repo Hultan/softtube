@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"math/rand"
 	"time"
@@ -9,13 +8,13 @@ import (
 
 // SubscriptionTable : SubscriptionTable in the SoftTube database
 type SubscriptionTable struct {
-	Connection *sql.DB
+	*Table
 }
 
 // sql : Get all subscriptions
-const sqlStatementGetAllSubscriptions = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions"
-const sqlStatementGetSubscription = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions WHERE id=?"
-const sqlStatementUpdateLastChecked = "UPDATE Subscriptions SET last_checked=?, next_update=? WHERE id=?"
+const sqlSubscriptionsGetAll = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions"
+const sqlSubscriptionsGet = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions WHERE id=?"
+const sqlSubscriptionsUpdateLastChecked = "UPDATE Subscriptions SET last_checked=?, next_update=? WHERE id=?"
 
 // GetAll : Returns all subscriptions
 func (s SubscriptionTable) GetAll() ([]Subscription, error) {
@@ -24,7 +23,7 @@ func (s SubscriptionTable) GetAll() ([]Subscription, error) {
 		return nil, errors.New("database not opened")
 	}
 
-	rows, err := s.Connection.Query(sqlStatementGetAllSubscriptions)
+	rows, err := s.Connection.Query(sqlSubscriptionsGetAll)
 	if err != nil {
 		return []Subscription{}, err
 	}
@@ -52,7 +51,7 @@ func (s SubscriptionTable) Get(id string) (Subscription, error) {
 		return Subscription{}, errors.New("database not opened")
 	}
 
-	row := s.Connection.QueryRow(sqlStatementGetSubscription, id)
+	row := s.Connection.QueryRow(sqlSubscriptionsGet, id)
 
 	sub := Subscription{}
 	err := row.Scan(&sub.ID, &sub.Name, &sub.Frequency, &sub.LastChecked, &sub.NextUpdate)
@@ -73,7 +72,7 @@ func (s SubscriptionTable) UpdateLastChecked(subscription *Subscription, interva
 	next := int(float32(interval)*0.5 + (float32(interval) * rand.Float32()))
 
 	// Execute insert statement
-	_, err := s.Connection.Exec(sqlStatementUpdateLastChecked, now, next, subscription.ID)
+	_, err := s.Connection.Exec(sqlSubscriptionsUpdateLastChecked, now, next, subscription.ID)
 	if err != nil {
 		return err
 	}

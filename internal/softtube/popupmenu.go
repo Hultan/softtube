@@ -98,7 +98,7 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.parent.videoList.treeView.Connect("button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
 		buttonEvent := gdk.EventButtonNewFromEvent(event)
 		if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
-			videoSelected := p.parent.videoList.video.getSelected(p.parent.videoList.treeView) != nil
+			videoSelected := p.parent.videoList.videoFunctions.getSelected(p.parent.videoList.treeView) != nil
 			switch p.parent.videoList.filterMode {
 			case constFilterModeSubscriptions:
 				p.popupDownload.SetSensitive(videoSelected)
@@ -198,16 +198,16 @@ func (p *popupMenu) SetupEvents() {
 
 	_ = p.popupDownload.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
-			_ = p.parent.videoList.video.download(vid, true)
+			_ = p.parent.videoList.videoFunctions.download(vid, true)
 		}
 	})
 	_ = p.popupRedownloadVideo.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
-			_ = p.parent.videoList.video.download(vid, false)
+			_ = p.parent.videoList.videoFunctions.download(vid, false)
 		}
 	})
 	_ = p.popupRedownloadVideos.Connect("activate", func() {
@@ -219,30 +219,30 @@ func (p *popupMenu) SetupEvents() {
 		for key := range videos {
 			vid := &videos[key]
 			if vid != nil {
-				_ = p.parent.videoList.video.download(vid, false)
+				_ = p.parent.videoList.videoFunctions.download(vid, false)
 			}
 		}
 	})
 
 	_ = p.popupPlay.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
-			p.parent.videoList.video.play(vid)
+			p.parent.videoList.videoFunctions.play(vid)
 		}
 	})
 
 	_ = p.popupGetDuration.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
-			p.parent.videoList.video.downloadDuration(vid)
+			p.parent.videoList.videoFunctions.downloadDuration(vid)
 		}
 	})
 
 	_ = p.popupGetVideoID.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
 			clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
 			if err != nil {
@@ -255,9 +255,9 @@ func (p *popupMenu) SetupEvents() {
 
 	_ = p.popupGetThumbnail.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
-			_, _ = p.parent.videoList.video.downloadThumbnail(vid)
+			_, _ = p.parent.videoList.videoFunctions.downloadThumbnail(vid)
 		}
 	})
 
@@ -267,16 +267,16 @@ func (p *popupMenu) SetupEvents() {
 
 	_ = p.popupSave.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
 			mode := p.popupSave.GetLabel() == constSetAsSaved
-			p.parent.videoList.video.setAsSaved(vid, mode)
+			p.parent.videoList.videoFunctions.setAsSaved(vid, mode)
 		}
 	})
 
 	_ = p.popupUnwatch.Connect("activate", func() {
 		treeview := p.parent.videoList.treeView
-		vid := p.parent.videoList.video.getSelected(treeview)
+		vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 		if vid != nil {
 			var mode int
 			switch p.popupUnwatch.GetLabel() {
@@ -290,7 +290,7 @@ func (p *popupMenu) SetupEvents() {
 				mode = 2
 				break
 			}
-			p.parent.videoList.video.setAsWatched(vid, mode)
+			p.parent.videoList.videoFunctions.setAsWatched(vid, mode)
 		}
 	})
 	_ = p.popupViewSubscriptions.Connect("activate", func() {

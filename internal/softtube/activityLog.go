@@ -48,14 +48,14 @@ func (a *activityLog) FillLog() {
 }
 
 // AddLog : Adds a log to the GUI log
-func (a *activityLog) AddLog(logType int, logMessage string) {
+func (a *activityLog) AddLog(logType database.LogType, logMessage string) {
 	// Insert into the gui log
 	a.treeView.SetModel(nil)
 	a.insertLog(logType, logMessage, true)
 	a.treeView.SetModel(a.listStore)
 }
 
-func (a *activityLog) insertLog(logType int, logMessage string, first bool) {
+func (a *activityLog) insertLog(logType database.LogType, logMessage string, first bool) {
 	color := a.getColor(logType)
 	image := a.imageBuffer[logType]
 	var iter *gtk.TreeIter
@@ -108,7 +108,7 @@ func (a *activityLog) setupColumns() {
 }
 
 func (a *activityLog) loadResources() {
-	for i := constLogDownload; i <= constLogError; i++ {
+	for i := int(constLogDownload); i <= int(constLogError); i++ {
 		fileName := a.getImageFileName(i)
 		fw := framework.NewFramework()
 		if fileName != "" {
@@ -144,7 +144,7 @@ func (a *activityLog) getImageFileName(index int) string {
 	}
 }
 
-func (a *activityLog) getColor(logType int) string {
+func (a *activityLog) getColor(logType database.LogType) string {
 	color := constColorNotDownloaded
 
 	switch logType {
@@ -170,5 +170,5 @@ func (a *activityLog) getColor(logType int) string {
 		break
 	}
 
-	return color
+	return string(color)
 }

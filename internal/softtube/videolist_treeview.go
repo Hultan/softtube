@@ -33,19 +33,19 @@ func (t *treeViewHelper) setupColumns() {
 }
 
 // createTextColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *treeViewHelper) createTextColumn(title string, id int, width int, weight int) *gtk.TreeViewColumn {
+func (t *treeViewHelper) createTextColumn(title string, id listStoreColumnType, width int, weight int) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererTextNew()
 	if err != nil {
 		log.Fatal("Unable to create text cell renderer:", err)
 	}
 	_ = cellRenderer.SetProperty("weight", weight)
 
-	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", id)
+	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", int(id))
 	if err != nil {
 		log.Fatal("Unable to create cell column:", err)
 	}
-	column.AddAttribute(cellRenderer, "background", listStoreColumnBackground)
-	column.AddAttribute(cellRenderer, "foreground", listStoreColumnForeground)
+	column.AddAttribute(cellRenderer, "background", int(listStoreColumnBackground))
+	column.AddAttribute(cellRenderer, "foreground", int(listStoreColumnForeground))
 	if width == 0 {
 		column.SetExpand(true)
 	} else {
@@ -64,7 +64,7 @@ func (t *treeViewHelper) createImageColumn(title string) *gtk.TreeViewColumn {
 	// cellRenderer.SetProperty("weight", weight)
 	// cellRenderer.SetVisible(true)
 
-	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "pixbuf", listStoreColumnImage)
+	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "pixbuf", int(listStoreColumnImage))
 	if err != nil {
 		log.Fatal("Unable to create cell column:", err)
 	}
@@ -83,14 +83,14 @@ func (t *treeViewHelper) createProgressColumn(title string) *gtk.TreeViewColumn 
 	}
 	// cellRenderer.SetVisible(true)
 
-	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", listStoreColumnProgressText)
+	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", int(listStoreColumnProgressText))
 	if err != nil {
 		log.Fatal("Unable to create cell column:", err)
 	}
 	column.SetFixedWidth(90)
 	column.SetVisible(true)
 	column.SetExpand(false)
-	column.AddAttribute(cellRenderer, "value", listStoreColumnProgress)
+	column.AddAttribute(cellRenderer, "value", int(listStoreColumnProgress))
 
 	return column
 }

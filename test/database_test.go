@@ -15,9 +15,9 @@ func TestVersion(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestVersion: Failed to open database : %s", err.Error())
 	}
-	version, err := db.Version.GetVersion()
+	version, err := db.Version.Get()
 	if err != nil {
-		t.Errorf("TestVersion: GetVersion() returned an error : %s", err.Error())
+		t.Errorf("TestVersion: Get() returned an error : %s", err.Error())
 	}
 
 	if version.Major != 1 || version.Minor != 0 || version.Revision != 0 {
@@ -154,9 +154,9 @@ func TestVideosInsert(t *testing.T) {
 	}
 
 	// Delete the new video
-	err = db.Videos.DeleteFromDatabase("TO_DELETE!")
+	err = db.Videos.Delete("TO_DELETE!")
 	if err != nil {
-		t.Errorf("TestVideosInsert: DeleteFromDatabase() returned an error : %s", err.Error())
+		t.Errorf("TestVideosInsert: Delete() returned an error : %s", err.Error())
 		return
 	}
 }
@@ -167,8 +167,8 @@ func openDatabase(t *testing.T) (*database.Database, error) {
 		t.Errorf("openDatabase: Failed to get config : %s", err.Error())
 		return nil, err
 	}
-	db := database.New(config.Connection.Server, config.Connection.Port, config.Connection.Database, config.Connection.Username, config.Connection.Password)
-	err = db.OpenDatabase()
+	db := database.NewDatabase(config.Connection.Server, config.Connection.Port, config.Connection.Database, config.Connection.Username, config.Connection.Password)
+	err = db.Open()
 	if err != nil {
 		t.Errorf("openDatabase: Failed to open database : %s", err.Error())
 		return nil, err

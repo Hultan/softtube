@@ -17,11 +17,13 @@ type Version struct {
 	Revision int
 }
 
+type LogType int
+
 // Log : Represents a SoftTube log entry
 type Log struct {
 	ID      int
 	Message string
-	Type    int
+	Type    LogType
 }
 
 // Subscription : Represents a YouTube subscription in SoftTube
@@ -33,6 +35,8 @@ type Subscription struct {
 	NextUpdate  sql.NullInt32
 }
 
+type VideoStatusType int
+
 // Video : Represents a YouTube video in SoftTube
 type Video struct {
 	ID               string
@@ -42,6 +46,6 @@ type Video struct {
 	Added            time.Time
 	Published        time.Time
 	Duration         sql.NullString
-	Status           int
+	Status           VideoStatusType
 	Saved            bool
 }

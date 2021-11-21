@@ -47,14 +47,14 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	err = db.OpenDatabase()
+	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	err = db.Open()
 	if err != nil {
 		logger.Log("ERROR (Open database)")
 		logger.LogError(err)
 		os.Exit(errorOpenDatabase)
 	}
-	defer db.CloseDatabase()
+	defer db.Close()
 	downloads, err := db.Download.GetAll()
 	if err != nil {
 		logger.Log(err.Error())
@@ -85,7 +85,7 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// Delete it from the table download immediately to
 	// avoid multiple download attempts (that can cause
 	// crashes)
-	err = db.Download.SetAsDownloaded(videoID)
+	err = db.Download.Delete(videoID)
 	if err != nil {
 		logger.Log("Failed to delete video from table download after download!")
 		logger.LogError(err)

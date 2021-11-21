@@ -35,14 +35,14 @@ func main() {
 	// }
 	//
 	// // Create the database object, and get all subscriptions
-	// db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	// db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	// err = db.OpenDatabase()
 	// if err!=nil {
 	//	fmt.Println(err.Error())
 	//	os.Exit(1)
 	// }
 	//
-	// defer db.CloseDatabase()
+	// defer db.Close()
 
 	cleanBackups()
 	cleanThumbnails(db)

@@ -1,20 +1,19 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 )
 
 // VersionTable : The version table in the database
 type VersionTable struct {
-	Connection *sql.DB
+	*Table
 }
 
 // sql : Get version
-const sqlStatementGetVersion = "select major,minor,revision from Version limit 1"
+const sqlVersionsGet = "select major,minor,revision from Version limit 1"
 
-// GetVersion : Get the version number of a SoftTube database
-func (v VersionTable) GetVersion() (Version, error) {
+// Get : Get the version number of a SoftTube database
+func (v VersionTable) Get() (Version, error) {
 	var version Version
 
 	// Check that database is opened
@@ -23,7 +22,7 @@ func (v VersionTable) GetVersion() (Version, error) {
 	}
 
 	// Get rows from database
-	rows, err := v.Connection.Query(sqlStatementGetVersion)
+	rows, err := v.Connection.Query(sqlVersionsGet)
 	if err != nil {
 		return version, err
 	}

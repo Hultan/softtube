@@ -7,55 +7,59 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// Database : A connection to the SoftTube database
-type Database struct {
-	Connection       *sql.DB
-	ConnectionString string
+type ConnectionInfo struct {
 	Server           string
 	Port             int
 	Database         string
 	Username         string
 	Password         string
-	Subscriptions    *SubscriptionTable
-	Videos           *VideosTable
-	Version          *VersionTable
-	Download         *DownloadTable
-	Log              *LogTable
 }
 
-// New : Creates a new database object
-func New(server string, port int, database, username, password string) *Database {
-	return &Database{Server: server, Port: port, Database: database, Username: username, Password: password}
+// Database : A connection to the SoftTube database
+type Database struct {
+	ConnectionInfo
+
+	Connection    *sql.DB
+	Subscriptions *SubscriptionTable
+	Videos        *VideosTable
+	Version       *VersionTable
+	Download      *DownloadTable
+	Log           *LogTable
 }
 
-// OpenDatabase : Open the database
-func (d *Database) OpenDatabase() error {
+// NewDatabase : Creates a new database object
+func NewDatabase(server string, port int, database, username, password string) *Database {
+	c := ConnectionInfo{Server: server, Port: port, Database: database, Username: username, Password: password}
+	return &Database{ConnectionInfo: c}
+}
+
+// Open : Open the database
+func (d *Database) Open() error {
 	// Open database
-	d.ConnectionString = d.getConnectionString()
-	conn, err := sql.Open(constDriverName, d.ConnectionString)
+	conn, err := sql.Open(constDriverName, d.ConnectionInfo.String())
 	if err != nil {
-		d.ConnectionString = ""
 		return err
 	}
 	d.Connection = conn
-	d.Subscriptions = &SubscriptionTable{Connection: conn}
-	d.Videos = &VideosTable{Connection: conn}
-	d.Version = &VersionTable{Connection: conn}
-	d.Download = &DownloadTable{Connection: conn}
-	d.Log = &LogTable{Connection: conn}
+	t := &Table{d}
+	d.Subscriptions = &SubscriptionTable{t}
+	d.Videos = &VideosTable{t}
+	d.Version = &VersionTable{t}
+	d.Download = &DownloadTable{t}
+	d.Log = &LogTable{t}
 
 	return nil
 }
 
-// CloseDatabase : Close the database
-func (d *Database) CloseDatabase() {
+// Close : Close the database
+func (d *Database) Close() {
 	if d.Connection != nil {
 		_ = d.Connection.Close()
 	}
 }
 
 // getConnectionString : Returns the connections string
-func (d *Database) getConnectionString() string {
+func (c *ConnectionInfo) String() string {
 	// "user:pwd@tcp(server:port)/database"
-	return fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", d.Username, d.Password, d.Server, d.Port, d.Database)
+	return fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", c.Username, c.Password, c.Server, c.Port, c.Database)
 }

@@ -23,17 +23,17 @@ const constVideoDurationCommand = "%s --get-duration -- '%s'"
 type videoList struct {
 	parent          *SoftTube
 	treeView        *gtk.TreeView
-	scroll          *scroll
-	video           *video
-	color           *color
+	scroll         *scroll
+	videoFunctions *videoFunctions
+	color          *color
 	keepScrollToEnd bool
-	filterMode      uint
+	filterMode      filterModeType
 }
 
 var videos []database.Video
 var listStore *gtk.ListStore
 
-// Load : Loads the toolbar from the glade file
+// Init : Loads the toolbar from the glade file
 func (v *videoList) Init(builder *framework.GtkBuilder) error {
 	v.filterMode = 0
 	// Get the tree view
@@ -44,7 +44,7 @@ func (v *videoList) Init(builder *framework.GtkBuilder) error {
 	s := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
 	v.scroll = &scroll{s}
 
-	v.video = &video{v}
+	v.videoFunctions = &videoFunctions{v}
 	v.color = &color{v}
 
 	helper := &treeViewHelper{v}
@@ -59,7 +59,7 @@ func (v *videoList) Search(text string) {
 }
 
 // SetFilterMode : Changes filter mode
-func (v *videoList) SetFilterMode(mode uint) {
+func (v *videoList) SetFilterMode(mode filterModeType) {
 	v.filterMode = mode
 	v.Refresh("")
 }
@@ -70,7 +70,7 @@ func (v *videoList) DeleteWatchedVideos() {
 		vid := videos[i]
 		if vid.Status == constStatusWatched && !vid.Saved {
 			// Delete the video from disk
-			v.video.delete(&vid)
+			v.videoFunctions.delete(&vid)
 		}
 	}
 
@@ -78,13 +78,13 @@ func (v *videoList) DeleteWatchedVideos() {
 }
 
 // Refresh : Refreshes the video list
-func (v *videoList) Refresh(text string) {
+func (v *videoList) Refresh(searchFor string) {
 	var err error
 
-	if text == "" {
+	if searchFor == "" {
 		videos, err = v.parent.DB.Videos.GetVideos(false)
 	} else {
-		videos, err = v.parent.DB.Videos.Search(text)
+		videos, err = v.parent.DB.Videos.Search(searchFor)
 	}
 	if err != nil {
 		v.parent.Logger.LogError(err)
@@ -114,7 +114,7 @@ func (v *videoList) Refresh(text string) {
 
 	for i := 0; i < len(videos); i++ {
 		video := videos[i]
-		v.video.add(&video, listStore)
+		v.videoFunctions.addToVideoList(&video, listStore)
 	}
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
@@ -153,7 +153,7 @@ func (v *videoList) Refresh(text string) {
 //
 
 func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
-	value, err := model.GetValue(iter, listStoreColumnBackground)
+	value, err := model.GetValue(iter, int(listStoreColumnBackground))
 	if err != nil {
 		v.parent.Logger.LogError(err)
 	}
@@ -193,7 +193,7 @@ func (v *videoList) removeInvalidDurations(duration sql.NullString) string {
 	return duration.String
 }
 
-func (v *videoList) getProgress(status int) (int, string) {
+func (v *videoList) getProgress(status database.VideoStatusType) (int, string) {
 	if status == constStatusWatched {
 		return 100, "watched"
 	} else if status == constStatusDownloaded {
@@ -205,7 +205,7 @@ func (v *videoList) getProgress(status int) (int, string) {
 
 func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 	fmt.Println("Enter rowactivated!")
-	vid := v.video.getSelected(treeView)
+	vid := v.videoFunctions.getSelected(treeView)
 	if vid == nil {
 		return
 	}
@@ -214,10 +214,10 @@ func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 		vid.Status == constStatusWatched ||
 		vid.Status == constStatusSaved {
 
-		v.video.play(vid)
+		v.videoFunctions.play(vid)
 
 	} else if vid.Status == constStatusNotDownloaded {
-		err := v.video.download(vid, true)
+		err := v.videoFunctions.download(vid, true)
 		if err != nil {
 			v.parent.Logger.LogError(err)
 		}

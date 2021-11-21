@@ -66,8 +66,8 @@ func openDatabase() *database.Database {
 		panic(err)
 	}
 
-	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	err = db.OpenDatabase()
+	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	err = db.Open()
 	if err != nil {
 		return nil
 	}
@@ -75,7 +75,7 @@ func openDatabase() *database.Database {
 }
 
 func closeDatabase() {
-	db.CloseDatabase()
+	db.Close()
 }
 
 func startApplication() {

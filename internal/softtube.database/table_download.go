@@ -1,19 +1,18 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 )
 
 // DownloadTable : VideosTable in the SoftTube database
 type DownloadTable struct {
-	Connection *sql.DB
+	*Table
 }
 
 // TODO : Make max downloads a setting
-const sqlStatementGetDownloads = "SELECT video_id FROM Download LIMIT 5"
-const sqlStatementInsertDownload = "INSERT INTO Download (video_id) VALUES (?)"
-const sqlStatementSetAsDownloaded = "DELETE FROM Download WHERE video_id=?"
+const sqlDownloadsGetAll = "SELECT video_id FROM Download LIMIT 5"
+const sqlDownloadsInsert = "INSERT INTO Download (video_id) VALUES (?)"
+const sqlDownloadsDelete = "DELETE FROM Download WHERE video_id=?"
 
 // Insert : Insert a new download request into the database
 func (d DownloadTable) Insert(id string) error {
@@ -23,7 +22,7 @@ func (d DownloadTable) Insert(id string) error {
 	}
 
 	// Execute insert statement
-	_, err := d.Connection.Exec(sqlStatementInsertDownload, id)
+	_, err := d.Connection.Exec(sqlDownloadsInsert, id)
 	if err != nil {
 		return err
 	}
@@ -31,15 +30,15 @@ func (d DownloadTable) Insert(id string) error {
 	return nil
 }
 
-// SetAsDownloaded : Deletes the row from the downloaded list
-func (d DownloadTable) SetAsDownloaded(id string) error {
+// Delete : Deletes the row from the downloaded list
+func (d DownloadTable) Delete(id string) error {
 	// Check that database is opened
 	if d.Connection == nil {
 		return errors.New("database not opened")
 	}
 
 	// Execute statement
-	_, err := d.Connection.Exec(sqlStatementSetAsDownloaded, id)
+	_, err := d.Connection.Exec(sqlDownloadsDelete, id)
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,7 @@ func (d DownloadTable) GetAll() ([]Download, error) {
 		return nil, errors.New("database not opened")
 	}
 
-	rows, err := d.Connection.Query(sqlStatementGetDownloads)
+	rows, err := d.Connection.Query(sqlDownloadsGetAll)
 	if err != nil {
 		return []Download{}, err
 	}

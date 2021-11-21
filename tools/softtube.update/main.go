@@ -56,14 +56,14 @@ func main() {
 	}
 
 	// Create the database object, and get all subscriptions
-	db = database.New(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	err = db.OpenDatabase()
+	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	err = db.Open()
 	if err != nil {
 		fmt.Println("ERROR (Open config) : ", err.Error())
 		os.Exit(1)
 	}
 
-	defer db.CloseDatabase()
+	defer db.Close()
 	subs, err := db.Subscriptions.GetAll()
 
 	// Handle errors

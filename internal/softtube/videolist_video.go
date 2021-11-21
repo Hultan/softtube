@@ -17,11 +17,11 @@ import (
 
 const youtubeDLPath = "yt-dlp"
 
-type video struct {
+type videoFunctions struct {
 	videoList *videoList
 }
 
-func (v *video) delete(video *database.Video) {
+func (v *videoFunctions) delete(video *database.Video) {
 	pathForDeletion := v.getPathForDeletion(video.ID)
 	if pathForDeletion != "" {
 		command := fmt.Sprintf("rm %s", pathForDeletion)
@@ -64,7 +64,7 @@ func (v *video) delete(video *database.Video) {
 	}
 }
 
-func (v *video) add(video *database.Video, listStore *gtk.ListStore) {
+func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.ListStore) {
 	// Get color based on status
 	backgroundColor, foregroundColor := v.videoList.color.getColor(video)
 	// Get the duration of the video
@@ -83,11 +83,11 @@ func (v *video) add(video *database.Video, listStore *gtk.ListStore) {
 			video.Added.Format(constDateLayout),
 			video.Title,
 			progress,
-			backgroundColor,
+			string(backgroundColor),
 			video.ID,
 			duration,
 			progressText,
-			foregroundColor})
+			string(foregroundColor)})
 
 	if err != nil {
 		v.videoList.parent.Logger.Log("Failed to add row!")
@@ -95,7 +95,7 @@ func (v *video) add(video *database.Video, listStore *gtk.ListStore) {
 	}
 }
 
-func (v *video) play(video *database.Video) {
+func (v *videoFunctions) play(video *database.Video) {
 	fmt.Println("Enter play!")
 
 	var wg sync.WaitGroup
@@ -162,7 +162,7 @@ func (v *video) play(video *database.Video) {
 
 }
 
-func (v *video) getPath(videoID string) string {
+func (v *videoFunctions) getPath(videoID string) string {
 	tryPath := path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+".mkv")
 	if _, err := os.Stat(tryPath); err == nil {
 		return tryPath
@@ -181,13 +181,13 @@ func (v *video) getPath(videoID string) string {
 	return ""
 }
 
-func (v *video) getPathForDeletion(videoID string) string {
+func (v *videoFunctions) getPathForDeletion(videoID string) string {
 	tryPath := path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+"*")
 	return tryPath
 }
 
 // Download a youtube video
-func (v *video) download(video *database.Video, markAsDownloading bool) error {
+func (v *videoFunctions) download(video *database.Video, markAsDownloading bool) error {
 	// Set the video to be downloaded
 	err := v.videoList.parent.DB.Download.Insert(video.ID)
 	if err != nil {
@@ -235,14 +235,14 @@ func (v *video) download(video *database.Video, markAsDownloading bool) error {
 	return nil
 }
 
-func (v *video) getSelected(treeView *gtk.TreeView) *database.Video {
+func (v *videoFunctions) getSelected(treeView *gtk.TreeView) *database.Video {
 	selection, err := treeView.GetSelection()
 	if err != nil {
 		return nil
 	}
 	model, iter, ok := selection.GetSelected()
 	if ok {
-		value, err := model.(*gtk.TreeModel).GetValue(iter, listStoreColumnVideoID)
+		value, err := model.(*gtk.TreeModel).GetValue(iter, int(listStoreColumnVideoID))
 		if err != nil {
 			return nil
 		}
@@ -262,8 +262,8 @@ func (v *video) getSelected(treeView *gtk.TreeView) *database.Video {
 	return nil
 }
 
-func (v *video) setAsWatched(video *database.Video, mode int) {
-	var status int
+func (v *videoFunctions) setAsWatched(video *database.Video, mode int) {
+	var status database.VideoStatusType
 	switch mode {
 	case 0:
 		status = constStatusNotDownloaded
@@ -284,7 +284,7 @@ func (v *video) setAsWatched(video *database.Video, mode int) {
 	v.videoList.Refresh("")
 }
 
-func (v *video) setAsSaved(video *database.Video, saved bool) {
+func (v *videoFunctions) setAsSaved(video *database.Video, saved bool) {
 	err := v.videoList.parent.DB.Videos.UpdateSave(video.ID, saved)
 	if err != nil {
 		if saved {
@@ -298,7 +298,7 @@ func (v *video) setAsSaved(video *database.Video, saved bool) {
 	v.videoList.Refresh("")
 }
 
-func (v *video) getThumbnailPath(videoID string) string {
+func (v *videoFunctions) getThumbnailPath(videoID string) string {
 	thumbnailPath := "/" + path.Join(v.videoList.parent.Config.ClientPaths.Thumbnails, fmt.Sprintf("%s.jpg", videoID))
 	if _, err := os.Stat(thumbnailPath); err == nil {
 		return thumbnailPath
@@ -312,7 +312,7 @@ func (v *video) getThumbnailPath(videoID string) string {
 	return ""
 }
 
-func (v *video) getThumbnail(videoID string) *gdk.Pixbuf {
+func (v *videoFunctions) getThumbnail(videoID string) *gdk.Pixbuf {
 	thumbnailPath := v.getThumbnailPath(videoID)
 	if thumbnailPath == "" {
 		return nil
@@ -336,7 +336,7 @@ func (v *video) getThumbnail(videoID string) *gdk.Pixbuf {
 }
 
 // Download a youtube video
-func (v *video) downloadDuration(video *database.Video) {
+func (v *videoFunctions) downloadDuration(video *database.Video) {
 	if video == nil {
 		return
 	}
@@ -359,7 +359,7 @@ func (v *video) downloadDuration(video *database.Video) {
 }
 
 // Get the thumbnail of a YouTube video
-func (v *video) downloadThumbnail(video *database.Video) (string, error) {
+func (v *videoFunctions) downloadThumbnail(video *database.Video) (string, error) {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, video.ID)
 

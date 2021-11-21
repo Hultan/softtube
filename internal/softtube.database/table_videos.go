@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -9,32 +8,32 @@ import (
 
 // VideosTable : VideosTable in the SoftTube database
 type VideosTable struct {
-	Connection *sql.DB
+	*Table
 }
 
-const sqlStatementGetFailedDownloads = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, 
+const sqlVideosGetFailed = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, 
 										Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
 									FROM Videos 
 									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id
 									WHERE Videos.status = 1
 									ORDER BY added desc`
-const sqlStatementVideoExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
-const sqlStatementGetStatus = "SELECT status FROM Videos WHERE id=?"
-const sqlStatementGetVideo = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
-const sqlStatementInsertVideo = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added, status, save) 
+const sqlVideosExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
+const sqlVideosGetStatus = "SELECT status FROM Videos WHERE id=?"
+const sqlVideosGet = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
+const sqlVideosInsert = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added, status, save) 
 								VALUES (?, ?, ?, ?, ?, ?, 0, 0);`
-const sqlStatementUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
-const sqlStatementDeleteVideo = "DELETE FROM Videos WHERE id=? AND save=0"
-const sqlStatementUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
-const sqlStatementUpdateSave = "UPDATE Videos SET save=? WHERE id=?"
-const sqlStatementSearchVideos = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
+const sqlVideosDelete = "DELETE FROM Videos WHERE id=? AND save=0"
+const sqlVideosUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
+const sqlVideosUpdateSave = "UPDATE Videos SET save=? WHERE id=?"
+const sqlVideosUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
+const sqlVideosSearch = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
 									Videos.status, Subscriptions.name , Videos.save
 									FROM Videos 
 									INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id 
 									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
 									ORDER BY Videos.Added DESC`
 
-const sqlStatementGetLatest = `SELECT * FROM 
+const sqlVideosGetLatest = `SELECT * FROM 
 									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
 									FROM Videos 
 									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
@@ -58,7 +57,7 @@ func (v VideosTable) Get(id string) (Video, error) {
 		return Video{}, errors.New("database not opened")
 	}
 
-	row := v.Connection.QueryRow(sqlStatementGetVideo, id)
+	row := v.Connection.QueryRow(sqlVideosGet, id)
 
 	video := Video{}
 	var saved uint8
@@ -78,7 +77,7 @@ func (v VideosTable) Exists(videoID string) (bool, error) {
 	}
 
 	// Execute select query
-	rows, err := v.Connection.Query(sqlStatementVideoExists, videoID)
+	rows, err := v.Connection.Query(sqlVideosExists, videoID)
 	if err != nil {
 		return false, err
 	}
@@ -105,7 +104,7 @@ func (v VideosTable) GetStatus(videoID string) (int, error) {
 	}
 
 	// Execute select query
-	rows, err := v.Connection.Query(sqlStatementGetStatus, videoID)
+	rows, err := v.Connection.Query(sqlVideosGetStatus, videoID)
 	if err != nil {
 		return -1, err
 	}
@@ -134,7 +133,7 @@ func (v VideosTable) Insert(id string, subscriptionID string, title string, dura
 	now := time.Now().UTC().Format(constDateLayout) // Added
 
 	// Execute insert statement
-	_, err := v.Connection.Exec(sqlStatementInsertVideo, id, subscriptionID, title, duration, published, now)
+	_, err := v.Connection.Exec(sqlVideosInsert, id, subscriptionID, title, duration, published, now)
 	if err != nil {
 		return err
 	}
@@ -143,14 +142,14 @@ func (v VideosTable) Insert(id string, subscriptionID string, title string, dura
 }
 
 // UpdateStatus : Update the status for a video
-func (v VideosTable) UpdateStatus(id string, status int) error {
+func (v VideosTable) UpdateStatus(id string, status VideoStatusType) error {
 	// Check that database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
 
 	// Execute the update statement
-	_, err := v.Connection.Exec(sqlStatementUpdateStatus, status, id)
+	_, err := v.Connection.Exec(sqlVideosUpdateStatus, status, id)
 	if err != nil {
 		return err
 	}
@@ -166,7 +165,7 @@ func (v VideosTable) UpdateSave(id string, saved bool) error {
 	}
 
 	// Execute the update statement
-	_, err := v.Connection.Exec(sqlStatementUpdateSave, saved, id)
+	_, err := v.Connection.Exec(sqlVideosUpdateSave, saved, id)
 	if err != nil {
 		return err
 	}
@@ -182,7 +181,7 @@ func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 	}
 
 	// Execute insert statement
-	_, err := v.Connection.Exec(sqlStatementUpdateDuration, duration, videoID)
+	_, err := v.Connection.Exec(sqlVideosUpdateDuration, duration, videoID)
 	if err != nil {
 		return err
 	}
@@ -190,15 +189,15 @@ func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 	return nil
 }
 
-// DeleteFromDatabase : Delete a video from the database
-func (v VideosTable) DeleteFromDatabase(id string) error {
+// Delete : Delete a video from the database
+func (v VideosTable) Delete(id string) error {
 	// Check that database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
 
 	// Execute delete query
-	_, err := v.Connection.Exec(sqlStatementDeleteVideo, id)
+	_, err := v.Connection.Exec(sqlVideosDelete, id)
 	if err != nil {
 		return err
 	}
@@ -214,7 +213,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 	}
 
 	search := fmt.Sprintf("%%%s%%", text)
-	rows, err := v.Connection.Query(sqlStatementSearchVideos, search, search)
+	rows, err := v.Connection.Query(sqlVideosSearch, search, search)
 	if err != nil {
 		return nil, err
 	}
@@ -248,9 +247,9 @@ func (v VideosTable) GetVideos(failed bool) ([]Video, error) {
 
 	var sqlString string
 	if failed {
-		sqlString = sqlStatementGetFailedDownloads
+		sqlString = sqlVideosGetFailed
 	} else {
-		sqlString = sqlStatementGetLatest
+		sqlString = sqlVideosGetLatest
 	}
 
 	rows, err := v.Connection.Query(sqlString)

@@ -1,30 +1,29 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 )
 
 // LogTable : The version table in the database
 type LogTable struct {
-	Connection *sql.DB
+	*Table
 }
 
 // sql : Get version
-const sqlStatementInsertLog = `INSERT INTO Log (type, message) VALUES (?, ?);`
-const sqlStatementGetLogs = `SELECT id, type, message FROM Log                 
+const sqlLogInsert = `INSERT INTO Log (type, message) VALUES (?, ?);`
+const sqlLogGetLatest = `SELECT id, type, message FROM Log                 
 ORDER BY id desc
 LIMIT 50`
 
 // Insert : Insert a new video into the database
-func (l *LogTable) Insert(logType int, logMessage string) error {
+func (l *LogTable) Insert(logType LogType, logMessage string) error {
 	// Check that database is opened
 	if l.Connection == nil {
 		return errors.New("database not opened")
 	}
 
 	// Execute insert statement
-	_, err := l.Connection.Exec(sqlStatementInsertLog, logType, logMessage)
+	_, err := l.Connection.Exec(sqlLogInsert, logType, logMessage)
 	if err != nil {
 		return err
 	}
@@ -41,7 +40,7 @@ func (l *LogTable) GetLatest() ([]Log, error) {
 	}
 
 	// Get rows from database
-	rows, err := l.Connection.Query(sqlStatementGetLogs)
+	rows, err := l.Connection.Query(sqlLogGetLatest)
 	if err != nil {
 		return nil, err
 	}

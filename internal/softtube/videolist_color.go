@@ -12,7 +12,7 @@ type color struct {
 	videoList *videoList
 }
 
-func (c *color) getColor(video *database.Video) (string, string) {
+func (c *color) getColor(video *database.Video) (colorType, colorType) {
 	if video.Saved {
 		return constColorSaved, "Black"
 	}
@@ -44,5 +44,5 @@ func (c *color) setRowColor(treeView *gtk.TreeView, color string) {
 	}
 	treePath := rows.Data().(*gtk.TreePath)
 	iter, _ := listStore.GetIter(treePath)
-	_ = listStore.SetValue(iter, listStoreColumnBackground, color)
+	_ = listStore.SetValue(iter, int(listStoreColumnBackground), color)
 }
