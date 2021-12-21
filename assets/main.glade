@@ -60,7 +60,8 @@
                       <object class="GtkMenuItem" id="menu_file_quit">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Quit</property>
+                        <property name="tooltip-text" translatable="yes">CTRL + q</property>
+                        <property name="label" translatable="yes">Quit (CTRL + q)</property>
                         <property name="use-underline">True</property>
                       </object>
                     </child>
@@ -111,7 +112,7 @@
                       <object class="GtkRadioMenuItem" id="menu_view_subscriptions">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Subscriptions</property>
+                        <property name="label" translatable="yes">Subscriptions (1)</property>
                         <property name="active">True</property>
                         <property name="draw-as-radio">True</property>
                       </object>
@@ -120,7 +121,7 @@
                       <object class="GtkRadioMenuItem" id="menu_view_downloads">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Downloads</property>
+                        <property name="label" translatable="yes">Downloads (2)</property>
                         <property name="use-underline">True</property>
                         <property name="draw-as-radio">True</property>
                       </object>
@@ -129,7 +130,7 @@
                       <object class="GtkRadioMenuItem" id="menu_view_to_watch">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">To watch</property>
+                        <property name="label" translatable="yes">To watch (3)</property>
                         <property name="draw-as-radio">True</property>
                       </object>
                     </child>
@@ -137,7 +138,7 @@
                       <object class="GtkRadioMenuItem" id="menu_view_saved">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Saved</property>
+                        <property name="label" translatable="yes">Saved (4)</property>
                         <property name="use-underline">True</property>
                         <property name="draw-as-radio">True</property>
                       </object>
@@ -146,7 +147,7 @@
                       <object class="GtkRadioMenuItem" id="menu_view_to_delete">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">To delete</property>
+                        <property name="label" translatable="yes">To delete (5)</property>
                         <property name="draw-as-radio">True</property>
                       </object>
                     </child>
@@ -213,7 +214,7 @@
               <object class="GtkToggleToolButton" id="toolbar_subscriptions">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Select to show the 'Subscription' view...</property>
+                <property name="tooltip-text" translatable="yes">Subscriptions view (1)</property>
                 <property name="label" translatable="yes">Subscriptions</property>
                 <property name="use-underline">True</property>
                 <property name="active">True</property>
@@ -224,9 +225,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToggleToolButton" id="toolbar_failed">
+              <object class="GtkToggleToolButton" id="toolbar_downloads">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">Downloads view (2)</property>
                 <property name="label" translatable="yes">Downloads</property>
                 <property name="use-underline">True</property>
               </object>
@@ -239,7 +241,7 @@
               <object class="GtkToggleToolButton" id="toolbar_to_watch">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Select to show the 'To watch' view...</property>
+                <property name="tooltip-text" translatable="yes">To watch view (3)</property>
                 <property name="label" translatable="yes">To watch</property>
                 <property name="use-underline">True</property>
               </object>
@@ -252,7 +254,7 @@
               <object class="GtkToggleToolButton" id="toolbar_saved">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Select to show the 'Saved' view...</property>
+                <property name="tooltip-text" translatable="yes">Saved view (4)</property>
                 <property name="label" translatable="yes">Saved</property>
                 <property name="use-underline">True</property>
               </object>
@@ -265,7 +267,7 @@
               <object class="GtkToggleToolButton" id="toolbar_to_delete">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Select to show the 'To delete' view...</property>
+                <property name="tooltip-text" translatable="yes">To delete view (5)</property>
                 <property name="label" translatable="yes">To delete</property>
               </object>
               <packing>
@@ -289,7 +291,7 @@
               <object class="GtkToolButton" id="toolbar_scroll_to_start">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Scroll to the start of the list...</property>
+                <property name="tooltip-text" translatable="yes">Scroll to the start of the list (Home)</property>
                 <property name="label" translatable="yes">Scroll to start</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-go-up</property>
@@ -303,7 +305,7 @@
               <object class="GtkToolButton" id="toolbar_scroll_to_end">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Scroll to the end of the list...</property>
+                <property name="tooltip-text" translatable="yes">Scroll to the end of the list (End)</property>
                 <property name="label" translatable="yes">Scroll to end</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-go-down</property>
@@ -317,7 +319,7 @@
               <object class="GtkToggleToolButton" id="toolbar_keep_scroll_to_end">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Always scroll to end after refreshing the list (in to watch view only)...</property>
+                <property name="tooltip-text" translatable="yes">Always scroll to end after refreshing the list (CTRL + End)</property>
                 <property name="label" translatable="yes">Always scroll to end</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-goto-bottom</property>
@@ -341,7 +343,7 @@
               <object class="GtkToolButton" id="toolbar_refresh_button">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Press the 'F5' key to refresh the video list...</property>
+                <property name="tooltip-text" translatable="yes">Refresh the video list (F5)</property>
                 <property name="label" translatable="yes">Refresh</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-refresh</property>
@@ -356,7 +358,7 @@
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can-focus">False</property>
-                <property name="tooltip-text" translatable="yes">Click this button to delete all watched videos...</property>
+                <property name="tooltip-text" translatable="yes">Delete all watched videos (Del)</property>
                 <property name="label" translatable="yes">Delete all</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-delete</property>
@@ -406,6 +408,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes">Clears previous search (CTRL + Del)...</property>
                 <property name="margin-left">5</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
@@ -424,7 +427,7 @@
                 <property name="margin-right">5</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">5</property>
-                <property name="placeholder-text" translatable="yes">Search in video titel or channel name...</property>
+                <property name="placeholder-text" translatable="yes">Search in video titel or channel name (CTRL + f)...</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -708,7 +711,7 @@
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="popup_view_failed">
+              <object class="GtkMenuItem" id="popup_view_downloads">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Downloads</property>

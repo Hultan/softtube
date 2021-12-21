@@ -1,6 +1,9 @@
 package softtube
 
 import (
+	"fmt"
+
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/hultan/softteam/framework"
@@ -42,6 +45,45 @@ func (s *SoftTube) StartApplication() error {
 	win.Maximize()
 	_ = win.Connect("destroy", func() {
 		gtk.MainQuit()
+	})
+
+	_ = win.Connect("key-press-event", func(w *gtk.Window, e *gdk.Event) {
+		k := gdk.EventKeyNewFromEvent(e)
+
+		fmt.Println(k.State())
+		fmt.Println(k.KeyVal())
+
+		if k.State() == 16 && k.KeyVal() == 65474 { // F5
+			s.videoList.Refresh("")
+		}
+		if k.State() == 16 && k.KeyVal() >= 49 && k.KeyVal() <= 54 { // 1-5
+			s.videoList.switchView(viewType(k.KeyVal() - 48))
+		}
+		if k.State() == 20 && k.KeyVal() == 102 { // Ctrl + f
+			s.searchBar.searchEntry.GrabFocus()
+		}
+		if k.State() == 16 && k.KeyVal() == 65535 { // Del
+			if s.videoList.currentView == viewToDelete {
+				s.videoList.DeleteWatchedVideos()
+			}
+		}
+		if k.State() == 16 && k.KeyVal() == 65360 { // Ctrl + f
+			s.videoList.scroll.toStart()
+		}
+		if k.State() == 16 && k.KeyVal() == 65367 { // Ctrl + f
+			s.videoList.scroll.toEnd()
+		}
+		if k.State() == 20 && k.KeyVal() == 65367 { // Ctrl + f
+			status := s.toolbar.toolbarKeepScrollToEnd.GetActive()
+			s.toolbar.toolbarKeepScrollToEnd.SetActive(!status)
+			// s.videoList.keepScrollToEnd = !s.videoList.keepScrollToEnd
+		}
+		if k.State() == 20 && k.KeyVal() == 113 { // Ctrl + q
+			gtk.MainQuit()
+		}
+		if k.State() == 20 && k.KeyVal() == 65535 { // Ctrl + Del
+			s.searchBar.Clear()
+		}
 	})
 	win.SetIconName("video-display")
 

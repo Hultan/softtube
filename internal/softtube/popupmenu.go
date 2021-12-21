@@ -48,10 +48,10 @@ func (p *popupMenu) Init(builder *framework.GtkBuilder) error {
 	p.popupUnwatch = builder.GetObject("popup_unwatch").(*gtk.MenuItem)
 	p.popupSave = builder.GetObject("popup_save").(*gtk.MenuItem)
 	p.popupViewSubscriptions = builder.GetObject("popup_view_subscriptions").(*gtk.MenuItem)
-	p.popupViewDownloads = builder.GetObject("popup_view_failed").(*gtk.MenuItem)
+	p.popupViewDownloads = builder.GetObject("popup_view_downloads").(*gtk.MenuItem)
 	p.popupViewToWatch = builder.GetObject("popup_view_to_watch").(*gtk.MenuItem)
-	p.popupViewToDelete = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
 	p.popupViewSaved = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
+	p.popupViewToDelete = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
 
 	p.SetupEvents()
 

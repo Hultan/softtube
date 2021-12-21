@@ -26,10 +26,10 @@ type toolbar struct {
 // Init initiates the toolbar
 func (t *toolbar) Init(builder *framework.GtkBuilder) error {
 	t.toolbarSubscriptions = builder.GetObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
-	t.toolbarDownloads = builder.GetObject("toolbar_failed").(*gtk.ToggleToolButton)
+	t.toolbarDownloads = builder.GetObject("toolbar_downloads").(*gtk.ToggleToolButton)
 	t.toolbarToWatch = builder.GetObject("toolbar_to_watch").(*gtk.ToggleToolButton)
-	t.toolbarToDelete = builder.GetObject("toolbar_to_delete").(*gtk.ToggleToolButton)
 	t.toolbarSaved = builder.GetObject("toolbar_saved").(*gtk.ToggleToolButton)
+	t.toolbarToDelete = builder.GetObject("toolbar_to_delete").(*gtk.ToggleToolButton)
 	t.toolbarScrollToStart = builder.GetObject("toolbar_scroll_to_start").(*gtk.ToolButton)
 	t.toolbarScrollToEnd = builder.GetObject("toolbar_scroll_to_end").(*gtk.ToolButton)
 	t.toolbarKeepScrollToEnd = builder.GetObject("toolbar_keep_scroll_to_end").(*gtk.ToggleToolButton)
