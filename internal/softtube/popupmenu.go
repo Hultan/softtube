@@ -34,59 +34,24 @@ type popupMenu struct {
 
 // Init : Loads the popup menu
 func (p *popupMenu) Init(builder *framework.GtkBuilder) error {
-	menu := builder.GetObject("popupmenu").(*gtk.Menu)
-	p.popupMenu = menu
-
-	menuItem := builder.GetObject("popup_refresh").(*gtk.MenuItem)
-	p.popupRefresh = menuItem
-
-	menuItem = builder.GetObject("popup_download").(*gtk.MenuItem)
-	p.popupDownload = menuItem
-
-	menuItem = builder.GetObject("popup_redownload").(*gtk.MenuItem)
-	p.popupRedownload = menuItem
-
-	menuItem = builder.GetObject("popup_redownload_failedvideo").(*gtk.MenuItem)
-	p.popupRedownloadVideo = menuItem
-
-	menuItem = builder.GetObject("popup_redownload_failedvideos").(*gtk.MenuItem)
-	p.popupRedownloadVideos = menuItem
-
-	menuItem = builder.GetObject("popup_play").(*gtk.MenuItem)
-	p.popupPlay = menuItem
-
-	menuItem = builder.GetObject("popup_get_duration").(*gtk.MenuItem)
-	p.popupGetDuration = menuItem
-
-	menuItem = builder.GetObject("popup_get_videoid").(*gtk.MenuItem)
-	p.popupGetVideoID = menuItem
-
-	menuItem = builder.GetObject("popup_get_thumbnail").(*gtk.MenuItem)
-	p.popupGetThumbnail = menuItem
-
-	menuItem = builder.GetObject("popup_delete_all").(*gtk.MenuItem)
-	p.popupDeleteAll = menuItem
-
-	menuItem = builder.GetObject("popup_unwatch").(*gtk.MenuItem)
-	p.popupUnwatch = menuItem
-
-	menuItem = builder.GetObject("popup_save").(*gtk.MenuItem)
-	p.popupSave = menuItem
-
-	menuItem = builder.GetObject("popup_view_subscriptions").(*gtk.MenuItem)
-	p.popupViewSubscriptions = menuItem
-
-	menuItem = builder.GetObject("popup_view_failed").(*gtk.MenuItem)
-	p.popupViewDownloads = menuItem
-
-	menuItem = builder.GetObject("popup_view_to_watch").(*gtk.MenuItem)
-	p.popupViewToWatch = menuItem
-
-	menuItem = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
-	p.popupViewToDelete = menuItem
-
-	menuItem = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
-	p.popupViewSaved = menuItem
+	p.popupMenu = builder.GetObject("popupmenu").(*gtk.Menu)
+	p.popupRefresh = builder.GetObject("popup_refresh").(*gtk.MenuItem)
+	p.popupDownload = builder.GetObject("popup_download").(*gtk.MenuItem)
+	p.popupRedownload = builder.GetObject("popup_redownload").(*gtk.MenuItem)
+	p.popupRedownloadVideo = builder.GetObject("popup_redownload_failedvideo").(*gtk.MenuItem)
+	p.popupRedownloadVideos = builder.GetObject("popup_redownload_failedvideos").(*gtk.MenuItem)
+	p.popupPlay = builder.GetObject("popup_play").(*gtk.MenuItem)
+	p.popupGetDuration = builder.GetObject("popup_get_duration").(*gtk.MenuItem)
+	p.popupGetVideoID = builder.GetObject("popup_get_videoid").(*gtk.MenuItem)
+	p.popupGetThumbnail = builder.GetObject("popup_get_thumbnail").(*gtk.MenuItem)
+	p.popupDeleteAll = builder.GetObject("popup_delete_all").(*gtk.MenuItem)
+	p.popupUnwatch = builder.GetObject("popup_unwatch").(*gtk.MenuItem)
+	p.popupSave = builder.GetObject("popup_save").(*gtk.MenuItem)
+	p.popupViewSubscriptions = builder.GetObject("popup_view_subscriptions").(*gtk.MenuItem)
+	p.popupViewDownloads = builder.GetObject("popup_view_failed").(*gtk.MenuItem)
+	p.popupViewToWatch = builder.GetObject("popup_view_to_watch").(*gtk.MenuItem)
+	p.popupViewToDelete = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
+	p.popupViewSaved = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
 
 	p.SetupEvents()
 
@@ -100,7 +65,7 @@ func (p *popupMenu) SetupEvents() {
 		if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
 			videoSelected := p.parent.videoList.videoFunctions.getSelected(p.parent.videoList.treeView) != nil
 			switch p.parent.videoList.filterMode {
-			case constFilterModeSubscriptions:
+			case viewSubscriptions:
 				p.popupDownload.SetSensitive(videoSelected)
 				p.popupRedownload.SetSensitive(true)
 				p.popupRedownloadVideo.SetSensitive(videoSelected)
@@ -118,7 +83,7 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewToWatch.SetSensitive(true)
 				p.popupViewToDelete.SetSensitive(true)
 				p.popupViewSaved.SetSensitive(true)
-			case constFilterModeDownloads:
+			case viewDownloads:
 				p.popupDownload.SetSensitive(false)
 				p.popupRedownload.SetSensitive(true)
 				p.popupRedownloadVideo.SetSensitive(videoSelected)
@@ -136,7 +101,7 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewToWatch.SetSensitive(true)
 				p.popupViewToDelete.SetSensitive(true)
 				p.popupViewSaved.SetSensitive(true)
-			case constFilterModeToWatch:
+			case viewToWatch:
 				p.popupDownload.SetSensitive(false)
 				p.popupRedownload.SetSensitive(false)
 				p.popupPlay.SetSensitive(videoSelected)
@@ -153,7 +118,7 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewToWatch.SetSensitive(false)
 				p.popupViewToDelete.SetSensitive(true)
 				p.popupViewSaved.SetSensitive(true)
-			case constFilterModeToDelete:
+			case viewToDelete:
 				p.popupDownload.SetSensitive(false)
 				p.popupRedownload.SetSensitive(false)
 				p.popupPlay.SetSensitive(videoSelected)
@@ -170,7 +135,7 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewToWatch.SetSensitive(true)
 				p.popupViewToDelete.SetSensitive(false)
 				p.popupViewSaved.SetSensitive(true)
-			case constFilterModeSaved:
+			case viewSaved:
 				p.popupDownload.SetSensitive(false)
 				p.popupRedownload.SetSensitive(false)
 				p.popupPlay.SetSensitive(videoSelected)
@@ -294,18 +259,18 @@ func (p *popupMenu) SetupEvents() {
 		}
 	})
 	_ = p.popupViewSubscriptions.Connect("activate", func() {
-		p.parent.videoList.SetFilterMode(constFilterModeSubscriptions)
+		p.parent.videoList.switchView(viewSubscriptions)
 	})
 	_ = p.popupViewDownloads.Connect("activate", func() {
-		p.parent.videoList.SetFilterMode(constFilterModeDownloads)
+		p.parent.videoList.switchView(viewDownloads)
 	})
 	_ = p.popupViewToWatch.Connect("activate", func() {
-		p.parent.videoList.SetFilterMode(constFilterModeToWatch)
-	})
-	_ = p.popupViewToDelete.Connect("activate", func() {
-		p.parent.videoList.SetFilterMode(constFilterModeToDelete)
+		p.parent.videoList.switchView(viewToWatch)
 	})
 	_ = p.popupViewSaved.Connect("activate", func() {
-		p.parent.videoList.SetFilterMode(constFilterModeSaved)
+		p.parent.videoList.switchView(viewSaved)
+	})
+	_ = p.popupViewToDelete.Connect("activate", func() {
+		p.parent.videoList.switchView(viewToDelete)
 	})
 }

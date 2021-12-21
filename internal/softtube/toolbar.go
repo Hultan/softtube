@@ -23,40 +23,19 @@ type toolbar struct {
 	toolbarQuit            *gtk.ToolButton
 }
 
-// Load : Loads the toolbar
+// Init initiates the toolbar
 func (t *toolbar) Init(builder *framework.GtkBuilder) error {
-	toggle := builder.GetObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
-	t.toolbarSubscriptions = toggle
-
-	toggle = builder.GetObject("toolbar_failed").(*gtk.ToggleToolButton)
-	t.toolbarDownloads = toggle
-
-	toggle = builder.GetObject("toolbar_to_watch").(*gtk.ToggleToolButton)
-	t.toolbarToWatch = toggle
-
-	toggle = builder.GetObject("toolbar_to_delete").(*gtk.ToggleToolButton)
-	t.toolbarToDelete = toggle
-
-	toggle = builder.GetObject("toolbar_saved").(*gtk.ToggleToolButton)
-	t.toolbarSaved = toggle
-
-	tool := builder.GetObject("toolbar_scroll_to_start").(*gtk.ToolButton)
-	t.toolbarScrollToStart = tool
-
-	tool = builder.GetObject("toolbar_scroll_to_end").(*gtk.ToolButton)
-	t.toolbarScrollToEnd = tool
-
-	toggle = builder.GetObject("toolbar_keep_scroll_to_end").(*gtk.ToggleToolButton)
-	t.toolbarKeepScrollToEnd = toggle
-
-	tool = builder.GetObject("toolbar_refresh_button").(*gtk.ToolButton)
-	t.toolbarRefresh = tool
-
-	tool = builder.GetObject("toolbar_delete_all_button").(*gtk.ToolButton)
-	t.toolbarDeleteAll = tool
-
-	tool = builder.GetObject("toolbar_quit_button").(*gtk.ToolButton)
-	t.toolbarQuit = tool
+	t.toolbarSubscriptions = builder.GetObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
+	t.toolbarDownloads = builder.GetObject("toolbar_failed").(*gtk.ToggleToolButton)
+	t.toolbarToWatch = builder.GetObject("toolbar_to_watch").(*gtk.ToggleToolButton)
+	t.toolbarToDelete = builder.GetObject("toolbar_to_delete").(*gtk.ToggleToolButton)
+	t.toolbarSaved = builder.GetObject("toolbar_saved").(*gtk.ToggleToolButton)
+	t.toolbarScrollToStart = builder.GetObject("toolbar_scroll_to_start").(*gtk.ToolButton)
+	t.toolbarScrollToEnd = builder.GetObject("toolbar_scroll_to_end").(*gtk.ToolButton)
+	t.toolbarKeepScrollToEnd = builder.GetObject("toolbar_keep_scroll_to_end").(*gtk.ToggleToolButton)
+	t.toolbarRefresh = builder.GetObject("toolbar_refresh_button").(*gtk.ToolButton)
+	t.toolbarDeleteAll = builder.GetObject("toolbar_delete_all_button").(*gtk.ToolButton)
+	t.toolbarQuit = builder.GetObject("toolbar_quit_button").(*gtk.ToolButton)
 
 	t.SetupEvents()
 
@@ -77,59 +56,19 @@ func (t *toolbar) SetupEvents() {
 		s.videoList.DeleteWatchedVideos()
 	})
 	_ = t.toolbarSubscriptions.Connect("clicked", func() {
-		if t.toolbarSubscriptions.GetActive() {
-			s := t.parent
-			t.toolbarDeleteAll.SetSensitive(false)
-			t.toolbarDownloads.SetActive(false)
-			t.toolbarToWatch.SetActive(false)
-			t.toolbarToDelete.SetActive(false)
-			t.toolbarSaved.SetActive(false)
-			s.videoList.SetFilterMode(constFilterModeSubscriptions)
-		}
+		t.parent.videoList.switchView(viewSubscriptions)
 	})
 	_ = t.toolbarDownloads.Connect("clicked", func() {
-		if t.toolbarDownloads.GetActive() {
-			s := t.parent
-			t.toolbarDeleteAll.SetSensitive(false)
-			t.toolbarSubscriptions.SetActive(false)
-			t.toolbarToWatch.SetActive(false)
-			t.toolbarToDelete.SetActive(false)
-			t.toolbarSaved.SetActive(false)
-			s.videoList.SetFilterMode(constFilterModeDownloads)
-		}
+		t.parent.videoList.switchView(viewDownloads)
 	})
 	_ = t.toolbarToWatch.Connect("clicked", func() {
-		if t.toolbarToWatch.GetActive() {
-			s := t.parent
-			t.toolbarDownloads.SetActive(false)
-			t.toolbarDeleteAll.SetSensitive(false)
-			t.toolbarSubscriptions.SetActive(false)
-			t.toolbarToDelete.SetActive(false)
-			t.toolbarSaved.SetActive(false)
-			s.videoList.SetFilterMode(constFilterModeToWatch)
-		}
-	})
-	_ = t.toolbarToDelete.Connect("clicked", func() {
-		if t.toolbarToDelete.GetActive() {
-			s := t.parent
-			t.toolbarDownloads.SetActive(false)
-			t.toolbarDeleteAll.SetSensitive(true)
-			t.toolbarSubscriptions.SetActive(false)
-			t.toolbarToWatch.SetActive(false)
-			t.toolbarSaved.SetActive(false)
-			s.videoList.SetFilterMode(constFilterModeToDelete)
-		}
+		t.parent.videoList.switchView(viewToWatch)
 	})
 	_ = t.toolbarSaved.Connect("clicked", func() {
-		if t.toolbarSaved.GetActive() {
-			s := t.parent
-			t.toolbarDownloads.SetActive(false)
-			t.toolbarDeleteAll.SetSensitive(false)
-			t.toolbarSubscriptions.SetActive(false)
-			t.toolbarToWatch.SetActive(false)
-			t.toolbarToDelete.SetActive(false)
-			s.videoList.SetFilterMode(constFilterModeSaved)
-		}
+		t.parent.videoList.switchView(viewSaved)
+	})
+	_ = t.toolbarToDelete.Connect("clicked", func() {
+		t.parent.videoList.switchView(viewToDelete)
 	})
 	_ = t.toolbarScrollToStart.Connect("clicked", func() {
 		s := t.parent

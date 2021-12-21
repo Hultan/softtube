@@ -23,15 +23,17 @@ const constVideoDurationCommand = "%s --get-duration -- '%s'"
 type videoList struct {
 	parent          *SoftTube
 	treeView        *gtk.TreeView
-	scroll         *scroll
-	videoFunctions *videoFunctions
-	color          *color
+	scroll          *scroll
+	videoFunctions  *videoFunctions
+	color           *color
 	keepScrollToEnd bool
-	filterMode      filterModeType
+	filterMode      viewType
 }
 
 var videos []database.Video
 var listStore *gtk.ListStore
+var currentView = viewNone
+var lastViewSwitch time.Time
 
 // Init : Loads the toolbar from the glade file
 func (v *videoList) Init(builder *framework.GtkBuilder) error {
@@ -50,6 +52,8 @@ func (v *videoList) Init(builder *framework.GtkBuilder) error {
 	helper := &treeViewHelper{v}
 	helper.Setup()
 
+	v.switchView(viewSubscriptions)
+
 	return nil
 }
 
@@ -59,7 +63,7 @@ func (v *videoList) Search(text string) {
 }
 
 // SetFilterMode : Changes filter mode
-func (v *videoList) SetFilterMode(mode filterModeType) {
+func (v *videoList) SetFilterMode(mode viewType) {
 	v.filterMode = mode
 	v.Refresh("")
 }
@@ -163,21 +167,21 @@ func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	}
 
 	switch v.filterMode {
-	case constFilterModeSubscriptions:
+	case viewSubscriptions:
 		return true
-	case constFilterModeDownloads:
+	case viewDownloads:
 		if color == constColorDownloading {
 			return true
 		}
-	case constFilterModeToWatch:
+	case viewToWatch:
 		if color == constColorDownloaded {
 			return true
 		}
-	case constFilterModeToDelete:
+	case viewToDelete:
 		if color == constColorWatched {
 			return true
 		}
-	case constFilterModeSaved:
+	case viewSaved:
 		if color == constColorSaved {
 			return true
 		}
@@ -233,4 +237,34 @@ func (v *videoList) renameJPG2WEBP(thumbnailPath string) {
 		newName := thumbnailPath[:len(thumbnailPath)-len(extension)] + ".webp"
 		_ = os.Rename(thumbnailPath, newName)
 	}
+}
+
+func (v *videoList) switchView(view viewType) {
+	// lastViewSwitch is used to avoid this function
+	// being called recursively when calling SetActive(true)
+	since := time.Now().Sub(lastViewSwitch).Milliseconds()
+	if since < 50 || currentView == view {
+		return
+	}
+	currentView = view
+	lastViewSwitch = time.Now()
+
+	v.parent.toolbar.toolbarDeleteAll.SetSensitive(view == viewToDelete)
+
+	v.parent.toolbar.toolbarSubscriptions.SetActive(view == viewSubscriptions)
+	v.parent.menuBar.menuViewSubscriptions.SetActive(view == viewSubscriptions)
+
+	v.parent.toolbar.toolbarDownloads.SetActive(view == viewDownloads)
+	v.parent.menuBar.menuViewDownloads.SetActive(view == viewDownloads)
+
+	v.parent.toolbar.toolbarToWatch.SetActive(view == viewToWatch)
+	v.parent.menuBar.menuViewToWatch.SetActive(view == viewToWatch)
+
+	v.parent.toolbar.toolbarSaved.SetActive(view == viewSaved)
+	v.parent.menuBar.menuViewSaved.SetActive(view == viewSaved)
+
+	v.parent.toolbar.toolbarToDelete.SetActive(view == viewToDelete)
+	v.parent.menuBar.menuViewToDelete.SetActive(view == viewToDelete)
+
+	v.SetFilterMode(view)
 }

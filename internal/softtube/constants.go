@@ -45,14 +45,15 @@ const (
 	constStatusSaved
 )
 
-type filterModeType int
+type viewType int
 
 const (
-	constFilterModeSubscriptions filterModeType = iota
-	constFilterModeToWatch
-	constFilterModeToDelete
-	constFilterModeSaved
-	constFilterModeDownloads
+	viewNone viewType = iota
+	viewSubscriptions
+	viewToWatch
+	viewToDelete
+	viewSaved
+	viewDownloads
 )
 
 const (
