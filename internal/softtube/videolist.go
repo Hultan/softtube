@@ -27,17 +27,18 @@ type videoList struct {
 	videoFunctions  *videoFunctions
 	color           *color
 	keepScrollToEnd bool
-	filterMode      viewType
+	currentView     viewType
+	lastViewSwitch  time.Time
 }
 
 var videos []database.Video
 var listStore *gtk.ListStore
-var currentView = viewNone
-var lastViewSwitch time.Time
 
 // Init : Loads the toolbar from the glade file
 func (v *videoList) Init(builder *framework.GtkBuilder) error {
-	v.filterMode = 0
+	v.currentView = viewSubscriptions
+	v.lastViewSwitch = time.Now()
+
 	// Get the tree view
 	treeView := builder.GetObject("video_treeview").(*gtk.TreeView)
 	v.treeView = treeView
@@ -52,20 +53,12 @@ func (v *videoList) Init(builder *framework.GtkBuilder) error {
 	helper := &treeViewHelper{v}
 	helper.Setup()
 
-	v.switchView(viewSubscriptions)
-
 	return nil
 }
 
 // Search : Searches for a video
 func (v *videoList) Search(text string) {
 	v.Refresh(text)
-}
-
-// SetFilterMode : Changes filter mode
-func (v *videoList) SetFilterMode(mode viewType) {
-	v.filterMode = mode
-	v.Refresh("")
 }
 
 // DeleteWatchedVideos : Deletes all watched videos from disk
@@ -166,7 +159,7 @@ func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 		v.parent.Logger.LogError(err)
 	}
 
-	switch v.filterMode {
+	switch v.currentView {
 	case viewSubscriptions:
 		return true
 	case viewDownloads:
@@ -242,12 +235,12 @@ func (v *videoList) renameJPG2WEBP(thumbnailPath string) {
 func (v *videoList) switchView(view viewType) {
 	// lastViewSwitch is used to avoid this function
 	// being called recursively when calling SetActive(true)
-	since := time.Now().Sub(lastViewSwitch).Milliseconds()
-	if since < 50 || currentView == view {
+	since := time.Now().Sub(v.lastViewSwitch).Milliseconds()
+	if since < 50 || v.currentView == view {
 		return
 	}
-	currentView = view
-	lastViewSwitch = time.Now()
+	v.currentView = view
+	v.lastViewSwitch = time.Now()
 
 	v.parent.toolbar.toolbarDeleteAll.SetSensitive(view == viewToDelete)
 
@@ -266,5 +259,5 @@ func (v *videoList) switchView(view viewType) {
 	v.parent.toolbar.toolbarToDelete.SetActive(view == viewToDelete)
 	v.parent.menuBar.menuViewToDelete.SetActive(view == viewToDelete)
 
-	v.SetFilterMode(view)
+	v.Refresh("")
 }

@@ -64,7 +64,7 @@ func (p *popupMenu) SetupEvents() {
 		buttonEvent := gdk.EventButtonNewFromEvent(event)
 		if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
 			videoSelected := p.parent.videoList.videoFunctions.getSelected(p.parent.videoList.treeView) != nil
-			switch p.parent.videoList.filterMode {
+			switch p.parent.videoList.currentView {
 			case viewSubscriptions:
 				p.popupDownload.SetSensitive(videoSelected)
 				p.popupRedownload.SetSensitive(true)
