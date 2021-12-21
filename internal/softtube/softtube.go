@@ -56,7 +56,7 @@ func (s *SoftTube) StartApplication() error {
 		if k.State() == 16 && k.KeyVal() == 65474 { // F5
 			s.videoList.Refresh("")
 		}
-		if k.State() == 16 && k.KeyVal() >= 49 && k.KeyVal() <= 54 { // 1-5
+		if k.State() == 20 && k.KeyVal() >= 49 && k.KeyVal() <= 54 { // CTRL + 1-5
 			s.videoList.switchView(viewType(k.KeyVal() - 48))
 		}
 		if k.State() == 20 && k.KeyVal() == 102 { // Ctrl + f
@@ -67,13 +67,13 @@ func (s *SoftTube) StartApplication() error {
 				s.videoList.DeleteWatchedVideos()
 			}
 		}
-		if k.State() == 16 && k.KeyVal() == 65360 { // Ctrl + f
+		if k.State() == 16 && k.KeyVal() == 65360 { // Home
 			s.videoList.scroll.toStart()
 		}
-		if k.State() == 16 && k.KeyVal() == 65367 { // Ctrl + f
+		if k.State() == 16 && k.KeyVal() == 65367 { // End
 			s.videoList.scroll.toEnd()
 		}
-		if k.State() == 20 && k.KeyVal() == 65367 { // Ctrl + f
+		if k.State() == 20 && k.KeyVal() == 65367 { // Ctrl + End
 			status := s.toolbar.toolbarKeepScrollToEnd.GetActive()
 			s.toolbar.toolbarKeepScrollToEnd.SetActive(!status)
 			// s.videoList.keepScrollToEnd = !s.videoList.keepScrollToEnd
