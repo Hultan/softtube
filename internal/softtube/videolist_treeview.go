@@ -24,12 +24,14 @@ func (t *treeViewHelper) setupEvents() {
 
 // setupColumns : Sets up the listview columns
 func (t *treeViewHelper) setupColumns() {
-	t.videoList.treeView.AppendColumn(t.createImageColumn("Image"))
-	t.videoList.treeView.AppendColumn(t.createTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
-	t.videoList.treeView.AppendColumn(t.createTextColumn("Date", listStoreColumnDate, 90, 300))
-	t.videoList.treeView.AppendColumn(t.createTextColumn("Title", listStoreColumnTitle, 0, 600))
-	t.videoList.treeView.AppendColumn(t.createTextColumn("Duration", listStoreColumnDuration, 90, 300))
-	t.videoList.treeView.AppendColumn(t.createProgressColumn("Progress"))
+	tw := t.videoList.treeView
+
+	tw.AppendColumn(t.createImageColumn("Image"))
+	tw.AppendColumn(t.createTextColumn("Channel name", listStoreColumnChannelName, 200, 300))
+	tw.AppendColumn(t.createTextColumn("Date", listStoreColumnDate, 120, 300))
+	tw.AppendColumn(t.createTextColumn("Duration", listStoreColumnDuration, 90, 300))
+	tw.AppendColumn(t.createTextColumn("Title", listStoreColumnTitle, 0, 600))
+	tw.AppendColumn(t.createProgressColumn("Progress"))
 }
 
 // createTextColumn : Add a column to the tree view (during the initialization of the tree view)
