@@ -1,8 +1,6 @@
 package softtube
 
 import (
-	"fmt"
-
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
@@ -50,8 +48,8 @@ func (s *SoftTube) StartApplication() error {
 	_ = win.Connect("key-press-event", func(w *gtk.Window, e *gdk.Event) {
 		k := gdk.EventKeyNewFromEvent(e)
 
-		fmt.Println(k.State())
-		fmt.Println(k.KeyVal())
+		// fmt.Println(k.State())
+		// fmt.Println(k.KeyVal())
 
 		if k.State() == 16 && k.KeyVal() == 65474 { // F5
 			s.videoList.Refresh("")
@@ -61,6 +59,9 @@ func (s *SoftTube) StartApplication() error {
 		}
 		if k.State() == 20 && k.KeyVal() == 102 { // Ctrl + f
 			s.searchBar.searchEntry.GrabFocus()
+		}
+		if k.State() == 20 && k.KeyVal() == 108 { // Ctrl + l
+			s.videoList.expandCollapseLog()
 		}
 		if k.State() == 16 && k.KeyVal() == 65535 { // Del
 			if s.videoList.currentView == viewToDelete {

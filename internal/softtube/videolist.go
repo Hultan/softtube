@@ -29,6 +29,8 @@ type videoList struct {
 	keepScrollToEnd bool
 	currentView     viewType
 	lastViewSwitch  time.Time
+	logPanel        *gtk.ScrolledWindow
+	isLogExpanded   bool
 }
 
 var videos []database.Video
@@ -52,6 +54,13 @@ func (v *videoList) Init(builder *framework.GtkBuilder) error {
 
 	helper := &treeViewHelper{v}
 	helper.Setup()
+
+	// LOG PANEL
+
+	// Get the scrolled window surrounding the treeview
+	logPanel := builder.GetObject("log_scrolled_window").(*gtk.ScrolledWindow)
+	v.logPanel = logPanel
+	v.isLogExpanded = true
 
 	return nil
 }
@@ -260,4 +269,13 @@ func (v *videoList) switchView(view viewType) {
 	v.parent.menuBar.menuViewToDelete.SetActive(view == viewToDelete)
 
 	v.Refresh("")
+}
+
+func (v *videoList) expandCollapseLog() {
+	if v.isLogExpanded {
+		v.logPanel.SetSizeRequest(60, -1)
+	} else {
+		v.logPanel.SetSizeRequest(410, -1)
+	}
+	v.isLogExpanded = !v.isLogExpanded
 }
