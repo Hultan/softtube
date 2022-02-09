@@ -7,12 +7,18 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// TODO : Testa att byta ut databas drivern mot
+// gorm.io/driver/mysql
+// samt
+// gorm.io/gorm
+// Se video : https://www.youtube.com/watch?v=zTnkskp-xWs
+
 type ConnectionInfo struct {
-	Server           string
-	Port             int
-	Database         string
-	Username         string
-	Password         string
+	Server   string
+	Port     int
+	Database string
+	Username string
+	Password string
 }
 
 // Database : A connection to the SoftTube database
