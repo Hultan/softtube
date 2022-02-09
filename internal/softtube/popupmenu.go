@@ -15,7 +15,6 @@ type popupMenu struct {
 	popupMenu              *gtk.Menu
 	popupRefresh           *gtk.MenuItem
 	popupDownload          *gtk.MenuItem
-	popupRedownload        *gtk.MenuItem
 	popupRedownloadVideo   *gtk.MenuItem
 	popupRedownloadVideos  *gtk.MenuItem
 	popupPlay              *gtk.MenuItem
@@ -37,7 +36,6 @@ func (p *popupMenu) Init(builder *framework.GtkBuilder) error {
 	p.popupMenu = builder.GetObject("popupmenu").(*gtk.Menu)
 	p.popupRefresh = builder.GetObject("popup_refresh").(*gtk.MenuItem)
 	p.popupDownload = builder.GetObject("popup_download").(*gtk.MenuItem)
-	p.popupRedownload = builder.GetObject("popup_redownload").(*gtk.MenuItem)
 	p.popupRedownloadVideo = builder.GetObject("popup_redownload_failedvideo").(*gtk.MenuItem)
 	p.popupRedownloadVideos = builder.GetObject("popup_redownload_failedvideos").(*gtk.MenuItem)
 	p.popupPlay = builder.GetObject("popup_play").(*gtk.MenuItem)
@@ -67,7 +65,6 @@ func (p *popupMenu) SetupEvents() {
 			switch p.parent.videoList.currentView {
 			case viewSubscriptions:
 				p.popupDownload.SetSensitive(videoSelected)
-				p.popupRedownload.SetSensitive(true)
 				p.popupRedownloadVideo.SetSensitive(videoSelected)
 				p.popupPlay.SetSensitive(false)
 				p.popupGetDuration.SetSensitive(videoSelected)
@@ -85,7 +82,6 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewSaved.SetSensitive(true)
 			case viewDownloads:
 				p.popupDownload.SetSensitive(false)
-				p.popupRedownload.SetSensitive(true)
 				p.popupRedownloadVideo.SetSensitive(videoSelected)
 				p.popupPlay.SetSensitive(false)
 				p.popupGetDuration.SetSensitive(videoSelected)
@@ -103,7 +99,6 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewSaved.SetSensitive(true)
 			case viewToWatch:
 				p.popupDownload.SetSensitive(false)
-				p.popupRedownload.SetSensitive(false)
 				p.popupPlay.SetSensitive(videoSelected)
 				p.popupGetDuration.SetSensitive(false)
 				p.popupGetVideoID.SetSensitive(videoSelected)
@@ -120,7 +115,6 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewSaved.SetSensitive(true)
 			case viewToDelete:
 				p.popupDownload.SetSensitive(false)
-				p.popupRedownload.SetSensitive(false)
 				p.popupPlay.SetSensitive(videoSelected)
 				p.popupGetDuration.SetSensitive(false)
 				p.popupGetVideoID.SetSensitive(videoSelected)
@@ -137,7 +131,6 @@ func (p *popupMenu) SetupEvents() {
 				p.popupViewSaved.SetSensitive(true)
 			case viewSaved:
 				p.popupDownload.SetSensitive(false)
-				p.popupRedownload.SetSensitive(false)
 				p.popupPlay.SetSensitive(videoSelected)
 				p.popupGetDuration.SetSensitive(false)
 				p.popupGetVideoID.SetSensitive(videoSelected)

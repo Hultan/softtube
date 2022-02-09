@@ -578,10 +578,10 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="popup_redownload">
+      <object class="GtkMenuItem" id="popup_tools">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Re-download</property>
+        <property name="label" translatable="yes">Download tools</property>
         <property name="use-underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
@@ -602,20 +602,12 @@
                 <property name="label" translatable="yes">Re-download all failed videos</property>
               </object>
             </child>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="popup_tools">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Download tools</property>
-        <property name="use-underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkSeparatorMenuItem">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+            </child>
             <child>
               <object class="GtkMenuItem" id="popup_get_videoid">
                 <property name="visible">True</property>
