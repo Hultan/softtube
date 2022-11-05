@@ -77,8 +77,10 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 
 	// Append video to list
 	iter := listStore.Append()
-	err := listStore.Set(iter, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-		[]interface{}{thumbnail,
+	err := listStore.Set(
+		iter, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+		[]interface{}{
+			thumbnail,
 			video.SubscriptionName,
 			video.Added.Format(constDateLayout),
 			video.Title,
@@ -87,7 +89,9 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 			video.ID,
 			duration,
 			progressText,
-			string(foregroundColor)})
+			string(foregroundColor),
+		},
+	)
 
 	if err != nil {
 		v.videoList.parent.Logger.Log("Failed to add row!")
@@ -97,6 +101,8 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 
 func (v *videoFunctions) play(video *database.Video) {
 	fmt.Println("Enter play!")
+
+	v.videoList.parent.activityLog.FillLog()
 
 	var wg sync.WaitGroup
 	wg.Add(4)
@@ -160,6 +166,14 @@ func (v *videoFunctions) play(video *database.Video) {
 	v.videoList.Refresh("")
 	fmt.Println("Leaving play!")
 
+	// Try and set focus to SMPlayer
+	go func() {
+		cmd := exec.Command("xdotool", "windowactivate --name smplayer")
+		err := cmd.Run()
+		if err != nil {
+			// Ignore errors
+		}
+	}()
 }
 
 func (v *videoFunctions) getPath(videoID string) string {
@@ -349,7 +363,9 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 			return
 		}
 		duration := string(output)
-		if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(duration, "ERROR: This live event") {
+		if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(
+			duration, "ERROR: This live event",
+		) {
 			// Is it a live-streaming event?
 			duration = "LIVE"
 		}

@@ -143,6 +143,7 @@ func (v *videoList) Refresh(searchFor string) {
 			// fatal error: unexpected signal during runtime execution
 			// [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x0]
 			// Tried to switch from time.Sleep() to time.After()
+			// This did not work either.
 			select {
 			case <-time.After(50 * time.Millisecond):
 				v.scroll.toEnd()
