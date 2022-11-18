@@ -31,14 +31,16 @@ func (a *activityLog) Init(builder *framework.GtkBuilder) {
 		panic(err)
 	}
 	a.listStore = store
-	a.FillLog()
+	a.FillLog(true)
 }
 
 // FillLog : Fills the log with the last n logs
-func (a *activityLog) FillLog() {
+func (a *activityLog) FillLog(init bool) {
 	logs := a.getLogs()
-	a.setupColumns()
-	a.loadResources()
+	if init {
+		a.setupColumns()
+		a.loadResources()
+	}
 
 	a.treeView.SetModel(nil)
 	for _, logItem := range logs {

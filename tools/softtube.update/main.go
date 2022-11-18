@@ -148,50 +148,61 @@ func updateSubscription(subscription *database.Subscription) {
 			fmt.Println(err.Error())
 		}
 
-		if !exists {
-			message := fmt.Sprintf("New video for channel '%s' : '%s'", subscription.Name, video.Title)
+		if exists {
+			continue
+		}
+
+		message := fmt.Sprintf(
+			"New video for channel '%s' (%s): '%s'",
+			subscription.Name, video.SubscriptionID, video.Title,
+		)
+		logger.Log(message)
+
+		video.Title = clean(video.Title)
+
+		// Insert the video in the database
+		// This must be executed before getDuration()
+		err = db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
+		if err != nil {
+			message = fmt.Sprintf(
+				"Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error(),
+			)
 			logger.Log(message)
+			return
+		}
+		message = fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
+		logger.Log(message)
 
-			video.Title = clean(video.Title)
+		waitGroup.Add(2)
 
-			// Insert the video in the database
-			// This must be executed before getDuration()
-			err := db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
+		go func() {
+			// Get duration
+			defer waitGroup.Done()
+			err := youtube.getDuration(video.ID, logger)
 			if err != nil {
-				message = fmt.Sprintf("Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error())
+				message = fmt.Sprintf(
+					"Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error(),
+				)
 				logger.Log(message)
 				return
 			}
-			message = fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
+			message = fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
 			logger.Log(message)
-
-			waitGroup.Add(2)
-
-			go func() {
-				// Get duration
-				defer waitGroup.Done()
-				err := youtube.getDuration(video.ID, logger)
-				if err != nil {
-					message = fmt.Sprintf("Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error())
-					logger.Log(message)
-					return
-				}
-				message = fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
+		}()
+		go func() {
+			// Get thumbnail
+			defer waitGroup.Done()
+			err := youtube.getThumbnail(video.ID, config.ServerPaths.Thumbnails, logger)
+			if err != nil {
+				message = fmt.Sprintf(
+					"Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error(),
+				)
 				logger.Log(message)
-			}()
-			go func() {
-				// Get thumbnail
-				defer waitGroup.Done()
-				err := youtube.getThumbnail(video.ID, config.ServerPaths.Thumbnails, logger)
-				if err != nil {
-					message = fmt.Sprintf("Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error())
-					logger.Log(message)
-					return
-				}
-				message = fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
-				logger.Log(message)
-			}()
-		}
+				return
+			}
+			message = fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
+			logger.Log(message)
+		}()
 	}
 
 	// Mark subscription as updated

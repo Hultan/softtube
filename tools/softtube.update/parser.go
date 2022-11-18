@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"time"
 
 	database "github.com/hultan/softtube/internal/softtube.database"
@@ -18,6 +19,7 @@ type Feed struct {
 // Entry : a youtube video
 type Entry struct {
 	ID        string `xml:"videoId"`
+	ChannelID string `xml:"channelId"`
 	Title     string `xml:"title"`
 	Published string `xml:"published"`
 }
@@ -32,7 +34,11 @@ func (f Feed) getVideos() []database.Video {
 	for i := 0; i < len(f.Entries); i++ {
 		var video database.Video
 		video.ID = f.Entries[i].ID
-		video.SubscriptionID = f.ChannelID
+		channelId := f.ChannelID
+		if strings.Trim(channelId, " \n\t") == "" {
+			channelId = f.Entries[i].ChannelID
+		}
+		video.SubscriptionID = channelId
 		video.Title = f.Entries[i].Title
 		publishedDate, err := time.Parse(constDateLayout, f.Entries[i].Published)
 		if err != nil {

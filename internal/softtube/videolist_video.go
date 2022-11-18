@@ -102,7 +102,7 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 func (v *videoFunctions) play(video *database.Video) {
 	fmt.Println("Enter play!")
 
-	v.videoList.parent.activityLog.FillLog()
+	v.videoList.parent.activityLog.FillLog(false)
 
 	var wg sync.WaitGroup
 	wg.Add(4)
@@ -167,13 +167,14 @@ func (v *videoFunctions) play(video *database.Video) {
 	fmt.Println("Leaving play!")
 
 	// Try and set focus to SMPlayer
-	go func() {
-		cmd := exec.Command("xdotool", "windowactivate --name smplayer")
-		err := cmd.Run()
-		if err != nil {
-			// Ignore errors
-		}
-	}()
+	// This might not work because of this bug : https://github.com/smplayer-dev/smplayer/issues/580
+	// go func() {
+	// 	cmd := exec.Command("xdotool", "windowactivate --name smplayer")
+	// 	err := cmd.Run()
+	// 	if err != nil {
+	// 		// Ignore errors
+	// 	}
+	// }()
 }
 
 func (v *videoFunctions) getPath(videoID string) string {
@@ -321,7 +322,7 @@ func (v *videoFunctions) getThumbnailPath(videoID string) string {
 	if _, err := os.Stat(thumbnailPath); err == nil {
 		// YouTube started to return *.webp thumbnails instead of *.jpg thumbnails sometimes
 		// Go can't read them, and getThumbnail fails to get a PixBuf, so return "" for now
-		return ""
+		return thumbnailPath
 	}
 	return ""
 }
