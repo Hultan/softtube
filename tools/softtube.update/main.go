@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Init config file
-	config = new(core.Config)
+	config = &core.Config{}
 	err = config.Load("main")
 	if err != nil {
 		fmt.Println("ERROR (Open config) : ", err.Error())
@@ -114,56 +114,6 @@ func main() {
 	}
 
 	waitGroup.Wait()
-
-	// updateSubscription(&subs[21])
-}
-
-func getVideos(subscription *database.Subscription) []database.Video {
-	// Download the subscription RSS
-	yt := &youtube{}
-	rss, err := yt.getSubscriptionRSS(subscription.ID)
-	if err != nil {
-		errorMessage := fmt.Sprintf(
-			"Failed to get RSS feed for %s (%s) : %s",
-			subscription.Name, subscription.ID, err.Error(),
-		)
-		logger.Log(errorMessage)
-		return nil
-	}
-
-	if contains404(rss) {
-		errorMessage := fmt.Sprintf(
-			"Channel %s (%s) has been deleted. Please remove channel...",
-			subscription.Name, subscription.ID,
-		)
-		logger.Log(errorMessage)
-		return nil
-	}
-
-	// Parse the RSS
-	feed := &Feed{}
-	err = feed.parse(rss)
-	if err != nil {
-		errorMessage := fmt.Sprintf(
-			"Failed to parse RSS feed for %s (%s) : %s",
-			subscription.Name, subscription.ID, err.Error(),
-		)
-		logger.Log(errorMessage)
-		return nil
-	}
-
-	// Get videos in the RSS
-	videos, err := feed.getVideos()
-	if err != nil {
-		errorMessage := fmt.Sprintf(
-			"Failed to get videos for %s (%s) : %s",
-			subscription.Name, subscription.ID, err.Error(),
-		)
-		logger.Log(errorMessage)
-		return nil
-	}
-
-	return videos
 }
 
 func updateSubscription(subscription *database.Subscription) {
@@ -215,6 +165,54 @@ func updateSubscription(subscription *database.Subscription) {
 		logger.LogError(err)
 	}
 	_ = db.Subscriptions.UpdateLastChecked(subscription, interval)
+}
+
+func getVideos(subscription *database.Subscription) []database.Video {
+	// Download the subscription RSS
+	yt := &youtube{}
+	rss, err := yt.getSubscriptionRSS(subscription.ID)
+	if err != nil {
+		errorMessage := fmt.Sprintf(
+			"Failed to get RSS feed for %s (%s) : %s",
+			subscription.Name, subscription.ID, err.Error(),
+		)
+		logger.Log(errorMessage)
+		return nil
+	}
+
+	if contains404(rss) {
+		errorMessage := fmt.Sprintf(
+			"Channel %s (%s) has been deleted. Please remove channel...",
+			subscription.Name, subscription.ID,
+		)
+		logger.Log(errorMessage)
+		return nil
+	}
+
+	// Parse the RSS
+	feed := &Feed{}
+	err = feed.parse(rss)
+	if err != nil {
+		errorMessage := fmt.Sprintf(
+			"Failed to parse RSS feed for %s (%s) : %s",
+			subscription.Name, subscription.ID, err.Error(),
+		)
+		logger.Log(errorMessage)
+		return nil
+	}
+
+	// Get videos in the RSS
+	videos, err := feed.getVideos()
+	if err != nil {
+		errorMessage := fmt.Sprintf(
+			"Failed to get videos for %s (%s) : %s",
+			subscription.Name, subscription.ID, err.Error(),
+		)
+		logger.Log(errorMessage)
+		return nil
+	}
+
+	return videos
 }
 
 func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
