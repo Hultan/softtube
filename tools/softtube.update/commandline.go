@@ -11,17 +11,18 @@ func processCommandLineArgs() error {
 	args := os.Args[1:]
 
 	// Loop through the arguments
-	for i := 0; i < len(args); i++ {
-		switch args[i] {
-		// We have a request for version
+	for _, arg := range args {
+		switch arg {
 		case "--version":
-			fmt.Println("SoftTube Update Tool")
-			fmt.Println("--------------------")
-			fmt.Println("softtube.update ", applicationVersion)
+			// We have a request for version
+			_, _ = fmt.Fprintln(os.Stdout, "SoftTube Update Tool")
+			_, _ = fmt.Fprintln(os.Stdout, "--------------------")
+			_, _ = fmt.Fprintln(os.Stdout, "softtube.update ", applicationVersion)
+
 			os.Exit(0)
-		// Invalid command line arg
 		default:
-			return errors.New("invalid command line arg : " + args[i])
+			// Invalid command line arg
+			return errors.New("invalid command line arg : " + arg)
 		}
 	}
 
@@ -29,7 +30,7 @@ func processCommandLineArgs() error {
 }
 
 func invalidCommandLineArg(err error) {
-	fmt.Println(err)
-	fmt.Println("Usage : softtube.update [--version]")
+	_, _ = fmt.Fprintln(os.Stderr, err)
+	_, _ = fmt.Fprintln(os.Stdout, "Usage : softtube.update [--version]")
 	os.Exit(0)
 }

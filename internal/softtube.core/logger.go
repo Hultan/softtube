@@ -57,17 +57,6 @@ func (l *Logger) LogStart(application string) {
 	log.Println("")
 }
 
-// LogFinished : Write end of log message
-func (l *Logger) LogFinished(application string) {
-	msg := fmt.Sprintf("- %s finished -", application)
-
-	log.Println("")
-	log.Println(strings.Repeat("-", len(msg)))
-	log.Println(msg)
-	log.Println(strings.Repeat("-", len(msg)))
-	log.Println("")
-}
-
 // Log : Simple log function
 func (l *Logger) Log(text string) {
 	log.Println(text)

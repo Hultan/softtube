@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/xml"
-	"fmt"
+	"errors"
 	"strings"
 	"time"
 
@@ -24,37 +24,56 @@ type Entry struct {
 	Published string `xml:"published"`
 }
 
-func (f *Feed) parse(rss string) {
+func (f *Feed) parse(rss string) error {
+	if rss == "" {
+		return errors.New("rss cannot be empty")
+	}
 	bytes := []byte(rss)
-	_ = xml.Unmarshal(bytes, &f)
+	return xml.Unmarshal(bytes, &f)
 }
 
-func (f Feed) getVideos() []database.Video {
+func (f *Feed) getVideos() ([]database.Video, error) {
 	var videoList []database.Video
-	for i := 0; i < len(f.Entries); i++ {
+
+	channelId := f.getChannelId() // Set the channel ID
+	for _, entry := range f.Entries {
 		var video database.Video
-		video.ID = f.Entries[i].ID
-		channelId := f.ChannelID
-		if strings.Trim(channelId, " \n\t") == "" {
-			channelId = f.Entries[i].ChannelID
-		}
+		video.ID = entry.ID
 		video.SubscriptionID = channelId
-		video.Title = f.Entries[i].Title
-		publishedDate, err := time.Parse(constDateLayout, f.Entries[i].Published)
+		video.Title = entry.Title
+		date, err := f.getDate(entry.Published)
 		if err != nil {
-			// TODO : Handle errors
-			fmt.Println(err.Error())
+			return nil, err
 		}
-		video.Published = localTime(publishedDate)
+		video.Published = date
 		videoList = append(videoList, video)
 	}
-	return videoList
+
+	return videoList, nil
 }
 
-func localTime(datetime time.Time) time.Time {
+func (f *Feed) getDate(dateString string) (time.Time, error) {
+	// Parse the date string
+	publishedDate, err := time.Parse(constDateLayout, dateString)
+	if err != nil {
+		return time.Now(), err
+	}
 	loc, err := time.LoadLocation("Europe/Stockholm")
 	if err != nil {
-		panic(err)
+		return time.Now(), err
 	}
-	return datetime.In(loc)
+	return publishedDate.In(loc), nil
+}
+
+func (f *Feed) getChannelId() string {
+	channelId := f.ChannelID // Set the channel ID
+	for _, entry := range f.Entries {
+		// 221120 PH : YouTube have made a change, sometimes the
+		// channel ID does not exist in the feed, but it does
+		// exist in one of the entries.
+		if strings.Trim(channelId, " \n\t") == "" {
+			channelId = entry.ChannelID
+		}
+	}
+	return channelId
 }

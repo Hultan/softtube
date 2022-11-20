@@ -1,10 +1,9 @@
-//
 // youtube-dl (yt-dlp)
-//
 package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,21 +11,16 @@ import (
 	"path"
 	"strings"
 	"time"
-
-	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
 type youtube struct {
 }
 
 // Get the duration of a YouTube video
-func (y youtube) getDuration(videoID string, logger *core.Logger) error {
+func (y youtube) getDuration(videoID string) error {
 
 	for i := 0; i < 3; i++ {
 		duration, err := y.getDurationInternal(videoID)
-		if y.checkDuration(videoID, duration) {
-			return nil
-		}
 		if err != nil || duration == "" {
 			switch i {
 			case 0:
@@ -38,47 +32,56 @@ func (y youtube) getDuration(videoID string, logger *core.Logger) error {
 				time.Sleep(30 * time.Second)
 				continue
 			case 2:
-				logger.Log("DURATION OUTPUT (" + videoID + ") : ")
-				logger.Log(duration)
-				logger.Log("DURATION OUTPUT (end) ")
+				logger.Log("Duration failed (" + videoID + ")! : Output =  " + duration)
 				// Save duration in the database
-				y.updateDuration(videoID, "", logger)
+				y.updateDuration(videoID, "")
 				return err
 			}
 		}
 
 		// Success, save duration in the database
-		y.updateDuration(videoID, duration, logger)
+		y.updateDuration(videoID, duration)
 	}
 
 	return nil
 }
 
-func (y youtube) checkDuration(videoID, duration string) bool {
-	if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(duration, "ERROR: This live event") {
-		// Is it a live-streaming event?
-		// Save duration in the database
-		y.updateDuration(videoID, "LIVE", logger)
+func (y youtube) updateDuration(videoID, duration string) {
+	// Save duration in the database
+	err := db.Videos.UpdateDuration(videoID, strings.Trim(duration, " \n"))
+	if err != nil {
+		logger.Log("Failed to update duration (" + videoID + ") : " + err.Error())
+	}
+}
+
+func (y youtube) isLiveEvent(duration string) bool {
+	if duration == "0" {
+		return true
+	}
+	if strings.HasPrefix(duration, "ERROR: Premieres") {
+		return true
+	}
+	if strings.HasPrefix(duration, "ERROR: This live event") {
 		return true
 	}
 	return false
 }
 
-func (y youtube) updateDuration(videoID, duration string, logger *core.Logger) {
-	// Save duration in the database
-	err := db.Videos.UpdateDuration(videoID, strings.Trim(duration, " \n"))
-	if err != nil {
-		logger.Log("UPDATE DURATION ERROR (" + videoID + ") : ")
-		logger.Log(err.Error())
-		logger.Log("UPDATE DURATION ERROR (end) : ")
-	}
-}
-
 // Get the duration of a YouTube video
-func (y youtube) getDurationInternal(videoID string) (string, error) {
-	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoID)
+func (y youtube) getDurationInternal(videoId string) (string, error) {
+	if videoId == "" {
+		return "", errors.New("videoId cannot be null")
+	}
+
+	command := fmt.Sprintf(constVideoDurationCommand, y.getYoutubePath(), videoId)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
+	// We check if it is a live event before checking the
+	// error here, because checking duration of a live event
+	// DOES fail and returns an error.
+	if y.isLiveEvent(string(output)) {
+		return "LIVE", nil
+	}
 	if err != nil {
 		return string(output), err
 	}
@@ -86,24 +89,21 @@ func (y youtube) getDurationInternal(videoID string) (string, error) {
 }
 
 // Get the thumbnail of a YouTube video
-func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger) error {
-
+func (y youtube) getThumbnail(videoId string) error {
 	for i := 0; i < 3; i++ {
-		output, err := y.getThumbnailInternal(thumbnailPath, videoID)
+		output, err := y.getThumbnailInternal(videoId)
 		if err != nil {
 			switch i {
 			case 0:
-				logger.Log("Failed to download thumbnail (" + videoID + "), trying again in 5 seconds!")
+				logger.Log("Failed to download thumbnail (" + videoId + "), trying again in 5 seconds!")
 				time.Sleep(5 * time.Second)
 				continue
 			case 1:
-				logger.Log("Failed to download thumbnail (" + videoID + "), trying again in 30 seconds!")
+				logger.Log("Failed to download thumbnail (" + videoId + "), trying again in 30 seconds!")
 				time.Sleep(30 * time.Second)
 				continue
 			case 2:
-				logger.Log("THUMBNAIL OUTPUT (" + videoID + ") : ")
-				logger.Log(output)
-				logger.Log("THUMBNAIL OUTPUT (end) ")
+				logger.Log("Thumbnail failed! Output (" + videoId + ") : " + output)
 				return err
 			}
 		}
@@ -112,25 +112,33 @@ func (y youtube) getThumbnail(videoID, thumbnailPath string, logger *core.Logger
 }
 
 // Get the thumbnail of a YouTube video
-func (y youtube) getThumbnailInternal(thumbnailPath, videoID string) (string, error) {
-	// %s/%s.jpg
-	thumbPath := fmt.Sprintf(constThumbnailLocation, thumbnailPath, videoID)
+func (y youtube) getThumbnailInternal(videoId string) (string, error) {
+	if videoId == "" {
+		return "", errors.New("videoId cannot be null")
+	}
+
+	thumbPath := y.getThumbnailPath(videoId)
 
 	// Don't download thumbnail if it already exists
 	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-		command := fmt.Sprintf(constThumbnailCommand, y.getYoutubePath(), thumbPath, videoID)
+		command := fmt.Sprintf(constThumbnailCommand, y.getYoutubePath(), thumbPath, videoId)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			return string(output), err
 		}
 	}
+
 	return "", nil
 }
 
 // Get the subscription RSS to a string.
-func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
-	url := fmt.Sprintf(constSubscriptionRSSURL, channelID)
+func (y youtube) getSubscriptionRSS(channelId string) (string, error) {
+	if channelId == "" {
+		return "", errors.New("channelId cannot be null")
+	}
+
+	url := y.getRSSFeedURL(channelId)
 	// Get the xml from the URL
 	response, err := http.Get(url)
 	if err != nil {
@@ -145,6 +153,7 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 	}
 	xml := buf.String()
 
+	// Close the response object
 	err = response.Body.Close()
 	if err != nil {
 		logger.LogError(err)
@@ -155,4 +164,12 @@ func (y youtube) getSubscriptionRSS(channelID string) (string, error) {
 
 func (y youtube) getYoutubePath() string {
 	return path.Join(config.ServerPaths.YoutubeDL, "yt-dlp")
+}
+
+func (y youtube) getRSSFeedURL(channelId string) string {
+	return fmt.Sprintf(constSubscriptionRSSURL, channelId)
+}
+
+func (y youtube) getThumbnailPath(videoId string) string {
+	return fmt.Sprintf(constThumbnailLocation, config.ServerPaths.Thumbnails, videoId)
 }

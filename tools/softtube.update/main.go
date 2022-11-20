@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/hultan/softteam/framework"
@@ -44,7 +45,6 @@ func main() {
 
 	// Start updating the softtube database
 	logger.LogStart("softtube update")
-	defer logger.LogFinished("softtube update")
 
 	conn := config.Connection
 	fw := framework.NewFramework()
@@ -118,92 +118,96 @@ func main() {
 	// updateSubscription(&subs[21])
 }
 
-func updateSubscription(subscription *database.Subscription) {
-	logger.LogFormat("Updating channel '", subscription.Name, "'.")
-
+func getVideos(subscription *database.Subscription) []database.Video {
 	// Download the subscription RSS
-	youtube := new(youtube)
-	rss, err := youtube.getSubscriptionRSS(subscription.ID)
+	yt := &youtube{}
+	rss, err := yt.getSubscriptionRSS(subscription.ID)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Error updating %s : %s", subscription.ID, err.Error())
+		errorMessage := fmt.Sprintf(
+			"Failed to get RSS feed for %s (%s) : %s",
+			subscription.Name, subscription.ID, err.Error(),
+		)
 		logger.Log(errorMessage)
+		return nil
+	}
+
+	if contains404(rss) {
+		errorMessage := fmt.Sprintf(
+			"Channel %s (%s) has been deleted. Please remove channel...",
+			subscription.Name, subscription.ID,
+		)
+		logger.Log(errorMessage)
+		return nil
 	}
 
 	// Parse the RSS
-	feed := new(Feed)
-	feed.parse(rss)
+	feed := &Feed{}
+	err = feed.parse(rss)
+	if err != nil {
+		errorMessage := fmt.Sprintf(
+			"Failed to parse RSS feed for %s (%s) : %s",
+			subscription.Name, subscription.ID, err.Error(),
+		)
+		logger.Log(errorMessage)
+		return nil
+	}
 
 	// Get videos in the RSS
-	videos := feed.getVideos()
+	videos, err := feed.getVideos()
+	if err != nil {
+		errorMessage := fmt.Sprintf(
+			"Failed to get videos for %s (%s) : %s",
+			subscription.Name, subscription.ID, err.Error(),
+		)
+		logger.Log(errorMessage)
+		return nil
+	}
+
+	return videos
+}
+
+func updateSubscription(subscription *database.Subscription) {
+	logger.LogFormat("Updating channel '", subscription.Name, "'.")
+
+	// Get videos in the RSS
+	videos := getVideos(subscription)
+	if videos == nil {
+		// We failed to get the videos, it is already logged
+		// in getVideos(), so just return
+		return
+	}
 
 	// Create the waitgroup to synchronize the goroutines below
 	var waitGroup sync.WaitGroup
 
-	for i := 0; i < len(videos); i++ {
-		video := videos[i]
-
+	for _, video := range videos {
 		// Check if the video already exists in the database
 		exists, err := db.Videos.Exists(video.ID)
 		if err != nil {
-			fmt.Println(err.Error())
+			errorMessage := fmt.Sprintf(
+				"Failed to check if video exists for %s (%s) : %s",
+				subscription.Name, subscription.ID, err.Error(),
+			)
+			logger.Log(errorMessage)
+			continue
 		}
 
 		if exists {
 			continue
 		}
 
-		message := fmt.Sprintf(
-			"New video for channel '%s' (%s): '%s'",
-			subscription.Name, video.SubscriptionID, video.Title,
-		)
-		logger.Log(message)
-
-		video.Title = clean(video.Title)
-
-		// Insert the video in the database
-		// This must be executed before getDuration()
-		err = db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
+		err = handleNewVideo(video, &waitGroup)
 		if err != nil {
-			message = fmt.Sprintf(
-				"Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error(),
+			errorMessage := fmt.Sprintf(
+				"Failed to handle new video for %s (%s) : %s",
+				subscription.Name, subscription.ID, err.Error(),
 			)
-			logger.Log(message)
-			return
+			logger.Log(errorMessage)
+			continue
 		}
-		message = fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
-		logger.Log(message)
-
-		waitGroup.Add(2)
-
-		go func() {
-			// Get duration
-			defer waitGroup.Done()
-			err := youtube.getDuration(video.ID, logger)
-			if err != nil {
-				message = fmt.Sprintf(
-					"Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error(),
-				)
-				logger.Log(message)
-				return
-			}
-			message = fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
-			logger.Log(message)
-		}()
-		go func() {
-			// Get thumbnail
-			defer waitGroup.Done()
-			err := youtube.getThumbnail(video.ID, config.ServerPaths.Thumbnails, logger)
-			if err != nil {
-				message = fmt.Sprintf(
-					"Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error(),
-				)
-				logger.Log(message)
-				return
-			}
-			message = fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
-			logger.Log(message)
-		}()
 	}
+
+	waitGroup.Wait()
 
 	// Mark subscription as updated
 	interval, err := getInterval(subscription.Frequency)
@@ -211,8 +215,63 @@ func updateSubscription(subscription *database.Subscription) {
 		logger.LogError(err)
 	}
 	_ = db.Subscriptions.UpdateLastChecked(subscription, interval)
+}
 
-	waitGroup.Wait()
+func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
+	// Clean video title from invalid character
+	// TODO : Remove this?
+	video.Title = clean(video.Title)
+
+	// Insert the video in the database
+	// This must be executed before getDuration()
+	err := db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
+	if err != nil {
+		msg := fmt.Sprintf(
+			"Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error(),
+		)
+		logger.Log(msg)
+		return err
+	} else {
+		msg := fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
+		logger.Log(msg)
+	}
+
+	waitGroup.Add(2)
+
+	go func() {
+		// Get duration
+		defer waitGroup.Done()
+		yt := &youtube{}
+		err = yt.getDuration(video.ID)
+		if err != nil {
+			msg := fmt.Sprintf(
+				"Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error(),
+			)
+			logger.Log(msg)
+			return
+		} else {
+			msg := fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
+			logger.Log(msg)
+		}
+	}()
+	go func() {
+		// Get thumbnail
+		defer waitGroup.Done()
+		yt := &youtube{}
+		err = yt.getThumbnail(video.ID)
+		if err != nil {
+			msg := fmt.Sprintf(
+				"Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error(),
+			)
+			logger.Log(msg)
+			return
+		} else {
+			msg := fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
+			logger.Log(msg)
+		}
+	}()
+
+	return nil
 }
 
 func clean(title string) string {
@@ -231,4 +290,8 @@ func getInterval(frequency int) (int, error) {
 		return config.Intervals.Low, nil
 	}
 	return 0, errors.New("invalid frequency")
+}
+
+func contains404(rss string) bool {
+	return strings.Contains(rss, "Error 404 (Not Found)")
 }
