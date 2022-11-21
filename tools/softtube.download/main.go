@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	logger *core.Logger
+	fw     *framework.Framework
+	logger *framework.Logger
 	config *core.Config
 	db     *database.Database
 )
@@ -24,41 +25,52 @@ func main() {
 	config = new(core.Config)
 	err := config.Load("main")
 	if err != nil {
-		fmt.Println("ERROR (Open config) : ", err.Error())
+		fmt.Println("Failed to open config file!")
+		fmt.Println(err)
 		os.Exit(errorOpenConfig)
 	}
 
 	// Setup logging
-	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Download))
+	fw = framework.NewFramework()
+	logger, err = fw.Log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Download))
+	if err != nil {
+		fmt.Println("Failed to open log file!")
+		fmt.Println(err)
+		os.Exit(errorOpenLogFile)
+	}
 	defer logger.Close()
 
 	// Start updating the softtube database
-	logger.LogStart("softtube download")
-	defer logger.LogFinished("softtube download")
+	logger.Info.Println()
+	logger.Info.Println("-----------------")
+	logger.Info.Println("softtube.download")
+	logger.Info.Println("-----------------")
+	logger.Info.Println()
 
 	// Decrypt the MySQL password
 	conn := config.Connection
 	fw := framework.NewFramework()
 	password, err := fw.Crypto.Decrypt(conn.Password)
 	if err != nil {
-		logger.Log("Failed to decrypt MySQL password!")
-		logger.LogError(err)
-		panic(err)
+		logger.Error.Println("Failed to decrypt MySQL password!")
+		logger.Error.Println(err)
+		os.Exit(errorDecryptPassword)
 	}
 
 	// Create the database object, and get all subscriptions
 	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.Open()
 	if err != nil {
-		logger.Log("ERROR (Open database)")
-		logger.LogError(err)
+		logger.Error.Println("Failed to open database!")
+		logger.Error.Println(err)
 		os.Exit(errorOpenDatabase)
 	}
 	defer db.Close()
 	downloads, err := db.Download.GetAll()
 	if err != nil {
-		logger.Log(err.Error())
-		panic(err)
+		logger.Error.Println("Failed to get all downloads!")
+		logger.Error.Println(err)
+		os.Exit(errorDownload)
 	}
 
 	var waitGroup sync.WaitGroup
@@ -75,8 +87,8 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// Set video status as downloading
 	err := db.Videos.UpdateStatus(videoID, constStatusDownloading)
 	if err != nil {
-		logger.Log("Failed to set video status to downloading before download!")
-		logger.LogError(err)
+		logger.Error.Println("Failed to set video status to downloading before download!")
+		logger.Error.Println(err)
 		wait.Done()
 		return
 	}
@@ -87,24 +99,27 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// crashes)
 	err = db.Download.Delete(videoID)
 	if err != nil {
-		logger.Log("Failed to delete video from table download after download!")
-		logger.LogError(err)
+		logger.Error.Println("Failed to delete video from table download after download!")
+		logger.Error.Println(err)
 		wait.Done()
 		return
 	}
 
 	// Download the video
-	command := fmt.Sprintf("%s -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
+	command := fmt.Sprintf(
+		"%s -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'",
+		getYoutubePath(), config.ServerPaths.Videos, videoID,
+	)
 	// command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	// Wait for the command to be executed (video to be downloaded)
 	err = cmd.Run()
 	if err != nil {
-		logger.Log("Failed to download video!")
+		logger.Error.Println("Failed to download video!")
 		msg := fmt.Sprintf("Command : %s", command)
-		logger.Log(msg)
-		logger.LogError(err)
+		logger.Error.Println(msg)
+		logger.Error.Println(err)
 		wait.Done()
 		return
 	}
@@ -112,8 +127,8 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// Set video status as downloaded
 	err = db.Videos.UpdateStatus(videoID, constStatusDownloaded)
 	if err != nil {
-		logger.Log("Failed to set video status to downloaded after download!")
-		logger.LogError(err)
+		logger.Error.Println("Failed to set video status to downloaded after download!")
+		logger.Error.Println(err)
 		wait.Done()
 		return
 	}

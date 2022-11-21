@@ -8,6 +8,9 @@ const constStatusDownloading database.VideoStatusType = 1
 const constStatusDownloaded database.VideoStatusType = 2
 
 const (
-	errorOpenConfig   = 1
-	errorOpenDatabase = 2
+	errorOpenConfig      = 1
+	errorOpenDatabase    = 2
+	errorOpenLogFile     = 3
+	errorDecryptPassword = 4
+	errorDownload        = 5
 )
