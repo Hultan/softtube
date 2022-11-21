@@ -24,15 +24,16 @@ func (y youtube) getDuration(videoID string) error {
 		if err != nil || duration == "" {
 			switch i {
 			case 0:
-				logger.Log("Failed to get duration (" + videoID + "), trying again in 5 seconds!")
+				logger.Warning.Printf("Failed to get duration (%s), trying again in 5 seconds!\n", videoID)
 				time.Sleep(5 * time.Second)
 				continue
 			case 1:
-				logger.Log("Failed to get duration (" + videoID + "), trying again in 30 seconds!")
+				logger.Warning.Printf("Failed to get duration (%s), trying again in 30 seconds!\n", videoID)
 				time.Sleep(30 * time.Second)
 				continue
 			case 2:
-				logger.Log("Duration failed (" + videoID + ")! : Output =  " + duration)
+				logger.Warning.Printf("getDuration() failed (%s)!\n", videoID)
+				logger.Warning.Printf("Output = %s.\n", duration)
 				// Save duration in the database
 				y.updateDuration(videoID, "")
 				return err
@@ -50,7 +51,8 @@ func (y youtube) updateDuration(videoID, duration string) {
 	// Save duration in the database
 	err := db.Videos.UpdateDuration(videoID, strings.Trim(duration, " \n"))
 	if err != nil {
-		logger.Log("Failed to update duration (" + videoID + ") : " + err.Error())
+		logger.Error.Printf("Failed to update duration (%s)!\n", videoID)
+		logger.Error.Println(err)
 	}
 }
 
@@ -95,15 +97,16 @@ func (y youtube) getThumbnail(videoId string) error {
 		if err != nil {
 			switch i {
 			case 0:
-				logger.Log("Failed to download thumbnail (" + videoId + "), trying again in 5 seconds!")
+				logger.Warning.Printf("Failed to download thumbnail (%s), trying again in 5 seconds!\n", videoId)
 				time.Sleep(5 * time.Second)
 				continue
 			case 1:
-				logger.Log("Failed to download thumbnail (" + videoId + "), trying again in 30 seconds!")
+				logger.Warning.Printf("Failed to download thumbnail (%s), trying again in 30 seconds!\n", videoId)
 				time.Sleep(30 * time.Second)
 				continue
 			case 2:
-				logger.Log("Thumbnail failed! Output (" + videoId + ") : " + output)
+				logger.Warning.Printf("getThumbnail() failed (%s)!\n", videoId)
+				logger.Warning.Printf("Output = %s.\n", output)
 				return err
 			}
 		}
@@ -142,6 +145,8 @@ func (y youtube) getSubscriptionRSS(channelId string) (string, error) {
 	// Get the xml from the URL
 	response, err := http.Get(url)
 	if err != nil {
+		logger.Error.Printf("Failed get url = '%s'!\n", url)
+		logger.Error.Println(err)
 		return "", err
 	}
 
@@ -149,14 +154,18 @@ func (y youtube) getSubscriptionRSS(channelId string) (string, error) {
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(response.Body)
 	if err != nil {
-		logger.LogError(err)
+		logger.Error.Println("Failed to read from response!")
+		logger.Error.Println(err)
+		return "", err
 	}
 	xml := buf.String()
 
 	// Close the response object
 	err = response.Body.Close()
 	if err != nil {
-		logger.LogError(err)
+		logger.Error.Println("Failed to close response!")
+		logger.Error.Println(err)
+		return "", err
 	}
 
 	return xml, nil
