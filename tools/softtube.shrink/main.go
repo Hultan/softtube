@@ -72,6 +72,8 @@ func main() {
 			logger.Info.Println("Successfully shrunk file : ", fullPath)
 		}
 	}
+
+	logger.Close()
 }
 
 func shrinkFile(fullPath string) error {
