@@ -31,6 +31,7 @@ func main() {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to open log file : ", err)
 		os.Exit(1)
 	}
+	defer logger.Close()
 
 	logger.Info.Println("")
 	logger.Info.Println("----------------------")
@@ -72,8 +73,6 @@ func main() {
 			logger.Info.Println("Successfully shrunk file : ", fullPath)
 		}
 	}
-
-	logger.Close()
 }
 
 func shrinkFile(fullPath string) error {

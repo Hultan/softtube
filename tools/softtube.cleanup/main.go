@@ -2,57 +2,110 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"time"
 
+	"github.com/hultan/softteam/framework"
+	core "github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
 var (
-	cutOff = time.Now().AddDate(0, 0, -30)
+	fw              *framework.Framework
+	logger          *framework.Logger
+	config          *core.Config
+	backupCutOff    = time.Now().AddDate(0, 0, -10)
+	thumbnailCutOff = time.Now().AddDate(0, 0, -14)
 	// config *core.Config
 	db *database.Database
 )
 
-func main() {
-	// // Init config file
-	// config = new(core.Config)
-	// err := config.Init("main")
-	// if err!=nil {
-	//	fmt.Println(err.Error())
-	//	os.Exit(1)
-	// }
-	//
-	// // Decrypt the MySQL password
-	// conn := config.Connection
-	// fw := framework.NewFramwork()
-	// password, err := fw.Crypto.Decrypt(conn.Password)
-	// if err != nil {
-	//	panic(err)
-	// }
-	//
-	// // Create the database object, and get all subscriptions
-	// db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
-	// err = db.OpenDatabase()
-	// if err!=nil {
-	//	fmt.Println(err.Error())
-	//	os.Exit(1)
-	// }
-	//
-	// defer db.Close()
+const (
+	errorOpenConfig      = 1
+	errorOpenLog         = 2
+	errorCleanBackup     = 3
+	errorCleanThumbnails = 4
+	errorDecryptPassword = 5
+	errorOpenDatabase    = 6
+)
 
-	cleanBackups()
-	cleanThumbnails(db)
+func main() {
+	fw = framework.NewFramework()
+
+	// Init config file
+	config = new(core.Config)
+	err := config.Load("main")
+	if err != nil {
+		fmt.Println("Failed to open config file!")
+		fmt.Println(err)
+		os.Exit(errorOpenConfig)
+	}
+
+	// Open log file
+	logger, err = fw.Log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Cleanup))
+	if err != nil {
+		fmt.Println("Failed to open log file!")
+		fmt.Println(err)
+		os.Exit(errorOpenLog)
+	}
+	defer logger.Close()
+
+	// Start updating the softtube database
+	logger.Info.Println()
+	logger.Info.Println("----------------")
+	logger.Info.Println("softtube.cleanup")
+	logger.Info.Println("----------------")
+	logger.Info.Println()
+
+	// Decrypt the MySQL password
+	conn := config.Connection
+	password, err := fw.Crypto.Decrypt(conn.Password)
+	if err != nil {
+		logger.Error.Println("Failed to decrypt MySQL password!")
+		logger.Error.Println(err)
+		os.Exit(errorDecryptPassword)
+	}
+
+	// Create the database object, and get all subscriptions
+	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
+	err = db.Open()
+	if err != nil {
+		logger.Error.Println("Failed to open database!")
+		logger.Error.Println(err)
+		os.Exit(errorOpenDatabase)
+	}
+
+	defer db.Close()
+
+	logger.Info.Println("Removing backups:")
+	logger.Info.Println()
+
+	err = cleanBackups()
+	if err != nil {
+		logger.Error.Println("Failed to cleanup backups!")
+		logger.Error.Println(err)
+		os.Exit(errorCleanBackup)
+	}
+
+	logger.Info.Println()
+	logger.Info.Println("Removing thumbnails:")
+	logger.Info.Println()
+
+	err = cleanThumbnails(db)
+	if err != nil {
+		logger.Error.Println("Failed to cleanup thumbnails!")
+		logger.Error.Println(err)
+		os.Exit(errorCleanThumbnails)
+	}
 }
 
-func cleanBackups() {
+func cleanBackups() error {
 	root := "/softtube/backup"
-	files, err := ioutil.ReadDir(root)
+	files, err := os.ReadDir(root)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, file := range files {
@@ -60,23 +113,27 @@ func cleanBackups() {
 		info, err := os.Stat(fileName)
 		if err != nil {
 			// Ignore file
+			logger.Warning.Printf("Failed to stat file '%s'\n", fileName)
+			logger.Warning.Println(err)
 			continue
 		}
 		if !info.IsDir() {
 			modTime := info.ModTime()
-			if modTime.Before(cutOff) {
-				fmt.Println("Removing old backup:", fileName)
+			if modTime.Before(backupCutOff) {
+				logger.Info.Printf("Removing old backup: '%s'\n", fileName)
 				_ = os.Remove(fileName)
 			}
 		}
 	}
+
+	return nil
 }
 
-func cleanThumbnails(db *database.Database) {
+func cleanThumbnails(db *database.Database) error {
 	root := "/softtube/thumbnails"
-	files, err := ioutil.ReadDir(root)
+	files, err := os.ReadDir(root)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, file := range files {
@@ -85,25 +142,31 @@ func cleanThumbnails(db *database.Database) {
 		info, err := os.Stat(fileName)
 		if err != nil {
 			// Ignore file
+			logger.Warning.Printf("Failed to stat file '%s'\n", fileName)
+			logger.Warning.Println(err)
 			continue
 		}
 		if !info.IsDir() {
 			modTime := info.ModTime()
-			if modTime.Before(cutOff) {
+			if modTime.Before(thumbnailCutOff) {
 				videoId := FilenameWithoutExtension(file.Name())
-				if !videoIsDownloadedAndNotWatched(db, videoId) {
+				if canDeleteThumbnail(db, videoId) {
+					logger.Info.Printf("Removing old thumbnail: '%s'\n", fileName)
 					_ = os.Remove(fileName)
 				}
 			}
 		}
 	}
+
+	return nil
 }
 
 func FilenameWithoutExtension(fn string) string {
 	return strings.TrimSuffix(fn, path.Ext(fn))
 }
 
-func videoIsDownloadedAndNotWatched(db *database.Database, videoId string) bool {
+func canDeleteThumbnail(db *database.Database, videoId string) bool {
 	status, _ := db.Videos.GetStatus(videoId)
-	return status == 2
+	// Delete thumbnails for not downloaded videos and deleted videos
+	return status == 0 || status == 4
 }

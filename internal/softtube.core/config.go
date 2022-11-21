@@ -35,6 +35,8 @@ type Config struct {
 		Update   string `json:"update"`
 		Download string `json:"download"`
 		SoftTube string `json:"softtube"`
+		Cleanup  string `json:"cleanup"`
+		Shrink   string `json:"shrink"`
 	} `json:"logs"`
 	Intervals struct {
 		High   int `json:"high"`
@@ -84,7 +86,6 @@ func (config *Config) Save(mode string) {
 		return
 	}
 
-
 	// Create JSON from config object
 	data, err := json.MarshalIndent(config, "", "\t")
 
@@ -95,7 +96,7 @@ func (config *Config) Save(mode string) {
 	}
 
 	// Write the data
-	_,_ = configFile.Write(data)
+	_, _ = configFile.Write(data)
 
 	_ = configFile.Close()
 }
