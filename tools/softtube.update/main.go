@@ -19,7 +19,8 @@ const applicationVersion string = "1.00"
 const maxUpdates = 50
 
 var (
-	logger *core.Logger
+	fw     *framework.Framework
+	logger *framework.Logger
 	config *core.Config
 	db     *database.Database
 )
@@ -40,39 +41,45 @@ func main() {
 	}
 
 	// Setup logging
-	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.Update))
+	fw = framework.NewFramework()
+	logger, err = fw.Log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Update))
 	defer logger.Close()
 
-	// Start updating the softtube database
-	logger.LogStart("softtube update")
+	logger.Info.Println("")
+	logger.Info.Println("---------------")
+	logger.Info.Println("softtube.update")
+	logger.Info.Println("---------------")
+	logger.Info.Println("")
 
+	// Start updating the softtube database
 	conn := config.Connection
-	fw := framework.NewFramework()
 	password, err := fw.Crypto.Decrypt(conn.Password)
 	if err != nil {
-		logger.Log("Failed to decrypt MySQL password!")
-		logger.LogError(err)
-		panic(err)
+		logger.Error.Println("Failed to decrypt MySQL password!")
+		logger.Error.Println(err)
+		os.Exit(1)
 	}
 
 	// Create the database object, and get all subscriptions
 	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.Open()
 	if err != nil {
-		fmt.Println("ERROR (Open config) : ", err.Error())
+		logger.Error.Println("Open database failed!")
+		logger.Error.Println(err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	// Get subscriptions
+	subs, err := db.Subscriptions.GetAll()
+	if err != nil {
+		logger.Error.Println("Get all subscriptions failed!")
+		logger.Error.Println(err)
 		os.Exit(1)
 	}
 
-	defer db.Close()
-	subs, err := db.Subscriptions.GetAll()
-
-	// Handle errors
-	if err != nil {
-		logger.Log(err.Error())
-	}
-
 	// Log result
-	logger.LogFormat("Loaded ", len(subs), " subscriptions.")
+	logger.Info.Printf("Loaded %d subscriptions.\n", len(subs))
 
 	// Check how many subscriptions that needs update
 	subsThatNeedsUpdate := 0
@@ -88,7 +95,7 @@ func main() {
 		subsThatNeedsUpdate = maxUpdates
 	}
 
-	logger.LogFormat("softtube-update needs to update ", subsThatNeedsUpdate, " (of ", len(subs), " subscriptions).")
+	logger.Info.Printf("softtube-update needs to update %d (of %d subscriptions).\n", subsThatNeedsUpdate, len(subs))
 
 	// Create a waitgroup to sync the goroutines
 	var waitGroup sync.WaitGroup
@@ -101,10 +108,11 @@ func main() {
 
 		if sub.NeedsUpdate() {
 			if count > maxUpdates {
-				logger.Log("Max number of updates reached!")
+				logger.Warning.Println("Max number of updates reached!")
 				break
 			}
 			count++
+
 			// Start goroutine to update subscription
 			go func() {
 				defer waitGroup.Done()
@@ -117,7 +125,7 @@ func main() {
 }
 
 func updateSubscription(subscription *database.Subscription) {
-	logger.LogFormat("Updating channel '", subscription.Name, "'.")
+	logger.Info.Printf("Updating channel '%d'.\n", subscription.Name)
 
 	// Get videos in the RSS
 	videos := getVideos(subscription)
@@ -138,7 +146,7 @@ func updateSubscription(subscription *database.Subscription) {
 				"Failed to check if video exists for %s (%s) : %s",
 				subscription.Name, subscription.ID, err.Error(),
 			)
-			logger.Log(errorMessage)
+			logger.Error.Println(errorMessage)
 			continue
 		}
 
@@ -152,7 +160,7 @@ func updateSubscription(subscription *database.Subscription) {
 				"Failed to handle new video for %s (%s) : %s",
 				subscription.Name, subscription.ID, err.Error(),
 			)
-			logger.Log(errorMessage)
+			logger.Error.Println(errorMessage)
 			continue
 		}
 	}
@@ -162,7 +170,7 @@ func updateSubscription(subscription *database.Subscription) {
 	// Mark subscription as updated
 	interval, err := getInterval(subscription.Frequency)
 	if err != nil {
-		logger.LogError(err)
+		logger.Error.Println(err)
 	}
 	_ = db.Subscriptions.UpdateLastChecked(subscription, interval)
 }
@@ -176,7 +184,7 @@ func getVideos(subscription *database.Subscription) []database.Video {
 			"Failed to get RSS feed for %s (%s) : %s",
 			subscription.Name, subscription.ID, err.Error(),
 		)
-		logger.Log(errorMessage)
+		logger.Error.Println(errorMessage)
 		return nil
 	}
 
@@ -185,7 +193,7 @@ func getVideos(subscription *database.Subscription) []database.Video {
 			"Channel %s (%s) has been deleted. Please remove channel...",
 			subscription.Name, subscription.ID,
 		)
-		logger.Log(errorMessage)
+		logger.Error.Println(errorMessage)
 		return nil
 	}
 
@@ -197,7 +205,7 @@ func getVideos(subscription *database.Subscription) []database.Video {
 			"Failed to parse RSS feed for %s (%s) : %s",
 			subscription.Name, subscription.ID, err.Error(),
 		)
-		logger.Log(errorMessage)
+		logger.Error.Println(errorMessage)
 		return nil
 	}
 
@@ -208,7 +216,7 @@ func getVideos(subscription *database.Subscription) []database.Video {
 			"Failed to get videos for %s (%s) : %s",
 			subscription.Name, subscription.ID, err.Error(),
 		)
-		logger.Log(errorMessage)
+		logger.Error.Println(errorMessage)
 		return nil
 	}
 
@@ -227,11 +235,11 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 		msg := fmt.Sprintf(
 			"Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error(),
 		)
-		logger.Log(msg)
+		logger.Error.Println(msg)
 		return err
 	} else {
 		msg := fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
-		logger.Log(msg)
+		logger.Info.Println(msg)
 	}
 
 	waitGroup.Add(2)
@@ -245,13 +253,14 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 			msg := fmt.Sprintf(
 				"Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error(),
 			)
-			logger.Log(msg)
+			logger.Error.Println(msg)
 			return
 		} else {
 			msg := fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
-			logger.Log(msg)
+			logger.Info.Println(msg)
 		}
 	}()
+
 	go func() {
 		// Get thumbnail
 		defer waitGroup.Done()
@@ -261,11 +270,11 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 			msg := fmt.Sprintf(
 				"Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error(),
 			)
-			logger.Log(msg)
+			logger.Error.Println(msg)
 			return
 		} else {
 			msg := fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
-			logger.Log(msg)
+			logger.Info.Println(msg)
 		}
 	}()
 
