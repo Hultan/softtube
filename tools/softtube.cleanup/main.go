@@ -18,8 +18,7 @@ var (
 	config          *core.Config
 	backupCutOff    = time.Now().AddDate(0, 0, -10)
 	thumbnailCutOff = time.Now().AddDate(0, 0, -14)
-	// config *core.Config
-	db *database.Database
+	db              *database.Database
 )
 
 const (
@@ -32,10 +31,8 @@ const (
 )
 
 func main() {
-	fw = framework.NewFramework()
-
 	// Init config file
-	config = new(core.Config)
+	config = &core.Config{}
 	err := config.Load("main")
 	if err != nil {
 		fmt.Println("Failed to open config file!")
@@ -44,6 +41,7 @@ func main() {
 	}
 
 	// Open log file
+	fw = framework.NewFramework()
 	logger, err = fw.Log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Cleanup))
 	if err != nil {
 		fmt.Println("Failed to open log file!")
