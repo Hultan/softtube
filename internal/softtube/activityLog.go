@@ -1,8 +1,6 @@
 package softtube
 
 import (
-	"errors"
-
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -110,40 +108,20 @@ func (a *activityLog) setupColumns() {
 }
 
 func (a *activityLog) loadResources() {
-	for i := int(constLogDownload); i <= int(constLogError); i++ {
-		fileName := a.getImageFileName(i)
-		fw := framework.NewFramework()
-		if fileName != "" {
-			path := fw.Resource.GetResourcePath(fileName)
-			if path == "" {
-				a.parent.Logger.LogError(errors.New("resource path not found"))
-			}
-			pic, err := gdk.PixbufNewFromFile(path)
-			if err != nil {
-				a.parent.Logger.LogError(err)
-			}
-			a.imageBuffer[i] = pic
-		}
-	}
+	a.imageBuffer[0] = a.createPixbuf(downloadIcon)
+	a.imageBuffer[1] = a.createPixbuf(playIcon)
+	a.imageBuffer[2] = a.createPixbuf(deleteIcon)
+	a.imageBuffer[3] = a.createPixbuf(setWatchedIcon)
+	a.imageBuffer[4] = a.createPixbuf(setUnwatchedIcon)
+	a.imageBuffer[5] = a.createPixbuf(errorIcon)
 }
 
-func (a *activityLog) getImageFileName(index int) string {
-	switch index {
-	case 0:
-		return "download.png"
-	case 1:
-		return "play.png"
-	case 2:
-		return "delete.png"
-	case 3:
-		return "set_watched.png"
-	case 4:
-		return "set_unwatched.png"
-	case 5:
-		return "error.png"
-	default:
-		return ""
+func (a *activityLog) createPixbuf(bytes []byte) *gdk.Pixbuf {
+	pic, err := gdk.PixbufNewFromBytesOnly(bytes)
+	if err != nil {
+		a.parent.Logger.LogError(err)
 	}
+	return pic
 }
 
 func (a *activityLog) getColor(logType database.LogType) string {
