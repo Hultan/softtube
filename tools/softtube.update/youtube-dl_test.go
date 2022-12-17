@@ -44,7 +44,8 @@ func Test_youtube_getDurationInternal(t *testing.T) {
 	}{
 		{"empty", args{""}, "", true},
 		{"invalid", args{"xxxxxxxxxxx"}, testFailedDuration, true},
-		{"karen puzzles", args{testVideoId}, "10:02\n", false},
+		{"karen puzzles", args{testVideoId}, "10:02", false},
+		{"python warning", args{"F7AEii-r4R8"}, "26:24", false},
 	}
 	for _, tt := range tests {
 		t.Run(

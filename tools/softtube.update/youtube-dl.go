@@ -87,7 +87,12 @@ func (y youtube) getDurationInternal(videoId string) (string, error) {
 	if err != nil {
 		return string(output), err
 	}
-	return string(output), nil
+	return y.getLastRow(string(output)), nil
+}
+
+func (y youtube) getLastRow(text string) string {
+	rows := strings.Split(text, "\n")
+	return rows[len(rows)-2]
 }
 
 // Get the thumbnail of a YouTube video

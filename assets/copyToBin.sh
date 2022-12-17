@@ -14,5 +14,7 @@ softtubeFolder="/softtube/bin"
 
 cp -rf $codeFolder/$program/build/* $binFolder/$program
 cp -rf $codeFolder/$program/build/* $softtubeFolder/$program
-cp -rf $codeFolder/$program/assets $binFolder/$program
-cp -rf $codeFolder/$program/assets $softtubeFolder/$program
+
+# No longer needed after version 2.6.9
+# cp -rf $codeFolder/$program/assets $binFolder/$program
+# cp -rf $codeFolder/$program/assets $softtubeFolder/$program

@@ -125,7 +125,7 @@ func main() {
 }
 
 func updateSubscription(subscription *database.Subscription) {
-	logger.Info.Printf("Updating channel '%d'.\n", subscription.Name)
+	logger.Info.Printf("Updating channel '%s'.\n", subscription.Name)
 
 	// Get videos in the RSS
 	videos := getVideos(subscription)
