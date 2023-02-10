@@ -91,8 +91,21 @@ func (y youtube) getDurationInternal(videoId string) (string, error) {
 }
 
 func (y youtube) getLastRow(text string) string {
+	var nonEmptyRows []string
+
 	rows := strings.Split(text, "\n")
-	return rows[len(rows)-2]
+	for _, row := range rows {
+		row = strings.Trim(row, " \t\n")
+		if row != "" {
+			nonEmptyRows = append(nonEmptyRows, row)
+		}
+	}
+
+	if len(nonEmptyRows) == 0 {
+		return ""
+	}
+
+	return nonEmptyRows[len(nonEmptyRows)-1]
 }
 
 // Get the thumbnail of a YouTube video

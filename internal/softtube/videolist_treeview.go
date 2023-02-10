@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/gotk3/gotk3/pango"
 )
 
 // treeViewHelper : A helper class for a gtk treeViewHelper
@@ -35,12 +36,18 @@ func (t *treeViewHelper) setupColumns() {
 }
 
 // createTextColumn : Add a column to the tree view (during the initialization of the tree view)
-func (t *treeViewHelper) createTextColumn(title string, id listStoreColumnType, width int, weight int) *gtk.TreeViewColumn {
+func (t *treeViewHelper) createTextColumn(
+	title string, id listStoreColumnType, width, weight int,
+) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererTextNew()
 	if err != nil {
 		log.Fatal("Unable to create text cell renderer:", err)
 	}
+
+	// Font weight and size
 	_ = cellRenderer.SetProperty("weight", weight)
+	_ = cellRenderer.SetProperty("size", 12500)
+	_ = cellRenderer.SetProperty("ellipsize", pango.ELLIPSIZE_END)
 
 	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", int(id))
 	if err != nil {
