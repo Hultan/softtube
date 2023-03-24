@@ -3,7 +3,7 @@ package softtube
 import (
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 )
 
 // menuBar : The SoftTube menu bar
@@ -19,7 +19,7 @@ type menuBar struct {
 }
 
 // Init initiates the menu bar
-func (m *menuBar) Init(builder *framework.GtkBuilder) error {
+func (m *menuBar) Init(builder *builder.Builder) error {
 	m.menuFileQuit = builder.GetObject("menu_file_quit").(*gtk.MenuItem)
 	m.menuHelpAbout = builder.GetObject("menu_help_about").(*gtk.MenuItem)
 
@@ -42,25 +42,39 @@ func (m *menuBar) Init(builder *framework.GtkBuilder) error {
 
 // SetupEvents sets up the menu events
 func (m *menuBar) SetupEvents() {
-	_ = m.menuFileQuit.Connect("activate", func() {
-		gtk.MainQuit()
-	})
-	_ = m.menuHelpAbout.Connect("activate", func() {
-	})
+	_ = m.menuFileQuit.Connect(
+		"activate", func() {
+			gtk.MainQuit()
+		},
+	)
+	_ = m.menuHelpAbout.Connect(
+		"activate", func() {
+		},
+	)
 
-	_ = m.menuViewSubscriptions.Connect("activate", func() {
-		m.parent.videoList.switchView(viewSubscriptions)
-	})
-	_ = m.menuViewDownloads.Connect("activate", func() {
-		m.parent.videoList.switchView(viewDownloads)
-	})
-	_ = m.menuViewToWatch.Connect("activate", func() {
-		m.parent.videoList.switchView(viewToWatch)
-	})
-	_ = m.menuViewSaved.Connect("activate", func() {
-		m.parent.videoList.switchView(viewSaved)
-	})
-	_ = m.menuViewToDelete.Connect("activate", func() {
-		m.parent.videoList.switchView(viewToDelete)
-	})
+	_ = m.menuViewSubscriptions.Connect(
+		"activate", func() {
+			m.parent.videoList.switchView(viewSubscriptions)
+		},
+	)
+	_ = m.menuViewDownloads.Connect(
+		"activate", func() {
+			m.parent.videoList.switchView(viewDownloads)
+		},
+	)
+	_ = m.menuViewToWatch.Connect(
+		"activate", func() {
+			m.parent.videoList.switchView(viewToWatch)
+		},
+	)
+	_ = m.menuViewSaved.Connect(
+		"activate", func() {
+			m.parent.videoList.switchView(viewSaved)
+		},
+	)
+	_ = m.menuViewToDelete.Connect(
+		"activate", func() {
+			m.parent.videoList.switchView(viewToDelete)
+		},
+	)
 }

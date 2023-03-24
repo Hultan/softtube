@@ -8,15 +8,14 @@ import (
 	"sync"
 
 	"github.com/hultan/crypto"
-	"github.com/hultan/softteam/framework"
+	log "github.com/hultan/softtube/internal/logger"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
 var (
-	fw     *framework.Framework
-	logger *framework.Logger
+	logger *log.Logger
 	config *core.Config
 	db     *database.Database
 )
@@ -32,8 +31,7 @@ func main() {
 	}
 
 	// Setup logging
-	fw = framework.NewFramework()
-	logger, err = fw.Log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Download))
+	logger, err = log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Download))
 	if err != nil {
 		fmt.Println("Failed to open log file!")
 		fmt.Println(err)

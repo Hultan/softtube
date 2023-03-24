@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	"github.com/gotk3/gotk3/gdk"
@@ -37,7 +37,7 @@ var videos []database.Video
 var listStore *gtk.ListStore
 
 // Init : Loads the toolbar from the glade file
-func (v *videoList) Init(builder *framework.GtkBuilder) error {
+func (v *videoList) Init(builder *builder.Builder) error {
 	v.currentView = viewSubscriptions
 	v.lastViewSwitch = time.Now()
 
@@ -102,16 +102,18 @@ func (v *videoList) Refresh(searchFor string) {
 	}
 
 	v.treeView.SetModel(nil)
-	listStore, err = gtk.ListStoreNew(gdk.PixbufGetType(), // Thumbnail
-		glib.TYPE_STRING, // Subscription name
-		glib.TYPE_STRING, // Added date
-		glib.TYPE_STRING, // Title
-		glib.TYPE_INT64,  // Progress
-		glib.TYPE_STRING, // Background color
-		glib.TYPE_STRING, // Video ID
-		glib.TYPE_STRING, // Duration
-		glib.TYPE_STRING, // Progress text
-		glib.TYPE_STRING) // Foreground color
+	listStore, err = gtk.ListStoreNew(
+		gdk.PixbufGetType(), // Thumbnail
+		glib.TYPE_STRING,    // Subscription name
+		glib.TYPE_STRING,    // Added date
+		glib.TYPE_STRING,    // Title
+		glib.TYPE_INT64,     // Progress
+		glib.TYPE_STRING,    // Background color
+		glib.TYPE_STRING,    // Video ID
+		glib.TYPE_STRING,    // Duration
+		glib.TYPE_STRING,    // Progress text
+		glib.TYPE_STRING,
+	) // Foreground color
 	if err != nil {
 		v.parent.Logger.Log("Failed to create list store!")
 		v.parent.Logger.LogError(err)

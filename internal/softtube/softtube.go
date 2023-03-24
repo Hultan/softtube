@@ -6,7 +6,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
@@ -54,12 +54,7 @@ func (s *SoftTube) StartApplication() error {
 
 	gtk.Init(nil)
 
-	b, err := gtk.BuilderNewFromString(mainGlade)
-	if err != nil {
-		s.Logger.LogError(err)
-		return err
-	}
-	builder := &framework.GtkBuilder{Builder: b}
+	builder := builder.NewBuilder(mainGlade)
 
 	win := builder.GetObject("main_window").(*gtk.Window)
 	win.SetTitle(s.getWindowTitle())
@@ -124,7 +119,7 @@ func (s *SoftTube) StartApplication() error {
 	return nil
 }
 
-func (s *SoftTube) setupControls(builder *framework.GtkBuilder) {
+func (s *SoftTube) setupControls(builder *builder.Builder) {
 	// Init toolbar
 	s.toolbar = &toolbar{parent: s}
 	err := s.toolbar.Init(builder)

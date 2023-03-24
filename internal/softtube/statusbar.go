@@ -5,7 +5,7 @@ import (
 
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 )
 
 // statusBar : The status bar of SoftTube
@@ -15,7 +15,7 @@ type statusBar struct {
 }
 
 // Load : Loads the toolbar
-func (s *statusBar) Init(builder *framework.GtkBuilder) error {
+func (s *statusBar) Init(builder *builder.Builder) error {
 	label := builder.GetObject("statusbar_number_of_videos").(*gtk.Label)
 	s.videoCount = label
 

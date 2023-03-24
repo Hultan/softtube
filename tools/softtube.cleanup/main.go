@@ -8,14 +8,13 @@ import (
 	"time"
 
 	"github.com/hultan/crypto"
-	"github.com/hultan/softteam/framework"
+	log "github.com/hultan/softtube/internal/logger"
 	core "github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
 var (
-	fw              *framework.Framework
-	logger          *framework.Logger
+	logger          *log.Logger
 	config          *core.Config
 	backupCutOff    = time.Now().AddDate(0, 0, -10)
 	thumbnailCutOff = time.Now().AddDate(0, 0, -14)
@@ -42,8 +41,7 @@ func main() {
 	}
 
 	// Open log file
-	fw = framework.NewFramework()
-	logger, err = fw.Log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Cleanup))
+	logger, err = log.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.Cleanup))
 	if err != nil {
 		fmt.Println("Failed to open log file!")
 		fmt.Println(err)

@@ -5,7 +5,7 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
@@ -18,7 +18,7 @@ type activityLog struct {
 }
 
 // Init : Loads the log
-func (a *activityLog) Init(builder *framework.GtkBuilder) {
+func (a *activityLog) Init(builder *builder.Builder) {
 	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
 	a.treeView = tree
 

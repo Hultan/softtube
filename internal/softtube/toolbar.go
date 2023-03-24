@@ -3,7 +3,7 @@ package softtube
 import (
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 )
 
 // toolbar : The toolbar for SoftTube application
@@ -24,7 +24,7 @@ type toolbar struct {
 }
 
 // Init initiates the toolbar
-func (t *toolbar) Init(builder *framework.GtkBuilder) error {
+func (t *toolbar) Init(builder *builder.Builder) error {
 	t.toolbarSubscriptions = builder.GetObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
 	t.toolbarDownloads = builder.GetObject("toolbar_downloads").(*gtk.ToggleToolButton)
 	t.toolbarToWatch = builder.GetObject("toolbar_to_watch").(*gtk.ToggleToolButton)
@@ -44,49 +44,71 @@ func (t *toolbar) Init(builder *framework.GtkBuilder) error {
 
 // SetupEvents : Set up the toolbar events
 func (t *toolbar) SetupEvents() {
-	_ = t.toolbarQuit.Connect("clicked", func() {
-		gtk.MainQuit()
-	})
-	_ = t.toolbarRefresh.Connect("clicked", func() {
-		s := t.parent
-		s.videoList.Refresh("")
-	})
-	_ = t.toolbarDeleteAll.Connect("clicked", func() {
-		s := t.parent
-		s.videoList.DeleteWatchedVideos()
-	})
-	_ = t.toolbarSubscriptions.Connect("clicked", func() {
-		t.parent.videoList.switchView(viewSubscriptions)
-	})
-	_ = t.toolbarDownloads.Connect("clicked", func() {
-		t.parent.videoList.switchView(viewDownloads)
-	})
-	_ = t.toolbarToWatch.Connect("clicked", func() {
-		t.parent.videoList.switchView(viewToWatch)
-	})
-	_ = t.toolbarSaved.Connect("clicked", func() {
-		t.parent.videoList.switchView(viewSaved)
-	})
-	_ = t.toolbarToDelete.Connect("clicked", func() {
-		t.parent.videoList.switchView(viewToDelete)
-	})
-	_ = t.toolbarScrollToStart.Connect("clicked", func() {
-		s := t.parent
-		s.videoList.scroll.toStart()
-	})
-	_ = t.toolbarScrollToEnd.Connect("clicked", func() {
-		s := t.parent
-		s.videoList.scroll.toEnd()
-	})
-	_ = t.toolbarKeepScrollToEnd.Connect("clicked", func() {
-		if t.toolbarKeepScrollToEnd.GetActive() {
+	_ = t.toolbarQuit.Connect(
+		"clicked", func() {
+			gtk.MainQuit()
+		},
+	)
+	_ = t.toolbarRefresh.Connect(
+		"clicked", func() {
 			s := t.parent
-			s.videoList.keepScrollToEnd = true
-			s.videoList.scroll.toEnd()
-		} else {
+			s.videoList.Refresh("")
+		},
+	)
+	_ = t.toolbarDeleteAll.Connect(
+		"clicked", func() {
 			s := t.parent
-			s.videoList.keepScrollToEnd = false
+			s.videoList.DeleteWatchedVideos()
+		},
+	)
+	_ = t.toolbarSubscriptions.Connect(
+		"clicked", func() {
+			t.parent.videoList.switchView(viewSubscriptions)
+		},
+	)
+	_ = t.toolbarDownloads.Connect(
+		"clicked", func() {
+			t.parent.videoList.switchView(viewDownloads)
+		},
+	)
+	_ = t.toolbarToWatch.Connect(
+		"clicked", func() {
+			t.parent.videoList.switchView(viewToWatch)
+		},
+	)
+	_ = t.toolbarSaved.Connect(
+		"clicked", func() {
+			t.parent.videoList.switchView(viewSaved)
+		},
+	)
+	_ = t.toolbarToDelete.Connect(
+		"clicked", func() {
+			t.parent.videoList.switchView(viewToDelete)
+		},
+	)
+	_ = t.toolbarScrollToStart.Connect(
+		"clicked", func() {
+			s := t.parent
 			s.videoList.scroll.toStart()
-		}
-	})
+		},
+	)
+	_ = t.toolbarScrollToEnd.Connect(
+		"clicked", func() {
+			s := t.parent
+			s.videoList.scroll.toEnd()
+		},
+	)
+	_ = t.toolbarKeepScrollToEnd.Connect(
+		"clicked", func() {
+			if t.toolbarKeepScrollToEnd.GetActive() {
+				s := t.parent
+				s.videoList.keepScrollToEnd = true
+				s.videoList.scroll.toEnd()
+			} else {
+				s := t.parent
+				s.videoList.keepScrollToEnd = false
+				s.videoList.scroll.toStart()
+			}
+		},
+	)
 }

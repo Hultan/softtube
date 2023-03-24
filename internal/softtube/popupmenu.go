@@ -6,7 +6,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/softtube/internal/builder"
 )
 
 // popupMenu : Handler the video list popupmenu
@@ -32,7 +32,7 @@ type popupMenu struct {
 }
 
 // Init : Loads the popup menu
-func (p *popupMenu) Init(builder *framework.GtkBuilder) error {
+func (p *popupMenu) Init(builder *builder.Builder) error {
 	p.popupMenu = builder.GetObject("popupmenu").(*gtk.Menu)
 	p.popupRefresh = builder.GetObject("popup_refresh").(*gtk.MenuItem)
 	p.popupDownload = builder.GetObject("popup_download").(*gtk.MenuItem)

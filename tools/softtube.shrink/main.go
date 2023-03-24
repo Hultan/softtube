@@ -8,7 +8,7 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 
-	"github.com/hultan/softteam/framework"
+	log "github.com/hultan/softtube/internal/logger"
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
@@ -18,15 +18,14 @@ const (
 )
 
 var (
-	logger *framework.Logger
+	logger *log.Logger
 	config *core.Config
 )
 
 func main() {
 	var err error
 
-	fw := framework.NewFramework()
-	logger, err = fw.Log.NewStandardLogger("/softtube/log/softtube.shrink.log")
+	logger, err = log.NewStandardLogger("/softtube/log/softtube.shrink.log")
 	if err != nil {
 		_, _ = fmt.Fprintln(os.Stderr, "Failed to open log file : ", err)
 		os.Exit(1)
