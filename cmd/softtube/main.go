@@ -3,7 +3,7 @@ package main
 import (
 	"path"
 
-	"github.com/hultan/softteam/framework"
+	"github.com/hultan/crypto"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -58,8 +58,8 @@ func stopLogging() {
 func openDatabase() *database.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
-	fw := framework.NewFramework()
-	password, err := fw.Crypto.Decrypt(conn.Password)
+	c := &crypto.Crypto{}
+	password, err := c.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")
 		logger.LogError(err)

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hultan/crypto"
 	"github.com/hultan/softteam/framework"
 	core "github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
@@ -59,7 +60,8 @@ func main() {
 
 	// Decrypt the MySQL password
 	conn := config.Connection
-	password, err := fw.Crypto.Decrypt(conn.Password)
+	c := &crypto.Crypto{}
+	password, err := c.Decrypt(conn.Password)
 	if err != nil {
 		logger.Error.Println("Failed to decrypt MySQL password!")
 		logger.Error.Println(err)

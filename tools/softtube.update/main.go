@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/hultan/crypto"
 	"github.com/hultan/softteam/framework"
 	"github.com/hultan/softtube/internal/softtube.database"
 
@@ -53,7 +54,8 @@ func main() {
 
 	// Start updating the softtube database
 	conn := config.Connection
-	password, err := fw.Crypto.Decrypt(conn.Password)
+	c := &crypto.Crypto{}
+	password, err := c.Decrypt(conn.Password)
 	if err != nil {
 		logger.Error.Println("Failed to decrypt MySQL password!")
 		logger.Error.Println(err)

@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gotk3/gotk3 v0.6.1
+	github.com/hultan/crypto v0.0.0-20230324113703-0074680ca8ca
 	github.com/hultan/softteam v1.3.1
 )
 

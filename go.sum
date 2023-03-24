@@ -4,6 +4,8 @@ github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfC
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/gotk3/gotk3 v0.6.1 h1:GJ400a0ecEEWrzjBvzBzH+pB/esEMIGdB9zPSmBdoeo=
 github.com/gotk3/gotk3 v0.6.1/go.mod h1:/hqFpkNa9T3JgNAE2fLvCdov7c5bw//FHNZrZ3Uv9/Q=
+github.com/hultan/crypto v0.0.0-20230324113703-0074680ca8ca h1:Kv+pfFrdMoE/5Gc4PVcttto+7wopfx9UKN+9wMBcG+0=
+github.com/hultan/crypto v0.0.0-20230324113703-0074680ca8ca/go.mod h1:Al02tqJQ4Kh8UhEMMGQMe8CtlWcFL3pbdhztdOph0OY=
 github.com/hultan/softteam v1.3.1 h1:sKDvu7ZPc2cd5Jco0LGxM/xyrIEgAPKcdTZH5gD3Miw=
 github.com/hultan/softteam v1.3.1/go.mod h1:hTLi7i+ODXrmzVOaJ2nFDyWmE1NlqJPiKcz8lDx1kv4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
