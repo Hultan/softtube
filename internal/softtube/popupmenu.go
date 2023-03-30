@@ -178,7 +178,7 @@ func (p *popupMenu) SetupEvents() {
 	)
 	_ = p.popupRedownloadVideos.Connect(
 		"activate", func() {
-			videos, err := p.parent.DB.Videos.GetVideos(true)
+			videos, err := p.parent.DB.Videos.GetVideos(true, p.parent.videoList.currentView == viewSaved)
 			if err != nil {
 				p.parent.Logger.LogError(err)
 				return

@@ -88,7 +88,7 @@ func (v *videoList) Refresh(searchFor string) {
 	var err error
 
 	if searchFor == "" {
-		videos, err = v.parent.DB.Videos.GetVideos(false)
+		videos, err = v.parent.DB.Videos.GetVideos(false, v.currentView == viewSaved)
 	} else {
 		videos, err = v.parent.DB.Videos.Search(searchFor)
 	}

@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -37,7 +38,7 @@ const sqlVideosGetLatest = `SELECT * FROM
 									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
 									FROM Videos 
 									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
-									ORDER BY added desc
+									ORDER BY $ORDER$
 									LIMIT 200) as Newest
 
 									UNION
@@ -48,7 +49,7 @@ const sqlVideosGetLatest = `SELECT * FROM
 										INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
 										WHERE Videos.status NOT IN (0,4) OR Videos.save=1) as Downloaded
 
-									ORDER BY added desc`
+									ORDER BY $ORDER$`
 
 // Get : Returns a subscription
 func (v VideosTable) Get(id string) (Video, error) {
@@ -61,7 +62,10 @@ func (v VideosTable) Get(id string) (Video, error) {
 
 	video := Video{}
 	var saved uint8
-	err := row.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &saved)
+	err := row.Scan(
+		&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status,
+		&saved,
+	)
 	if saved == 1 {
 		video.Saved = true
 	}
@@ -124,7 +128,9 @@ func (v VideosTable) GetStatus(videoID string) (int, error) {
 }
 
 // Insert : Insert a new video into the database
-func (v VideosTable) Insert(id string, subscriptionID string, title string, duration string, published time.Time) error {
+func (v VideosTable) Insert(
+	id string, subscriptionID string, title string, duration string, published time.Time,
+) error {
 	// Check that database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
@@ -223,7 +229,10 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 
 	for rows.Next() {
 		video := new(Video)
-		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName, &saved)
+		err = rows.Scan(
+			&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added,
+			&video.Status, &video.SubscriptionName, &saved,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -239,7 +248,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 }
 
 // GetVideos : Gets a list of the latest videos
-func (v VideosTable) GetVideos(failed bool) ([]Video, error) {
+func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
 	// Check that database is opened
 	if v.Connection == nil {
 		return nil, errors.New("database not opened")
@@ -250,6 +259,11 @@ func (v VideosTable) GetVideos(failed bool) ([]Video, error) {
 		sqlString = sqlVideosGetFailed
 	} else {
 		sqlString = sqlVideosGetLatest
+		if savedView {
+			sqlString = strings.Replace(sqlString, "$ORDER$", "subscription_id, title desc", -1)
+		} else {
+			sqlString = strings.Replace(sqlString, "$ORDER$", "added desc", -1)
+		}
 	}
 
 	rows, err := v.Connection.Query(sqlString)
@@ -262,7 +276,10 @@ func (v VideosTable) GetVideos(failed bool) ([]Video, error) {
 
 	for rows.Next() {
 		video := new(Video)
-		err = rows.Scan(&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status, &video.SubscriptionName, &saved)
+		err = rows.Scan(
+			&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added,
+			&video.Status, &video.SubscriptionName, &saved,
+		)
 		if err != nil {
 			return []Video{}, err
 		}
