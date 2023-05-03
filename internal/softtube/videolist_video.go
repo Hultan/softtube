@@ -376,18 +376,17 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 }
 
 // Get the thumbnail of a YouTube video
-func (v *videoFunctions) downloadThumbnail(video *database.Video) (string, error) {
+func (v *videoFunctions) downloadThumbnail(video *database.Video) {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, video.ID)
 
-	// Don't download thumbnail if it already exists
-	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-		command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, video.ID)
-		cmd := exec.Command("/bin/bash", "-c", command)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return string(output), err
+	go func() {
+		// Don't download thumbnail if it already exists
+		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+			command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, video.ID)
+			cmd := exec.Command("/bin/bash", "-c", command)
+			_, _ = cmd.CombinedOutput()
 		}
-	}
-	return "", nil
+	}()
+	return
 }

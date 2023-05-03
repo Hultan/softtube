@@ -232,7 +232,7 @@ func (p *popupMenu) SetupEvents() {
 			treeview := p.parent.videoList.treeView
 			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
 			if vid != nil {
-				_, _ = p.parent.videoList.videoFunctions.downloadThumbnail(vid)
+				p.parent.videoList.videoFunctions.downloadThumbnail(vid)
 			}
 		},
 	)
