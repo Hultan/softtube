@@ -58,9 +58,9 @@ func (s *SoftTube) StartApplication() error {
 
 	gtk.Init(nil)
 
-	builder := builder.NewBuilder(mainGlade)
+	b := builder.NewBuilder(mainGlade)
 
-	win := builder.GetObject("main_window").(*gtk.Window)
+	win := b.GetObject("main_window").(*gtk.Window)
 	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
 	appIcon, err := gdk.PixbufNewFromDataOnly(applicationIcon)
@@ -119,7 +119,7 @@ func (s *SoftTube) StartApplication() error {
 	)
 	win.SetIconName("video-display")
 
-	s.setupControls(builder)
+	s.setupControls(b)
 
 	// Show the Window and all of its components.
 	win.ShowAll()
