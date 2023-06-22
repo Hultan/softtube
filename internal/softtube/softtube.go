@@ -2,8 +2,6 @@ package softtube
 
 import (
 	_ "embed"
-	"log"
-
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
@@ -14,9 +12,6 @@ import (
 
 //go:embed assets/main.glade
 var mainGlade string
-
-//go:embed assets/application.png
-var applicationIcon []byte
 
 //go:embed assets/delete.png
 var deleteIcon []byte
@@ -63,11 +58,6 @@ func (s *SoftTube) StartApplication() error {
 	win := b.GetObject("main_window").(*gtk.Window)
 	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
-	appIcon, err := gdk.PixbufNewFromDataOnly(applicationIcon)
-	if err != nil {
-		log.Fatal(err)
-	}
-	win.SetIcon(appIcon)
 	_ = win.Connect(
 		"destroy", func() {
 			gtk.MainQuit()
