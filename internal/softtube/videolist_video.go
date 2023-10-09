@@ -2,6 +2,7 @@ package softtube
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -23,45 +24,56 @@ type videoFunctions struct {
 
 func (v *videoFunctions) delete(video *database.Video) {
 	pathForDeletion := v.getPathForDeletion(video.ID)
-	if pathForDeletion != "" {
+	if pathForDeletion == "" {
+		return
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(4)
+
+	go func() {
+		// Remove the actual video file
 		command := fmt.Sprintf("rm %s", pathForDeletion)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		// Starts a sub process that deletes the video
 		err := cmd.Start()
 		if err != nil {
+			log.Printf("Error deleting video : %v\n", err)
 		}
+		err = cmd.Wait()
+		if err != nil {
+			log.Printf("Error waiting for process to stop : %v\n", err)
+		}
+		wg.Done()
+	}()
 
-		var wg sync.WaitGroup
-		wg.Add(3)
+	go func() {
+		// Log that the video has been deleted in the database
+		err := v.videoList.parent.DB.Log.Insert(constLogDelete, video.Title)
+		if err != nil {
+			v.videoList.parent.Logger.Log("Failed to log video as watched!")
+			v.videoList.parent.Logger.LogError(err)
+		}
+		wg.Done()
+	}()
 
-		go func() {
-			// Log that the video has been deleted in the database
-			err = v.videoList.parent.DB.Log.Insert(constLogDelete, video.Title)
-			if err != nil {
-				v.videoList.parent.Logger.Log("Failed to log video as watched!")
-				v.videoList.parent.Logger.LogError(err)
-			}
-			wg.Done()
-		}()
+	go func() {
+		// Log that the video has been deleted in the GUI
+		v.videoList.parent.activityLog.AddLog(constLogDelete, video.Title)
+		wg.Done()
+	}()
 
-		go func() {
-			// Log that the video has been deleted in the GUI
-			v.videoList.parent.activityLog.AddLog(constLogDelete, video.Title)
-			wg.Done()
-		}()
+	go func() {
+		// Set video status as deleted
+		err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDeleted)
+		if err != nil {
+			v.videoList.parent.Logger.Log("Failed to set video status to deleted!")
+			v.videoList.parent.Logger.LogError(err)
+		}
+		wg.Done()
+	}()
 
-		go func() {
-			// Set video status as deleted
-			err = v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDeleted)
-			if err != nil {
-				v.videoList.parent.Logger.Log("Failed to set video status to deleted!")
-				v.videoList.parent.Logger.LogError(err)
-			}
-			wg.Done()
-		}()
-
-		wg.Wait()
-	}
+	wg.Wait()
 }
 
 func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.ListStore) {
