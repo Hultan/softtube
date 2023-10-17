@@ -136,6 +136,10 @@ func (v VideosTable) Insert(
 		return errors.New("database not opened")
 	}
 
+	if !strings.HasPrefix(subscriptionID, "UC") {
+		subscriptionID = "UC" + subscriptionID
+	}
+
 	now := time.Now().UTC().Format(constDateLayout) // Added
 
 	// Execute insert statement
