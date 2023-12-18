@@ -282,7 +282,7 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 }
 
 func clean(title string) string {
-	re := regexp.MustCompile("[^[:ascii:]åäö]")
+	re := regexp.MustCompile("[^[:ascii:]åäöÅÄÖ]")
 
 	return re.ReplaceAllLiteralString(title, "")
 }

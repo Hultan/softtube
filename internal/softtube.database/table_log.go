@@ -10,7 +10,7 @@ type LogTable struct {
 }
 
 // sql : Get version
-const sqlLogInsert = `INSERT INTO Log (type, message) VALUES (?, ?);`
+const sqlLogInsert = `INSERT INTO Log (type, message, time) VALUES (?, ?, NOW());`
 const sqlLogGetLatest = `SELECT id, type, message FROM Log                 
 ORDER BY id desc
 LIMIT 50`

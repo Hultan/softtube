@@ -198,6 +198,8 @@ func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 		if color == constColorSaved {
 			return true
 		}
+	default:
+		panic("unhandled default case")
 	}
 
 	return false
