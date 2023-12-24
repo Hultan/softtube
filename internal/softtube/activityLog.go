@@ -18,74 +18,72 @@ type activityLog struct {
 }
 
 // Init : Loads the log
-func (a *activityLog) Init(builder *builder.Builder) {
+func (al *activityLog) Init(builder *builder.Builder) {
 	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
-	a.treeView = tree
+	al.treeView = tree
 
 	store, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
-		a.parent.Logger.Log("Failed to create liststore!")
-		a.parent.Logger.LogError(err)
+		al.parent.Logger.Log("Failed to create list store!")
+		al.parent.Logger.LogError(err)
 		panic(err)
 	}
-	a.listStore = store
-	a.FillLog(true)
+	al.listStore = store
+	al.setupColumns()
+	al.loadResources()
+	al.FillLog()
 }
 
 // FillLog : Fills the log with the last n logs
-func (a *activityLog) FillLog(init bool) {
-	logs := a.getLogs()
-	if init {
-		a.setupColumns()
-		a.loadResources()
-	}
+func (al *activityLog) FillLog() {
+	logs := al.getLogs()
 
-	a.treeView.SetModel(nil)
+	al.treeView.SetModel(nil)
 	for _, logItem := range logs {
-		a.insertLog(logItem.Type, logItem.Message, false)
+		al.insertLog(logItem.Type, logItem.Message, false)
 	}
-	a.treeView.SetModel(a.listStore)
+	al.treeView.SetModel(al.listStore)
 }
 
 // AddLog : Adds a log to the GUI log
-func (a *activityLog) AddLog(logType database.LogType, logMessage string) {
+func (al *activityLog) AddLog(logType database.LogType, logMessage string) {
 	// Insert into the gui log
-	a.treeView.SetModel(nil)
-	a.insertLog(logType, logMessage, true)
-	a.treeView.SetModel(a.listStore)
+	al.treeView.SetModel(nil)
+	al.insertLog(logType, logMessage, true)
+	al.treeView.SetModel(al.listStore)
 }
 
-func (a *activityLog) insertLog(logType database.LogType, logMessage string, first bool) {
-	color := a.getColor(logType)
-	image := a.imageBuffer[logType]
+func (al *activityLog) insertLog(logType database.LogType, logMessage string, first bool) {
+	col := al.getColor(logType)
+	img := al.imageBuffer[logType]
 	var iter *gtk.TreeIter
 
 	if first {
-		iter = a.listStore.InsertAfter(nil)
+		iter = al.listStore.InsertAfter(nil)
 	} else {
-		iter = a.listStore.InsertBefore(nil)
+		iter = al.listStore.InsertBefore(nil)
 	}
-	_ = a.listStore.Set(iter, []int{0, 1, 2}, []interface{}{image, a.shortenString(logMessage), color})
+	_ = al.listStore.Set(iter, []int{0, 1, 2}, []interface{}{img, al.shortenString(logMessage), col})
 }
 
-func (a *activityLog) shortenString(text string) string {
+func (al *activityLog) shortenString(text string) string {
 	if len(text) > 50 {
 		return text[:47] + "..."
 	}
 	return text
 }
 
-func (a *activityLog) getLogs() []database.Log {
-	logs, err := a.parent.DB.Log.GetLatest()
+func (al *activityLog) getLogs() []database.Log {
+	logs, err := al.parent.DB.Log.GetLatest()
 	if err != nil {
-		a.parent.Logger.Log("Failed to load logs!")
-		a.parent.Logger.LogError(err)
+		al.parent.Logger.Log("Failed to load logs!")
+		al.parent.Logger.LogError(err)
 		return nil
 	}
 	return logs
 }
 
-func (a *activityLog) setupColumns() {
+func (al *activityLog) setupColumns() {
 	imageRenderer, _ := gtk.CellRendererPixbufNew()
 	imageColumn, _ := gtk.TreeViewColumnNew()
 	imageColumn.SetExpand(false)
@@ -94,7 +92,7 @@ func (a *activityLog) setupColumns() {
 	imageColumn.SetTitle("Type")
 	imageColumn.PackStart(imageRenderer, true)
 	imageColumn.AddAttribute(imageRenderer, "pixbuf", 0)
-	a.treeView.AppendColumn(imageColumn)
+	al.treeView.AppendColumn(imageColumn)
 
 	logTextRenderer, _ := gtk.CellRendererTextNew()
 	logTextColumn, _ := gtk.TreeViewColumnNew()
@@ -104,51 +102,51 @@ func (a *activityLog) setupColumns() {
 	logTextColumn.PackStart(logTextRenderer, true)
 	logTextColumn.AddAttribute(logTextRenderer, "text", 1)
 	logTextColumn.AddAttribute(logTextRenderer, "background", 2)
-	a.treeView.AppendColumn(logTextColumn)
+	al.treeView.AppendColumn(logTextColumn)
 }
 
-func (a *activityLog) loadResources() {
-	a.imageBuffer[0] = a.createPixbuf(downloadIcon)
-	a.imageBuffer[1] = a.createPixbuf(playIcon)
-	a.imageBuffer[2] = a.createPixbuf(deleteIcon)
-	a.imageBuffer[3] = a.createPixbuf(setWatchedIcon)
-	a.imageBuffer[4] = a.createPixbuf(setUnwatchedIcon)
-	a.imageBuffer[5] = a.createPixbuf(errorIcon)
+func (al *activityLog) loadResources() {
+	al.imageBuffer[0] = al.createPixbuf(downloadIcon)
+	al.imageBuffer[1] = al.createPixbuf(playIcon)
+	al.imageBuffer[2] = al.createPixbuf(deleteIcon)
+	al.imageBuffer[3] = al.createPixbuf(setWatchedIcon)
+	al.imageBuffer[4] = al.createPixbuf(setUnwatchedIcon)
+	al.imageBuffer[5] = al.createPixbuf(errorIcon)
 }
 
-func (a *activityLog) createPixbuf(bytes []byte) *gdk.Pixbuf {
+func (al *activityLog) createPixbuf(bytes []byte) *gdk.Pixbuf {
 	pic, err := gdk.PixbufNewFromBytesOnly(bytes)
 	if err != nil {
-		a.parent.Logger.LogError(err)
+		al.parent.Logger.LogError(err)
 	}
 	return pic
 }
 
-func (a *activityLog) getColor(logType database.LogType) string {
-	color := constColorNotDownloaded
+func (al *activityLog) getColor(logType database.LogType) string {
+	col := constColorNotDownloaded
 
 	switch logType {
 	case constLogDownload:
-		color = constColorDownloaded
+		col = constColorDownloaded
 		break
 	case constLogPlay:
-		color = constColorWatched
+		col = constColorWatched
 		break
 	case constLogDelete:
-		color = constColorDeleted
+		col = constColorDeleted
 		break
 	case constLogSetWatched:
-		color = constColorNotDownloaded
+		col = constColorNotDownloaded
 		break
 	case constLogSetUnwatched:
-		color = constColorNotDownloaded
+		col = constColorNotDownloaded
 		break
 	case constLogError:
-		color = constColorWarning
+		col = constColorWarning
 		break
 	default:
 		break
 	}
 
-	return string(color)
+	return string(col)
 }
