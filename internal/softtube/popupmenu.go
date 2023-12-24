@@ -71,10 +71,14 @@ func (p *popupMenu) SetupEvents() {
 					p.popupViewToDelete.SetSensitive(toDelete)
 				}
 
+				p.popupDownload.SetSensitive(false)
+				p.popupRedownloadVideo.SetSensitive(false)
+				p.popupRedownloadVideos.SetSensitive(false)
+
 				switch p.parent.videoList.currentView {
 				case viewSubscriptions:
 					p.popupDownload.SetSensitive(videoSelected)
-					p.popupRedownloadVideo.SetSensitive(false)
+
 					p.popupPlay.SetSensitive(false)
 					p.popupGetDuration.SetSensitive(videoSelected)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -84,10 +88,12 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsNotDownloaded)
 					p.popupSave.SetSensitive(false)
 					p.popupSave.SetLabel(constSetAsSaved)
+
 					view(false, true, true, true, true)
 				case viewDownloads:
-					p.popupDownload.SetSensitive(false)
 					p.popupRedownloadVideo.SetSensitive(videoSelected)
+					p.popupRedownloadVideos.SetSensitive(videoSelected)
+
 					p.popupPlay.SetSensitive(false)
 					p.popupGetDuration.SetSensitive(videoSelected)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -97,10 +103,9 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsNotDownloaded)
 					p.popupSave.SetSensitive(false)
 					p.popupSave.SetLabel(constSetAsSaved)
+
 					view(true, false, true, true, true)
 				case viewToWatch:
-					p.popupDownload.SetSensitive(false)
-					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(videoSelected)
 					p.popupGetDuration.SetSensitive(false)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -110,10 +115,9 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsWatched)
 					p.popupSave.SetSensitive(videoSelected)
 					p.popupSave.SetLabel(constSetAsSaved)
+
 					view(true, true, false, true, true)
 				case viewToDelete:
-					p.popupDownload.SetSensitive(false)
-					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(videoSelected)
 					p.popupGetDuration.SetSensitive(false)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -123,10 +127,9 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsUnwatched)
 					p.popupSave.SetSensitive(videoSelected)
 					p.popupSave.SetLabel(constSetAsSaved)
+
 					view(true, true, true, true, false)
 				case viewSaved:
-					p.popupDownload.SetSensitive(false)
-					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(videoSelected)
 					p.popupGetDuration.SetSensitive(false)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -136,6 +139,7 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsWatched)
 					p.popupSave.SetSensitive(true)
 					p.popupSave.SetLabel(constSetAsNotSaved)
+
 					view(true, true, true, false, true)
 				}
 
@@ -170,13 +174,13 @@ func (p *popupMenu) SetupEvents() {
 	)
 	_ = p.popupRedownloadVideos.Connect(
 		"activate", func() {
-			videos, err := p.parent.DB.Videos.GetVideos(true, p.parent.videoList.currentView == viewSaved)
+			vids, err := p.parent.DB.Videos.GetVideos(true, p.parent.videoList.currentView == viewSaved)
 			if err != nil {
 				p.parent.Logger.LogError(err)
 				return
 			}
-			for key := range videos {
-				vid := &videos[key]
+			for key := range vids {
+				vid := &vids[key]
 				if vid != nil {
 					_ = p.parent.videoList.videoFunctions.download(vid, false)
 				}
