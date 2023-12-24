@@ -20,6 +20,7 @@ func (s *searchBar) Init(builder *builder.Builder) error {
 
 	searchEntry := builder.GetObject("search_entry").(*gtk.Entry)
 	s.searchEntry = searchEntry
+
 	s.SetupEvents()
 
 	return nil
