@@ -63,10 +63,18 @@ func (p *popupMenu) SetupEvents() {
 			buttonEvent := gdk.EventButtonNewFromEvent(event)
 			if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
 				videoSelected := p.parent.videoList.videoFunctions.getSelected(p.parent.videoList.treeView) != nil
+				view := func(subscription, download, toWatch, saved, toDelete bool) {
+					p.popupViewSubscriptions.SetSensitive(subscription)
+					p.popupViewDownloads.SetSensitive(download)
+					p.popupViewToWatch.SetSensitive(toWatch)
+					p.popupViewSaved.SetSensitive(saved)
+					p.popupViewToDelete.SetSensitive(toDelete)
+				}
+
 				switch p.parent.videoList.currentView {
 				case viewSubscriptions:
 					p.popupDownload.SetSensitive(videoSelected)
-					p.popupRedownloadVideo.SetSensitive(videoSelected)
+					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(false)
 					p.popupGetDuration.SetSensitive(videoSelected)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -76,11 +84,7 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsNotDownloaded)
 					p.popupSave.SetSensitive(false)
 					p.popupSave.SetLabel(constSetAsSaved)
-					p.popupViewSubscriptions.SetSensitive(false)
-					p.popupViewDownloads.SetSensitive(true)
-					p.popupViewToWatch.SetSensitive(true)
-					p.popupViewToDelete.SetSensitive(true)
-					p.popupViewSaved.SetSensitive(true)
+					view(false, true, true, true, true)
 				case viewDownloads:
 					p.popupDownload.SetSensitive(false)
 					p.popupRedownloadVideo.SetSensitive(videoSelected)
@@ -93,13 +97,10 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsNotDownloaded)
 					p.popupSave.SetSensitive(false)
 					p.popupSave.SetLabel(constSetAsSaved)
-					p.popupViewSubscriptions.SetSensitive(true)
-					p.popupViewDownloads.SetSensitive(false)
-					p.popupViewToWatch.SetSensitive(true)
-					p.popupViewToDelete.SetSensitive(true)
-					p.popupViewSaved.SetSensitive(true)
+					view(true, false, true, true, true)
 				case viewToWatch:
 					p.popupDownload.SetSensitive(false)
+					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(videoSelected)
 					p.popupGetDuration.SetSensitive(false)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -109,13 +110,10 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsWatched)
 					p.popupSave.SetSensitive(videoSelected)
 					p.popupSave.SetLabel(constSetAsSaved)
-					p.popupViewSubscriptions.SetSensitive(true)
-					p.popupViewDownloads.SetSensitive(true)
-					p.popupViewToWatch.SetSensitive(false)
-					p.popupViewToDelete.SetSensitive(true)
-					p.popupViewSaved.SetSensitive(true)
+					view(true, true, false, true, true)
 				case viewToDelete:
 					p.popupDownload.SetSensitive(false)
+					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(videoSelected)
 					p.popupGetDuration.SetSensitive(false)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -125,13 +123,10 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsUnwatched)
 					p.popupSave.SetSensitive(videoSelected)
 					p.popupSave.SetLabel(constSetAsSaved)
-					p.popupViewSubscriptions.SetSensitive(true)
-					p.popupViewDownloads.SetSensitive(true)
-					p.popupViewToWatch.SetSensitive(true)
-					p.popupViewToDelete.SetSensitive(false)
-					p.popupViewSaved.SetSensitive(true)
+					view(true, true, true, true, false)
 				case viewSaved:
 					p.popupDownload.SetSensitive(false)
+					p.popupRedownloadVideo.SetSensitive(false)
 					p.popupPlay.SetSensitive(videoSelected)
 					p.popupGetDuration.SetSensitive(false)
 					p.popupGetVideoID.SetSensitive(videoSelected)
@@ -141,12 +136,9 @@ func (p *popupMenu) SetupEvents() {
 					p.popupUnwatch.SetLabel(constSetAsWatched)
 					p.popupSave.SetSensitive(true)
 					p.popupSave.SetLabel(constSetAsNotSaved)
-					p.popupViewSubscriptions.SetSensitive(true)
-					p.popupViewDownloads.SetSensitive(true)
-					p.popupViewToWatch.SetSensitive(true)
-					p.popupViewToDelete.SetSensitive(true)
-					p.popupViewSaved.SetSensitive(false)
+					view(true, true, true, false, true)
 				}
+
 				p.popupMenu.PopupAtPointer(event)
 			}
 		},
