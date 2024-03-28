@@ -372,19 +372,55 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 		command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, video.ID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
-		if err != nil {
+		if len(output) == 0 && err != nil {
 			return
 		}
-		duration := string(output)
-		if duration == "0" || strings.HasPrefix(duration, "ERROR: Premieres") || strings.HasPrefix(
-			duration, "ERROR: This live event",
-		) {
-			// Is it a live-streaming event?
+
+		duration := strings.Trim(string(output), " \n")
+		if isLive(duration) {
 			duration = "LIVE"
+		}
+		if isError(duration) {
+			duration = "ERROR"
+		}
+		if isMember(duration) {
+			duration = "MEMBER"
 		}
 
 		_ = v.videoList.parent.DB.Videos.UpdateDuration(video.ID, duration)
 	}()
+}
+
+func isLive(duration string) bool {
+	if duration == "" || duration == "0" {
+		return true
+	}
+
+	if strings.Contains(duration, "Premieres") {
+		return true
+	}
+
+	if strings.Contains(duration, "This live event") {
+		return true
+	}
+
+	return false
+}
+
+func isError(duration string) bool {
+	if strings.Contains(duration, "uploader has not") {
+		return true
+	}
+
+	return false
+}
+
+func isMember(duration string) bool {
+	if strings.Contains(duration, "Join this channel") {
+		return true
+	}
+
+	return false
 }
 
 // Get the thumbnail of a YouTube video

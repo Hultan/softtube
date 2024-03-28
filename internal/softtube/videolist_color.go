@@ -17,10 +17,11 @@ func (c *color) getColor(video *database.Video) (colorType, colorType) {
 		return constColorSaved, "Black"
 	}
 	duration := c.videoList.removeInvalidDurations(video.Duration)
-	if strings.Trim(duration, " ") == "LIVE" {
+	duration = strings.Trim(duration, " ")
+	if duration == "LIVE" {
 		// If duration is LIVE, lets change color to live color
 		return constColorLive, "Black"
-	} else if duration == "" {
+	} else if duration == "" || duration == "ERROR" || duration == "MEMBER" {
 		// If duration is invalid, lets change color to warning
 		return constColorWarning, "Black"
 	} else if video.Status == constStatusDeleted {
