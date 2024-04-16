@@ -377,6 +377,10 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 		}
 
 		duration := strings.Trim(string(output), " \n")
+		if isWarning(duration) {
+			i := strings.Index(duration, "\n")
+			duration = duration[i+1:]
+		}
 		if isLive(duration) {
 			duration = "LIVE"
 		}
@@ -389,6 +393,14 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 
 		_ = v.videoList.parent.DB.Videos.UpdateDuration(video.ID, duration)
 	}()
+}
+
+func isWarning(duration string) bool {
+	if strings.HasPrefix(duration, "WARNING: ") {
+		return true
+	}
+
+	return false
 }
 
 func isLive(duration string) bool {

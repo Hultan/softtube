@@ -16,7 +16,7 @@ import (
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
-const applicationVersion string = "1.00"
+const applicationVersion string = "1.10"
 const maxUpdates = 50
 
 var (
