@@ -1,6 +1,8 @@
 package softtube
 
 import (
+	"unicode/utf8"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -67,9 +69,13 @@ func (al *activityLog) insertLog(logType database.LogType, logMessage string, fi
 }
 
 func (al *activityLog) shortenString(text string) string {
-	if len(text) > 50 {
-		return text[:47] + "..."
+	if utf8.RuneCountInString(text) > 50 {
+		r := []rune(text)
+		return string(r[:47]) + "..."
 	}
+	//if len(text) > 50 {
+	//	return text[:47] + "..."
+	//}
 	return text
 }
 
