@@ -17,7 +17,7 @@ var (
 	logger          *log.Logger
 	config          *core.Config
 	backupCutOff    = time.Now().AddDate(0, 0, -10)
-	thumbnailCutOff = time.Now().AddDate(0, 0, -14)
+	thumbnailCutOff = time.Now().AddDate(0, 0, -7)
 	db              *database.Database
 )
 
@@ -164,7 +164,13 @@ func FilenameWithoutExtension(fn string) string {
 }
 
 func canDeleteThumbnail(db *database.Database, videoId string) bool {
-	status, _ := db.Videos.GetStatus(videoId)
+	status, err := db.Videos.GetStatus(videoId)
+	if err != nil {
+		logger.Warning.Printf("Failed to get status of video: '%s'\n", videoId)
+		logger.Warning.Printf("Error: %s\n", err)
+		logger.Warning.Println(err)
+		return false
+	}
 	// Delete thumbnails for not downloaded videos and deleted videos
 	return status == 0 || status == 4
 }
