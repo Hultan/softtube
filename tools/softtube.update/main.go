@@ -16,7 +16,7 @@ import (
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
-const applicationVersion string = "1.10"
+const applicationVersion string = "1.11"
 const maxUpdates = 50
 
 var (
@@ -282,7 +282,8 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 }
 
 func clean(title string) string {
-	re := regexp.MustCompile("^\\p{Cc}")
+	re := regexp.MustCompile("[^[:ascii:]åäöÅÄÖ]")
+	// re := regexp.MustCompile("^\\p{Cc}")
 
 	return re.ReplaceAllLiteralString(title, "")
 }

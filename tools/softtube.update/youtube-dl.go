@@ -24,6 +24,7 @@ func (y youtube) getDuration(videoID string) error {
 		if err != nil || duration == "" {
 			switch i {
 			case 0:
+				logger.Warning.Printf("Failed to get duration with error (%s) : Duration = %s!\n", err, duration)
 				logger.Warning.Printf("Failed to get duration (%s), trying again in 5 seconds!\n", videoID)
 				time.Sleep(5 * time.Second)
 				continue
@@ -115,6 +116,7 @@ func (y youtube) getThumbnail(videoId string) error {
 		if err != nil {
 			switch i {
 			case 0:
+				logger.Warning.Printf("Failed to get duration with error (%s) : Output = %s!\n", err, output)
 				logger.Warning.Printf("Failed to download thumbnail (%s), trying again in 5 seconds!\n", videoId)
 				time.Sleep(5 * time.Second)
 				continue
