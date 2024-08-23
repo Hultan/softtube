@@ -58,8 +58,7 @@ func main() {
 
 	// Decrypt the MySQL password
 	conn := config.Connection
-	c := &crypto.Crypto{}
-	password, err := c.Decrypt(conn.Password)
+	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
 		logger.Error.Println("Failed to decrypt MySQL password!")
 		logger.Error.Println(err)
