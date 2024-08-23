@@ -52,8 +52,7 @@ func main() {
 
 	// Start updating the softtube database
 	conn := config.Connection
-	c := &crypto.Crypto{}
-	password, err := c.Decrypt(conn.Password)
+	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
 		logger.Error.Println("Failed to decrypt MySQL password!")
 		logger.Error.Println(err)
@@ -167,6 +166,10 @@ func updateSubscription(subscription *database.Subscription) {
 
 	waitGroup.Wait()
 
+	setNextUpdate(subscription)
+}
+
+func setNextUpdate(subscription *database.Subscription) {
 	// Mark subscription as updated
 	interval, err := getInterval(subscription.Frequency)
 	if err != nil {
@@ -193,6 +196,7 @@ func getVideos(subscription *database.Subscription) []database.Video {
 			"Channel %s (%s) has been deleted. Please remove channel...",
 			subscription.Name, subscription.ID,
 		)
+		setNextUpdate(subscription)
 		logger.Error.Println(errorMessage)
 		return nil
 	}
@@ -233,12 +237,12 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 	err := db.Videos.Insert(video.ID, video.SubscriptionID, video.Title, "", video.Published)
 	if err != nil {
 		msg := fmt.Sprintf(
-			"Inserted video '%s' in database : Failed! (Reason : %s)", video.Title, err.Error(),
+			"Inserted video (%s) '%s' in database : Failed! (Reason : %s)", video.ID, video.Title, err.Error(),
 		)
 		logger.Error.Println(msg)
 		return err
 	} else {
-		msg := fmt.Sprintf("Inserted video '%s' in database : Success!", video.Title)
+		msg := fmt.Sprintf("Inserted video (%s) '%s' in database : Success!", video.ID, video.Title)
 		logger.Info.Println(msg)
 	}
 
@@ -251,12 +255,12 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 		err = yt.getDuration(video.ID)
 		if err != nil {
 			msg := fmt.Sprintf(
-				"Updated duration for video '%s' : Failed! (Reason : %s)", video.Title, err.Error(),
+				"Updated duration for video (%s) '%s' : Failed! (Reason : %s)", video.ID, video.Title, err.Error(),
 			)
 			logger.Error.Println(msg)
 			return
 		} else {
-			msg := fmt.Sprintf("Updated duration for video '%s' : Success!", video.Title)
+			msg := fmt.Sprintf("Updated duration for video (%s) '%s' : Success!", video.ID, video.Title)
 			logger.Info.Println(msg)
 		}
 	}()
@@ -268,12 +272,12 @@ func handleNewVideo(video database.Video, waitGroup *sync.WaitGroup) error {
 		err = yt.getThumbnail(video.ID)
 		if err != nil {
 			msg := fmt.Sprintf(
-				"Downloaded thumbnail for video '%s': Failed! (Reason : %s)", video.Title, err.Error(),
+				"Downloaded thumbnail for video (%s) '%s': Failed! (Reason : %s)", video.ID, video.Title, err.Error(),
 			)
 			logger.Error.Println(msg)
 			return
 		} else {
-			msg := fmt.Sprintf("Downloaded thumbnail for video '%s': Success!", video.Title)
+			msg := fmt.Sprintf("Downloaded thumbnail for video (%s) '%s': Success!", video.ID, video.Title)
 			logger.Info.Println(msg)
 		}
 	}()

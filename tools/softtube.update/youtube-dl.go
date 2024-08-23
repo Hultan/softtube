@@ -24,17 +24,18 @@ func (y youtube) getDuration(videoID string) error {
 		if err != nil || duration == "" {
 			switch i {
 			case 0:
-				logger.Warning.Printf("Failed to get duration with error (%s) : Duration = %s!\n", err, duration)
-				logger.Warning.Printf("Failed to get duration (%s), trying again in 5 seconds!\n", videoID)
+				logger.Warning.Printf("Failed to get duration (%s) : Error = (%s)\n", videoID, err)
+				logger.Warning.Printf("Failed to get duration (%s) : Output = (%s)\n", videoID, duration)
+				if strings.Contains(duration, "Video unavailable") {
+					return err
+				}
 				time.Sleep(5 * time.Second)
 				continue
 			case 1:
-				logger.Warning.Printf("Failed to get duration (%s), trying again in 30 seconds!\n", videoID)
 				time.Sleep(30 * time.Second)
 				continue
 			case 2:
-				logger.Warning.Printf("getDuration() failed (%s)!\n", videoID)
-				logger.Warning.Printf("Output = %s.\n", duration)
+				logger.Warning.Printf("Failed to get duration (%s)\n", videoID)
 				// Save duration in the database
 				y.updateDuration(videoID, "")
 				return err
@@ -116,17 +117,18 @@ func (y youtube) getThumbnail(videoId string) error {
 		if err != nil {
 			switch i {
 			case 0:
-				logger.Warning.Printf("Failed to get duration with error (%s) : Output = %s!\n", err, output)
-				logger.Warning.Printf("Failed to download thumbnail (%s), trying again in 5 seconds!\n", videoId)
+				logger.Warning.Printf("Failed to download thumbnail (%s) : Error = (%s)\n", videoId, err)
+				logger.Warning.Printf("Failed to download thumbnail (%s) : Output = (%s)\n", videoId, output)
+				if strings.Contains(output, "Video unavailable") {
+					return err
+				}
 				time.Sleep(5 * time.Second)
 				continue
 			case 1:
-				logger.Warning.Printf("Failed to download thumbnail (%s), trying again in 30 seconds!\n", videoId)
 				time.Sleep(30 * time.Second)
 				continue
 			case 2:
-				logger.Warning.Printf("getThumbnail() failed (%s)!\n", videoId)
-				logger.Warning.Printf("Output = %s.\n", output)
+				logger.Warning.Printf("Failed to download thumbnail (%s)\n", videoId)
 				return err
 			}
 		}

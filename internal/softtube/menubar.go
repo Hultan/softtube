@@ -1,8 +1,12 @@
 package softtube
 
 import (
-	"github.com/gotk3/gotk3/gtk"
+	"fmt"
+	"os/exec"
+	"path"
+	"syscall"
 
+	"github.com/gotk3/gotk3/gtk"
 	"github.com/hultan/softtube/internal/builder"
 )
 
@@ -16,6 +20,9 @@ type menuBar struct {
 	menuViewToWatch       *gtk.RadioMenuItem
 	menuViewSaved         *gtk.RadioMenuItem
 	menuViewToDelete      *gtk.RadioMenuItem
+
+	menuViewLog       *gtk.MenuItem
+	menuViewUpdateLog *gtk.MenuItem
 }
 
 // Init initiates the menu bar
@@ -34,6 +41,9 @@ func (m *menuBar) Init(builder *builder.Builder) error {
 	m.menuViewSaved.JoinGroup(m.menuViewSubscriptions)
 	m.menuViewToDelete.JoinGroup(m.menuViewSubscriptions)
 	m.menuViewSubscriptions.SetActive(true)
+
+	m.menuViewLog = builder.GetObject("menu_view_log").(*gtk.MenuItem)
+	m.menuViewUpdateLog = builder.GetObject("menu_view_update_log").(*gtk.MenuItem)
 
 	m.SetupEvents()
 
@@ -77,4 +87,32 @@ func (m *menuBar) SetupEvents() {
 			m.parent.videoList.switchView(viewToDelete)
 		},
 	)
+	_ = m.menuViewLog.Connect(
+		"activate", func() {
+			m.openLogFile("softtube.client.log")
+		},
+	)
+	_ = m.menuViewUpdateLog.Connect(
+		"activate", func() {
+			m.openLogFile("softtube.update.log")
+		},
+	)
+}
+
+func (m *menuBar) openLogFile(logFile string) {
+	// Start Video Player
+	go func() {
+		p := path.Join(m.parent.Config.ClientPaths.Log, logFile)
+		command := fmt.Sprintf("xed '%s' &", p)
+		cmd := exec.Command("/bin/bash", "-c", command)
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+			Pgid:    0,
+		}
+		// Starts a sub process (smplayer)
+		// Did not get this to work, but read the following, and maybe I can get
+		// this to work in the future
+		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
+		_ = cmd.Run()
+	}()
 }

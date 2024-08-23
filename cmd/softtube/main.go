@@ -58,8 +58,7 @@ func stopLogging() {
 func openDatabase() *database.Database {
 	// Create the database object, and get all subscriptions
 	conn := config.Connection
-	c := &crypto.Crypto{}
-	password, err := c.Decrypt(conn.Password)
+	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
 		logger.Log("Failed to decrypt MySQL password!")
 		logger.LogError(err)

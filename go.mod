@@ -1,16 +1,11 @@
 module github.com/hultan/softtube
 
-go 1.18
+go 1.22
 
 require (
-	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gotk3/gotk3 v0.6.1
-	github.com/hultan/crypto v0.0.0-20230324113703-0074680ca8ca
-	github.com/hultan/softteam v1.3.1
+	github.com/go-sql-driver/mysql v1.8.1
+	github.com/gotk3/gotk3 v0.6.3
+	github.com/hultan/crypto v1.0.1
 )
 
-require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
-)
+require filippo.io/edwards25519 v1.1.0 // indirect
