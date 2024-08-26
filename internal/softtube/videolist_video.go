@@ -19,6 +19,7 @@ import (
 const youtubeDLPath = "yt-dlp"
 
 type videoFunctions struct {
+	parent    *SoftTube
 	videoList *videoList
 }
 
@@ -372,7 +373,10 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 		command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, video.ID)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
-		if len(output) == 0 && err != nil {
+		if err != nil {
+			v.parent.Logger.Log("Failed to get duration:")
+			v.parent.Logger.Log(string(output))
+			v.parent.Logger.LogError(err)
 			return
 		}
 
@@ -393,6 +397,29 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 
 		_ = v.videoList.parent.DB.Videos.UpdateDuration(video.ID, duration)
 	}()
+}
+
+// Get the thumbnail of a YouTube video
+func (v *videoFunctions) downloadThumbnail(video *database.Video) {
+	// %s/%s.jpg
+	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, video.ID)
+
+	go func() {
+		// Don't download thumbnail if it already exists
+		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+			command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, video.ID)
+			cmd := exec.Command("/bin/bash", "-c", command)
+			output, err := cmd.CombinedOutput()
+			if len(output) == 0 && err != nil {
+				v.parent.Logger.Log("Failed to download thumbnail:")
+				v.parent.Logger.Log(string(output))
+				v.parent.Logger.LogError(err)
+				return
+			}
+
+		}
+	}()
+	return
 }
 
 func isWarning(duration string) bool {
@@ -433,20 +460,4 @@ func isMember(duration string) bool {
 	}
 
 	return false
-}
-
-// Get the thumbnail of a YouTube video
-func (v *videoFunctions) downloadThumbnail(video *database.Video) {
-	// %s/%s.jpg
-	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, video.ID)
-
-	go func() {
-		// Don't download thumbnail if it already exists
-		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-			command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, video.ID)
-			cmd := exec.Command("/bin/bash", "-c", command)
-			_, _ = cmd.CombinedOutput()
-		}
-	}()
-	return
 }

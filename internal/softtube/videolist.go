@@ -49,7 +49,7 @@ func (v *videoList) Init(builder *builder.Builder) error {
 	s := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
 	v.scroll = &scroll{s}
 
-	v.videoFunctions = &videoFunctions{v}
+	v.videoFunctions = &videoFunctions{parent: v.parent, videoList: v}
 	v.color = &color{v}
 
 	helper := &treeViewHelper{v}
