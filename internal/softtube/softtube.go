@@ -2,6 +2,7 @@ package softtube
 
 import (
 	_ "embed"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
@@ -104,6 +105,20 @@ func (s *SoftTube) StartApplication() error {
 			}
 			if k.State() == 20 && k.KeyVal() == 65535 { // Ctrl + Del
 				s.searchBar.Clear()
+			}
+			if k.KeyVal() == gdk.KEY_d || k.KeyVal() == gdk.KEY_D { // D (duration)
+				vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
+				if vid == nil {
+					return
+				}
+				s.videoList.videoFunctions.downloadDuration(vid)
+			}
+			if k.KeyVal() == gdk.KEY_t || k.KeyVal() == gdk.KEY_T { // T (thumbnail)
+				vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
+				if vid == nil {
+					return
+				}
+				s.videoList.videoFunctions.downloadThumbnail(vid)
 			}
 		},
 	)
