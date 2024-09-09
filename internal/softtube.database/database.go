@@ -28,7 +28,6 @@ type Database struct {
 	Connection    *sql.DB
 	Subscriptions *SubscriptionTable
 	Videos        *VideosTable
-	Version       *VersionTable
 	Download      *DownloadTable
 	Log           *LogTable
 }
@@ -50,7 +49,6 @@ func (d *Database) Open() error {
 	t := &Table{d}
 	d.Subscriptions = &SubscriptionTable{t}
 	d.Videos = &VideosTable{t}
-	d.Version = &VersionTable{t}
 	d.Download = &DownloadTable{t}
 	d.Log = &LogTable{t}
 
