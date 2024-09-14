@@ -71,17 +71,18 @@ func (s *SoftTube) StartApplication() error {
 
 			// fmt.Println(k.State())
 			// fmt.Println(k.KeyVal())
+			ctrl := k.State() == 20
 
 			if k.State() == 16 && k.KeyVal() == 65474 { // F5
 				s.videoList.Refresh("")
 			}
-			if k.State() == 20 && k.KeyVal() >= 49 && k.KeyVal() <= 54 { // CTRL + 1-5
+			if ctrl && k.KeyVal() >= 49 && k.KeyVal() <= 54 { // CTRL + 1-5
 				s.videoList.switchView(viewType(k.KeyVal() - 48))
 			}
-			if k.State() == 20 && k.KeyVal() == 102 { // Ctrl + f
+			if ctrl && k.KeyVal() == 102 { // Ctrl + f
 				s.searchBar.searchEntry.GrabFocus()
 			}
-			if k.State() == 20 && k.KeyVal() == 108 { // Ctrl + l
+			if ctrl && k.KeyVal() == 108 { // Ctrl + l
 				s.videoList.expandCollapseLog()
 			}
 			if k.State() == 16 && k.KeyVal() == 65535 { // Del
@@ -95,25 +96,25 @@ func (s *SoftTube) StartApplication() error {
 			if k.State() == 16 && k.KeyVal() == 65367 { // End
 				s.videoList.scroll.toEnd()
 			}
-			if k.State() == 20 && k.KeyVal() == 65367 { // Ctrl + End
+			if ctrl && k.KeyVal() == 65367 { // Ctrl + End
 				status := s.toolbar.toolbarKeepScrollToEnd.GetActive()
 				s.toolbar.toolbarKeepScrollToEnd.SetActive(!status)
 				// s.videoList.keepScrollToEnd = !s.videoList.keepScrollToEnd
 			}
-			if k.State() == 20 && k.KeyVal() == 113 { // Ctrl + q
+			if ctrl && k.KeyVal() == 113 { // Ctrl + q
 				gtk.MainQuit()
 			}
-			if k.State() == 20 && k.KeyVal() == 65535 { // Ctrl + Del
+			if ctrl && k.KeyVal() == 65535 { // Ctrl + Del
 				s.searchBar.Clear()
 			}
-			if k.KeyVal() == gdk.KEY_d || k.KeyVal() == gdk.KEY_D { // D (duration)
+			if ctrl && (k.KeyVal() == gdk.KEY_d || k.KeyVal() == gdk.KEY_D) { // ctrl + D (duration)
 				vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
 				if vid == nil {
 					return
 				}
 				s.videoList.videoFunctions.downloadDuration(vid)
 			}
-			if k.KeyVal() == gdk.KEY_t || k.KeyVal() == gdk.KEY_T { // T (thumbnail)
+			if ctrl && (k.KeyVal() == gdk.KEY_t || k.KeyVal() == gdk.KEY_T) { // ctrl + T (thumbnail)
 				vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
 				if vid == nil {
 					return
