@@ -67,60 +67,7 @@ func (s *SoftTube) StartApplication() error {
 
 	_ = win.Connect(
 		"key-press-event", func(w *gtk.Window, e *gdk.Event) {
-			k := gdk.EventKeyNewFromEvent(e)
-
-			// fmt.Println(k.State())
-			// fmt.Println(k.KeyVal())
-			ctrl := k.State() == 20
-
-			if k.State() == 16 && k.KeyVal() == 65474 { // F5
-				s.videoList.Refresh("")
-			}
-			if ctrl && k.KeyVal() >= 49 && k.KeyVal() <= 54 { // CTRL + 1-5
-				s.videoList.switchView(viewType(k.KeyVal() - 48))
-			}
-			if ctrl && k.KeyVal() == 102 { // Ctrl + f
-				s.searchBar.searchEntry.GrabFocus()
-			}
-			if ctrl && k.KeyVal() == 108 { // Ctrl + l
-				s.videoList.expandCollapseLog()
-			}
-			if k.State() == 16 && k.KeyVal() == 65535 { // Del
-				if s.videoList.currentView == viewToDelete {
-					s.videoList.DeleteWatchedVideos()
-				}
-			}
-			if k.State() == 16 && k.KeyVal() == 65360 { // Home
-				s.videoList.scroll.toStart()
-			}
-			if k.State() == 16 && k.KeyVal() == 65367 { // End
-				s.videoList.scroll.toEnd()
-			}
-			if ctrl && k.KeyVal() == 65367 { // Ctrl + End
-				status := s.toolbar.toolbarKeepScrollToEnd.GetActive()
-				s.toolbar.toolbarKeepScrollToEnd.SetActive(!status)
-				// s.videoList.keepScrollToEnd = !s.videoList.keepScrollToEnd
-			}
-			if ctrl && k.KeyVal() == 113 { // Ctrl + q
-				gtk.MainQuit()
-			}
-			if ctrl && k.KeyVal() == 65535 { // Ctrl + Del
-				s.searchBar.Clear()
-			}
-			if ctrl && (k.KeyVal() == gdk.KEY_d || k.KeyVal() == gdk.KEY_D) { // ctrl + D (duration)
-				vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
-				if vid == nil {
-					return
-				}
-				s.videoList.videoFunctions.downloadDuration(vid)
-			}
-			if ctrl && (k.KeyVal() == gdk.KEY_t || k.KeyVal() == gdk.KEY_T) { // ctrl + T (thumbnail)
-				vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
-				if vid == nil {
-					return
-				}
-				s.videoList.videoFunctions.downloadThumbnail(vid)
-			}
+			s.onKeyPressed(e)
 		},
 	)
 	win.SetIconName("video-display")
@@ -192,4 +139,61 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 func (s *SoftTube) getWindowTitle() string {
 	return constAppTitle + " " + constAppVersion
+}
+
+func (s *SoftTube) onKeyPressed(e *gdk.Event) {
+	k := gdk.EventKeyNewFromEvent(e)
+
+	//fmt.Println(k.State())
+	//fmt.Println(k.KeyVal())
+
+	ctrl := (k.State() & gdk.CONTROL_MASK) != 0
+	special := (k.State() & gdk.MOD2_MASK) != 0 // Used for special keys like F5, DELETE, HOME in X11 etc
+
+	// Control + key
+	if ctrl {
+		switch k.KeyVal() {
+		case gdk.KEY_f: // Ctrl + f
+			s.searchBar.searchEntry.GrabFocus()
+		case gdk.KEY_l: // Ctrl + l
+			s.videoList.expandCollapseLog()
+		case gdk.KEY_q: // Ctrl + q
+			gtk.MainQuit()
+		case gdk.KEY_d: // Ctrl + d
+			vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
+			if vid != nil {
+				s.videoList.videoFunctions.downloadDuration(vid)
+			}
+		case gdk.KEY_t: // Ctrl + t
+			vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
+			if vid != nil {
+				s.videoList.videoFunctions.downloadThumbnail(vid)
+			}
+		case gdk.KEY_Delete: // Ctrl + Del
+			s.searchBar.Clear()
+		case gdk.KEY_End: // Ctrl + End
+			status := s.toolbar.toolbarKeepScrollToEnd.GetActive()
+			s.toolbar.toolbarKeepScrollToEnd.SetActive(!status)
+		default: // Ctrl + 1-5
+			if k.KeyVal() >= gdk.KEY_1 && k.KeyVal() <= gdk.KEY_5 { // Change view
+				s.videoList.switchView(viewType(k.KeyVal() - gdk.KEY_0))
+			}
+		}
+	}
+
+	// Special keys
+	if special {
+		switch k.KeyVal() {
+		case gdk.KEY_F5: // F5
+			s.videoList.Refresh("")
+		case gdk.KEY_Delete: // Del
+			if s.videoList.currentView == viewToDelete {
+				s.videoList.DeleteWatchedVideos()
+			}
+		case gdk.KEY_Home: // Home
+			s.videoList.scroll.toStart()
+		case gdk.KEY_End: // End
+			s.videoList.scroll.toEnd()
+		}
+	}
 }
