@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -21,12 +22,13 @@ const sqlVideosGetFailed = `SELECT Videos.id, Videos.subscription_id, Videos.tit
 const sqlVideosExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
 const sqlVideosGetStatus = "SELECT status FROM Videos WHERE id=?"
 const sqlVideosGet = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
-const sqlVideosInsert = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added, status, save) 
-								VALUES (?, ?, ?, ?, ?, ?, 0, 0);`
+const sqlVideosInsert = `INSERT IGNORE INTO Videos (id, subscription_id, title, duration, published, added, status, 
+save, seconds) 
+								VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?);`
 const sqlVideosDelete = "DELETE FROM Videos WHERE id=? AND save=0"
 const sqlVideosUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
 const sqlVideosUpdateSave = "UPDATE Videos SET save=? WHERE id=?"
-const sqlVideosUpdateDuration = "UPDATE Videos SET duration=? WHERE id=?"
+const sqlVideosUpdateDuration = "UPDATE Videos SET duration=?, seconds=? WHERE id=?"
 const sqlVideosSearch = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
 									Videos.status, Subscriptions.name , Videos.save
 									FROM Videos 
@@ -143,7 +145,8 @@ func (v VideosTable) Insert(
 	now := time.Now().UTC().Format(constDateLayout) // Added
 
 	// Execute insert statement
-	_, err := v.Connection.Exec(sqlVideosInsert, id, subscriptionID, title, duration, published, now)
+	_, err := v.Connection.Exec(sqlVideosInsert, id, subscriptionID, title, duration, published, now,
+		v.getSeconds(duration))
 	if err != nil {
 		return err
 	}
@@ -191,7 +194,7 @@ func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 	}
 
 	// Execute insert statement
-	_, err := v.Connection.Exec(sqlVideosUpdateDuration, duration, videoID)
+	_, err := v.Connection.Exec(sqlVideosUpdateDuration, duration, v.getSeconds(duration), videoID)
 	if err != nil {
 		return err
 	}
@@ -296,4 +299,59 @@ func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
 	_ = rows.Close()
 
 	return videos, nil
+}
+
+func (v VideosTable) getSeconds(duration string) int {
+	if duration == "" {
+		return 0
+	}
+	if duration == "LIVE" || duration == "MEMBER" || duration == "ERROR" {
+		return 0
+	}
+
+	// Split the duration into parts
+	parts := strings.Split(duration, ":")
+
+	// Handle different formats based on the number of parts
+	switch len(parts) {
+	case 1:
+		// Format: SS or S
+		seconds, err := strconv.Atoi(parts[0])
+
+		if err != nil {
+			return 0
+		}
+		return seconds
+
+	case 2:
+		// Format: MM:SS or M:SS
+		minutes, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return 0
+		}
+		seconds, err := strconv.Atoi(parts[1])
+		if err != nil {
+			return 0
+		}
+		return minutes*60 + seconds
+
+	case 3:
+		// Format: HH:MM:SS or H:MM:SS
+		hours, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return 0
+		}
+		minutes, err := strconv.Atoi(parts[1])
+		if err != nil {
+			return 0
+		}
+		seconds, err := strconv.Atoi(parts[2])
+		if err != nil {
+			return 0
+		}
+		return hours*3600 + minutes*60 + seconds
+
+	default:
+		return 0
+	}
 }
