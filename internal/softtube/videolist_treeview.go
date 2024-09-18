@@ -1,8 +1,6 @@
 package softtube
 
 import (
-	"log"
-
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/gotk3/gotk3/pango"
 )
@@ -41,7 +39,8 @@ func (t *treeViewHelper) createTextColumn(
 ) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererTextNew()
 	if err != nil {
-		log.Fatal("Unable to create text cell renderer:", err)
+		t.videoList.parent.Logger.Error.Println("Unable to create text cell renderer:", err)
+		panic(err)
 	}
 
 	// Font weight and size
@@ -51,7 +50,8 @@ func (t *treeViewHelper) createTextColumn(
 
 	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", int(id))
 	if err != nil {
-		log.Fatal("Unable to create cell column:", err)
+		t.videoList.parent.Logger.Error.Println("Unable to create cell column:", err)
+		panic(err)
 	}
 	column.AddAttribute(cellRenderer, "background", int(listStoreColumnBackground))
 	column.AddAttribute(cellRenderer, "foreground", int(listStoreColumnForeground))
@@ -68,14 +68,16 @@ func (t *treeViewHelper) createTextColumn(
 func (t *treeViewHelper) createImageColumn(title string) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererPixbufNew()
 	if err != nil {
-		log.Fatal("Unable to create pixbuf cell renderer:", err)
+		t.videoList.parent.Logger.Error.Println("Unable to create pixbuf cell renderer:", err)
+		panic(err)
 	}
 	// cellRenderer.SetProperty("weight", weight)
 	// cellRenderer.SetVisible(true)
 
 	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "pixbuf", int(listStoreColumnImage))
 	if err != nil {
-		log.Fatal("Unable to create cell column:", err)
+		t.videoList.parent.Logger.Error.Println("Unable to create cell column:", err)
+		panic(err)
 	}
 	column.SetFixedWidth(160)
 	column.SetVisible(true)
@@ -88,13 +90,15 @@ func (t *treeViewHelper) createImageColumn(title string) *gtk.TreeViewColumn {
 func (t *treeViewHelper) createProgressColumn(title string) *gtk.TreeViewColumn {
 	cellRenderer, err := gtk.CellRendererProgressNew()
 	if err != nil {
-		log.Fatal("Unable to create progress cell renderer:", err)
+		t.videoList.parent.Logger.Error.Println("Unable to create progress cell renderer:", err)
+		panic(err)
 	}
 	// cellRenderer.SetVisible(true)
 
 	column, err := gtk.TreeViewColumnNewWithAttribute(title, cellRenderer, "text", int(listStoreColumnProgressText))
 	if err != nil {
-		log.Fatal("Unable to create cell column:", err)
+		t.videoList.parent.Logger.Error.Println("Unable to create cell column:", err)
+		panic(err)
 	}
 	column.SetFixedWidth(90)
 	column.SetVisible(true)

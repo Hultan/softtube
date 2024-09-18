@@ -20,20 +20,20 @@ type activityLog struct {
 }
 
 // Init : Loads the log
-func (al *activityLog) Init(builder *builder.Builder) {
+func (al *activityLog) Init(builder *builder.Builder) error {
 	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
 	al.treeView = tree
 
 	store, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
-		al.parent.Logger.Error.Println("Failed to create list store!")
-		al.parent.Logger.Error.Println(err)
-		panic(err)
+		return err
 	}
 	al.listStore = store
 	al.setupColumns()
 	al.loadResources()
 	al.FillLog()
+
+	return nil
 }
 
 // FillLog : Fills the log with the last n logs

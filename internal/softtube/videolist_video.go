@@ -2,7 +2,6 @@ package softtube
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -39,11 +38,13 @@ func (v *videoFunctions) delete(video *database.Video) {
 		// Starts a sub process that deletes the video
 		err := cmd.Start()
 		if err != nil {
-			log.Printf("Error deleting video : %v\n", err)
+			v.videoList.parent.Logger.Error.Printf("Error deleting video : %v\n", err)
+			return
 		}
 		err = cmd.Wait()
 		if err != nil {
-			log.Printf("Error waiting for process to stop : %v\n", err)
+			v.videoList.parent.Logger.Error.Printf("Error waiting for process to stop : %v\n", err)
+			return
 		}
 		wg.Done()
 	}()

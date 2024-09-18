@@ -87,6 +87,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.toolbar = &toolbar{parent: s}
 	err := s.toolbar.Init(builder)
 	if err != nil {
+		s.Logger.Error.Println("setupControls : toolbar failed!")
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
@@ -95,6 +96,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.statusBar = &statusBar{parent: s}
 	err = s.statusBar.Init(builder)
 	if err != nil {
+		s.Logger.Error.Println("setupControls : statusbar failed!")
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
@@ -103,6 +105,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.menuBar = &menuBar{parent: s}
 	err = s.menuBar.Init(builder)
 	if err != nil {
+		s.Logger.Error.Println("setupControls : menubar failed!")
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
@@ -111,6 +114,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.searchBar = &searchBar{parent: s}
 	err = s.searchBar.Init(builder)
 	if err != nil {
+		s.Logger.Error.Println("setupControls : searchbar failed!")
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
@@ -119,6 +123,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.videoList = &videoList{parent: s}
 	err = s.videoList.Init(builder)
 	if err != nil {
+		s.Logger.Error.Println("setupControls : videolist failed!")
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
@@ -129,13 +134,19 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.popupMenu = &popupMenu{parent: s}
 	err = s.popupMenu.Init(builder)
 	if err != nil {
+		s.Logger.Error.Println("setupControls : popupmenu failed!")
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
 
 	// Init log
 	s.activityLog = &activityLog{parent: s, treeView: s.videoList.treeView}
-	s.activityLog.Init(builder)
+	err = s.activityLog.Init(builder)
+	if err != nil {
+		s.Logger.Error.Println("setupControls : activitylog failed!")
+		s.Logger.Error.Println(err)
+		panic(err)
+	}
 }
 
 func (s *SoftTube) getWindowTitle() string {
@@ -144,9 +155,6 @@ func (s *SoftTube) getWindowTitle() string {
 
 func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 	k := gdk.EventKeyNewFromEvent(e)
-
-	//fmt.Println(k.State())
-	//fmt.Println(k.KeyVal())
 
 	ctrl := (k.State() & gdk.CONTROL_MASK) != 0
 	special := (k.State() & gdk.MOD2_MASK) != 0 // Used for special keys like F5, DELETE, HOME in X11 etc

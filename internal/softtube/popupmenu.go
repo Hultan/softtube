@@ -1,8 +1,6 @@
 package softtube
 
 import (
-	"fmt"
-
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
@@ -215,7 +213,7 @@ func (p *popupMenu) SetupEvents() {
 			if vid != nil {
 				clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
 				if err != nil {
-					fmt.Println("Clipboard error!")
+					p.parent.Logger.Error.Println(err)
 					return
 				}
 				clipboard.SetText(vid.ID)

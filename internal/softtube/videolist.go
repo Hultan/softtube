@@ -114,7 +114,6 @@ func (v *videoList) Refresh(searchFor string) {
 		glib.TYPE_STRING,
 	) // Foreground color
 	if err != nil {
-		v.parent.Logger.Error.Println("Failed to create list store!")
 		v.parent.Logger.Error.Println(err)
 		panic(err)
 	}
@@ -173,7 +172,7 @@ func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	if err != nil {
 		v.parent.Logger.Error.Println(err)
 	}
-	color, err := value.GetString()
+	col, err := value.GetString()
 	if err != nil {
 		v.parent.Logger.Error.Println(err)
 	}
@@ -182,19 +181,19 @@ func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	case viewSubscriptions:
 		return true
 	case viewDownloads:
-		if color == constColorDownloading {
+		if col == constColorDownloading {
 			return true
 		}
 	case viewToWatch:
-		if color == constColorDownloaded {
+		if col == constColorDownloaded {
 			return true
 		}
 	case viewToDelete:
-		if color == constColorWatched {
+		if col == constColorWatched {
 			return true
 		}
 	case viewSaved:
-		if color == constColorSaved {
+		if col == constColorSaved {
 			return true
 		}
 	default:
@@ -247,7 +246,10 @@ func (v *videoList) renameJPG2WEBP(thumbnailPath string) {
 	extension := filepath.Ext(thumbnailPath)
 	if extension == ".jpg" {
 		newName := thumbnailPath[:len(thumbnailPath)-len(extension)] + ".webp"
-		_ = os.Rename(thumbnailPath, newName)
+		err := os.Rename(thumbnailPath, newName)
+		if err != nil {
+			v.parent.Logger.Error.Println(err)
+		}
 	}
 }
 

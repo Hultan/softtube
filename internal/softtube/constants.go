@@ -48,8 +48,7 @@ const (
 type viewType int
 
 const (
-	viewNone viewType = iota
-	viewSubscriptions
+	viewSubscriptions viewType = iota + 1
 	viewDownloads
 	viewToWatch
 	viewSaved

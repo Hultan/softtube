@@ -113,6 +113,9 @@ func (m *menuBar) openLogFile(logFile string) {
 		// Did not get this to work, but read the following, and maybe I can get
 		// this to work in the future
 		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
-		_ = cmd.Run()
+		err := cmd.Run()
+		if err != nil {
+			m.parent.Logger.Error.Println(err)
+		}
 	}()
 }
