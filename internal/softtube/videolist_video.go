@@ -52,8 +52,8 @@ func (v *videoFunctions) delete(video *database.Video) {
 		// Log that the video has been deleted in the database
 		err := v.videoList.parent.DB.Log.Insert(constLogDelete, video.Title)
 		if err != nil {
-			v.videoList.parent.Logger.Log("Failed to log video as watched!")
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println("Failed to log video as watched!")
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -68,8 +68,8 @@ func (v *videoFunctions) delete(video *database.Video) {
 		// Set video status as deleted
 		err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDeleted)
 		if err != nil {
-			v.videoList.parent.Logger.Log("Failed to set video status to deleted!")
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println("Failed to set video status to deleted!")
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -107,8 +107,8 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 	)
 
 	if err != nil {
-		v.videoList.parent.Logger.Log("Failed to add row!")
-		v.videoList.parent.Logger.LogError(err)
+		v.videoList.parent.Logger.Error.Println("Failed to add row!")
+		v.videoList.parent.Logger.Error.Println(err)
 	}
 }
 
@@ -125,7 +125,7 @@ func (v *videoFunctions) play(video *database.Video) {
 		videoPath := v.getPath(video.ID)
 		if videoPath == "" {
 			msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
-			v.videoList.parent.Logger.Log(msg)
+			v.videoList.parent.Logger.Error.Println(msg)
 			return
 		}
 
@@ -141,7 +141,7 @@ func (v *videoFunctions) play(video *database.Video) {
 		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
 		err := cmd.Run()
 		if err != nil {
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -153,8 +153,8 @@ func (v *videoFunctions) play(video *database.Video) {
 		// Log that the video has been deleted in the database
 		err := v.videoList.parent.DB.Log.Insert(constLogPlay, video.Title)
 		if err != nil {
-			v.videoList.parent.Logger.Log("Failed to log video as watched!")
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println("Failed to log video as watched!")
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -169,8 +169,8 @@ func (v *videoFunctions) play(video *database.Video) {
 		// Set video status as watched
 		err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusWatched)
 		if err != nil {
-			v.videoList.parent.Logger.Log("Failed to set video status to watched!")
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println("Failed to set video status to watched!")
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -219,8 +219,8 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 	// Set the video to be downloaded
 	err := v.videoList.parent.DB.Download.Insert(video.ID)
 	if err != nil {
-		v.videoList.parent.Logger.Log("Failed to set video to be downloaded!")
-		v.videoList.parent.Logger.LogError(err)
+		v.videoList.parent.Logger.Error.Println("Failed to set video to be downloaded!")
+		v.videoList.parent.Logger.Error.Println(err)
 		return err
 	}
 
@@ -236,8 +236,8 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 		// Log that the video has been requested to be downloaded in the database
 		err = v.videoList.parent.DB.Log.Insert(constLogDownload, video.Title)
 		if err != nil {
-			v.videoList.parent.Logger.Log("Failed to log video as watched!")
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println("Failed to log video as watched!")
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -252,8 +252,8 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 		// Set video status as downloading
 		err = v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDownloading)
 		if err != nil {
-			v.videoList.parent.Logger.Log("Failed to set video status to downloading!")
-			v.videoList.parent.Logger.LogError(err)
+			v.videoList.parent.Logger.Error.Println("Failed to set video status to downloading!")
+			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
 	}()
@@ -305,8 +305,8 @@ func (v *videoFunctions) setAsWatched(video *database.Video, mode int) {
 	}
 	err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, status)
 	if err != nil {
-		v.videoList.parent.Logger.LogFormat("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
-		v.videoList.parent.Logger.LogError(err)
+		v.videoList.parent.Logger.Error.Printf("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
+		v.videoList.parent.Logger.Error.Println(err)
 	}
 	// v.videoList.setRowColor(v.videoList.Treeview, constColorSaved)
 	v.videoList.Refresh("")
@@ -316,11 +316,11 @@ func (v *videoFunctions) setAsSaved(video *database.Video, saved bool) {
 	err := v.videoList.parent.DB.Videos.UpdateSave(video.ID, saved)
 	if err != nil {
 		if saved {
-			v.videoList.parent.Logger.LogFormat("Failed to set video as saved! %s", video.ID)
+			v.videoList.parent.Logger.Error.Printf("Failed to set video as saved! %s", video.ID)
 		} else {
-			v.videoList.parent.Logger.LogFormat("Failed to set video as unsaved! %s", video.ID)
+			v.videoList.parent.Logger.Error.Printf("Failed to set video as unsaved! %s", video.ID)
 		}
-		v.videoList.parent.Logger.LogError(err)
+		v.videoList.parent.Logger.Error.Println(err)
 	}
 	// v.videoList.setRowColor(v.videoList.Treeview, constColorSaved)
 	v.videoList.Refresh("")
@@ -349,13 +349,13 @@ func (v *videoFunctions) getThumbnail(videoID string) *gdk.Pixbuf {
 	thumbnail, err := gdk.PixbufNewFromFile(thumbnailPath)
 	if err != nil {
 		v.videoList.renameJPG2WEBP(thumbnailPath)
-		v.videoList.parent.Logger.LogError(err)
+		v.videoList.parent.Logger.Error.Println(err)
 		thumbnail = nil
 	} else {
 		thumbnail, err = thumbnail.ScaleSimple(160, 90, gdk.INTERP_BILINEAR)
 		if err != nil {
 			msg := fmt.Sprintf("Failed to scale thumnail (%s)!", thumbnailPath)
-			v.videoList.parent.Logger.Log(msg)
+			v.videoList.parent.Logger.Error.Println(msg)
 			thumbnail = nil
 		}
 	}
@@ -374,9 +374,9 @@ func (v *videoFunctions) downloadDuration(video *database.Video) {
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			v.parent.Logger.Log("Failed to get duration:")
-			v.parent.Logger.Log(string(output))
-			v.parent.Logger.LogError(err)
+			v.parent.Logger.Error.Println("Failed to get duration:")
+			v.parent.Logger.Error.Println(string(output))
+			v.parent.Logger.Error.Println(err)
 			return
 		}
 
@@ -411,9 +411,9 @@ func (v *videoFunctions) downloadThumbnail(video *database.Video) {
 			cmd := exec.Command("/bin/bash", "-c", command)
 			output, err := cmd.CombinedOutput()
 			if len(output) == 0 && err != nil {
-				v.parent.Logger.Log("Failed to download thumbnail:")
-				v.parent.Logger.Log(string(output))
-				v.parent.Logger.LogError(err)
+				v.parent.Logger.Error.Println("Failed to download thumbnail:")
+				v.parent.Logger.Error.Println(string(output))
+				v.parent.Logger.Error.Println(err)
 				return
 			}
 

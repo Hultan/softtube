@@ -92,7 +92,7 @@ func (v *videoList) Refresh(searchFor string) {
 		videos, err = v.parent.DB.Videos.Search(searchFor)
 	}
 	if err != nil {
-		v.parent.Logger.LogError(err)
+		v.parent.Logger.Error.Println(err)
 		return
 	}
 
@@ -114,8 +114,8 @@ func (v *videoList) Refresh(searchFor string) {
 		glib.TYPE_STRING,
 	) // Foreground color
 	if err != nil {
-		v.parent.Logger.Log("Failed to create list store!")
-		v.parent.Logger.LogError(err)
+		v.parent.Logger.Error.Println("Failed to create list store!")
+		v.parent.Logger.Error.Println(err)
 		panic(err)
 	}
 
@@ -126,7 +126,7 @@ func (v *videoList) Refresh(searchFor string) {
 
 	filter, err := listStore.FilterNew(&gtk.TreePath{})
 	if err != nil {
-		v.parent.Logger.LogError(err)
+		v.parent.Logger.Error.Println(err)
 		return
 	}
 	filter.SetVisibleFunc(v.filterFunc)
@@ -171,11 +171,11 @@ func (v *videoList) Refresh(searchFor string) {
 func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 	value, err := model.GetValue(iter, int(listStoreColumnBackground))
 	if err != nil {
-		v.parent.Logger.LogError(err)
+		v.parent.Logger.Error.Println(err)
 	}
 	color, err := value.GetString()
 	if err != nil {
-		v.parent.Logger.LogError(err)
+		v.parent.Logger.Error.Println(err)
 	}
 
 	switch v.currentView {
@@ -236,7 +236,7 @@ func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 	} else if vid.Status == constStatusNotDownloaded {
 		err := v.videoFunctions.download(vid, true)
 		if err != nil {
-			v.parent.Logger.LogError(err)
+			v.parent.Logger.Error.Println(err)
 		}
 	}
 }

@@ -176,7 +176,7 @@ func (p *popupMenu) SetupEvents() {
 		"activate", func() {
 			vids, err := p.parent.DB.Videos.GetVideos(true, p.parent.videoList.currentView == viewSaved)
 			if err != nil {
-				p.parent.Logger.LogError(err)
+				p.parent.Logger.Error.Println(err)
 				return
 			}
 			for key := range vids {

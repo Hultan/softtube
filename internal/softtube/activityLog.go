@@ -26,8 +26,8 @@ func (al *activityLog) Init(builder *builder.Builder) {
 
 	store, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
-		al.parent.Logger.Log("Failed to create list store!")
-		al.parent.Logger.LogError(err)
+		al.parent.Logger.Error.Println("Failed to create list store!")
+		al.parent.Logger.Error.Println(err)
 		panic(err)
 	}
 	al.listStore = store
@@ -82,8 +82,8 @@ func (al *activityLog) shortenString(text string) string {
 func (al *activityLog) getLogs() []database.Log {
 	logs, err := al.parent.DB.Log.GetLatest()
 	if err != nil {
-		al.parent.Logger.Log("Failed to load logs!")
-		al.parent.Logger.LogError(err)
+		al.parent.Logger.Error.Println("Failed to load logs!")
+		al.parent.Logger.Error.Println(err)
 		return nil
 	}
 	return logs
@@ -123,7 +123,7 @@ func (al *activityLog) loadResources() {
 func (al *activityLog) createPixbuf(bytes []byte) *gdk.Pixbuf {
 	pic, err := gdk.PixbufNewFromBytesOnly(bytes)
 	if err != nil {
-		al.parent.Logger.LogError(err)
+		al.parent.Logger.Error.Println(err)
 	}
 	return pic
 }

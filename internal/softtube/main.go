@@ -5,6 +5,7 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/softtube/internal/logger"
 
 	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.core"
@@ -35,7 +36,7 @@ var setUnwatchedIcon []byte
 // SoftTube : The SoftTube application object
 type SoftTube struct {
 	Config *core.Config
-	Logger *core.Logger
+	Logger *logger.Logger
 	DB     *database.Database
 
 	toolbar     *toolbar
@@ -49,8 +50,8 @@ type SoftTube struct {
 
 // StartApplication : Starts the SoftTube application
 func (s *SoftTube) StartApplication() error {
-	s.Logger.Log("SoftTube client startup")
-	defer s.Logger.Log("SoftTube client shutdown")
+	s.Logger.Info.Println("SoftTube client startup")
+	defer s.Logger.Info.Println("SoftTube client shutdown")
 
 	gtk.Init(nil)
 
@@ -86,7 +87,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.toolbar = &toolbar{parent: s}
 	err := s.toolbar.Init(builder)
 	if err != nil {
-		s.Logger.LogError(err)
+		s.Logger.Error.Println(err)
 		panic(err)
 	}
 
@@ -94,7 +95,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.statusBar = &statusBar{parent: s}
 	err = s.statusBar.Init(builder)
 	if err != nil {
-		s.Logger.LogError(err)
+		s.Logger.Error.Println(err)
 		panic(err)
 	}
 
@@ -102,7 +103,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.menuBar = &menuBar{parent: s}
 	err = s.menuBar.Init(builder)
 	if err != nil {
-		s.Logger.LogError(err)
+		s.Logger.Error.Println(err)
 		panic(err)
 	}
 
@@ -110,7 +111,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.searchBar = &searchBar{parent: s}
 	err = s.searchBar.Init(builder)
 	if err != nil {
-		s.Logger.LogError(err)
+		s.Logger.Error.Println(err)
 		panic(err)
 	}
 
@@ -118,7 +119,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.videoList = &videoList{parent: s}
 	err = s.videoList.Init(builder)
 	if err != nil {
-		s.Logger.LogError(err)
+		s.Logger.Error.Println(err)
 		panic(err)
 	}
 
@@ -128,7 +129,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 	s.popupMenu = &popupMenu{parent: s}
 	err = s.popupMenu.Init(builder)
 	if err != nil {
-		s.Logger.LogError(err)
+		s.Logger.Error.Println(err)
 		panic(err)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"path"
 
 	"github.com/hultan/crypto"
+	"github.com/hultan/softtube/internal/logger"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,7 +14,7 @@ import (
 )
 
 var (
-	logger   *core.Logger
+	log      *logger.Logger
 	config   *core.Config
 	db       *database.Database
 	softTube *softtube.SoftTube
@@ -44,15 +45,18 @@ func loadConfig() {
 }
 
 func startLogging() {
+	var err error
+
 	// Start logging
-	logger = core.NewLog(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
-	logger.LogStart("softtube client")
+	log, err = logger.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func stopLogging() {
 	// Close log file
-	logger.LogFinished("softtube client")
-	logger.Close()
+	log.Close()
 }
 
 func openDatabase() *database.Database {
@@ -60,8 +64,8 @@ func openDatabase() *database.Database {
 	conn := config.Connection
 	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
-		logger.Log("Failed to decrypt MySQL password!")
-		logger.LogError(err)
+		log.Info.Println("Failed to decrypt MySQL password!")
+		log.Info.Println(err)
 		panic(err)
 	}
 
@@ -81,13 +85,13 @@ func startApplication() {
 	// Create a new application.
 	softTube = &softtube.SoftTube{
 		Config: config,
-		Logger: logger,
+		Logger: log,
 		DB:     db,
 	}
 	err := softTube.StartApplication()
 	if err != nil {
-		logger.Log("Failed to start application!")
-		logger.LogError(err)
+		log.Info.Println("Failed to start application!")
+		log.Info.Println(err)
 		panic(err)
 	}
 }
