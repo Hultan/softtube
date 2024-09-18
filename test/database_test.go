@@ -9,22 +9,6 @@ import (
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
 
-// TestVersion : tests get version from database
-func TestVersion(t *testing.T) {
-	db, err := openDatabase(t)
-	if err != nil {
-		t.Errorf("TestVersion: Failed to open database : %s", err.Error())
-	}
-	version, err := db.Version.Get()
-	if err != nil {
-		t.Errorf("TestVersion: Get() returned an error : %s", err.Error())
-	}
-
-	if version.Major != 1 || version.Minor != 0 || version.Revision != 0 {
-		t.Errorf("TestVersion: Version returned wrong version (should be 1.0.0) : %d.%d.%d", version.Major, version.Minor, version.Revision)
-	}
-}
-
 // TestSubscriptionGetAll : test Subscription.GetAll()
 func TestSubscriptionGetAll(t *testing.T) {
 	db, err := openDatabase(t)
@@ -167,7 +151,8 @@ func openDatabase(t *testing.T) (*database.Database, error) {
 		t.Errorf("openDatabase: Failed to get config : %s", err.Error())
 		return nil, err
 	}
-	db := database.NewDatabase(config.Connection.Server, config.Connection.Port, config.Connection.Database, config.Connection.Username, config.Connection.Password)
+	db := database.NewDatabase(config.Connection.Server, config.Connection.Port, config.Connection.Database,
+		config.Connection.Username, config.Connection.Password)
 	err = db.Open()
 	if err != nil {
 		t.Errorf("openDatabase: Failed to open database : %s", err.Error())

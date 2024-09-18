@@ -2,7 +2,6 @@ package softtube
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -223,7 +222,6 @@ func (v *videoList) getProgress(status database.VideoStatusType) (int, string) {
 }
 
 func (v *videoList) rowActivated(treeView *gtk.TreeView) {
-	fmt.Println("Enter rowactivated!")
 	vid := v.videoFunctions.getSelected(treeView)
 	if vid == nil {
 		return
@@ -241,7 +239,6 @@ func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 			v.parent.Logger.LogError(err)
 		}
 	}
-	fmt.Println("Leaving rowactivated!")
 }
 
 // Some .webp images are erroneously named .jpg, so
