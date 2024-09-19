@@ -128,8 +128,6 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 		panic(err)
 	}
 
-	s.videoList.Refresh("")
-
 	// Init popup menu bar
 	s.popupMenu = &popupMenu{parent: s}
 	err = s.popupMenu.Init(builder)
@@ -147,6 +145,10 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
+
+	go func() {
+		s.videoList.Refresh("")
+	}()
 }
 
 func (s *SoftTube) getWindowTitle() string {
