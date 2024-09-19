@@ -267,7 +267,7 @@ func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
 	} else {
 		sqlString = sqlVideosGetLatest
 		if savedView {
-			sqlString = strings.Replace(sqlString, "$ORDER$", "subscription_id, title desc", -1)
+			sqlString = strings.Replace(sqlString, "$ORDER$", "subscription_id, added asc", -1)
 		} else {
 			sqlString = strings.Replace(sqlString, "$ORDER$", "added desc", -1)
 		}
