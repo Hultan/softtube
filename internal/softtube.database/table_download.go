@@ -9,11 +9,6 @@ type DownloadTable struct {
 	*Table
 }
 
-// TODO : Make max downloads a setting
-const sqlDownloadsGetAll = "SELECT video_id FROM Download LIMIT 5"
-const sqlDownloadsInsert = "INSERT INTO Download (video_id) VALUES (?)"
-const sqlDownloadsDelete = "DELETE FROM Download WHERE video_id=?"
-
 // Insert : Insert a new download request into the database
 func (d DownloadTable) Insert(id string) error {
 	// Check that database is opened

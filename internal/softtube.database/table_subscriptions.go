@@ -11,11 +11,6 @@ type SubscriptionTable struct {
 	*Table
 }
 
-// sql : Get all subscriptions
-const sqlSubscriptionsGetAll = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions"
-const sqlSubscriptionsGet = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions WHERE id=?"
-const sqlSubscriptionsUpdateLastChecked = "UPDATE Subscriptions SET last_checked=?, next_update=? WHERE id=?"
-
 // GetAll : Returns all subscriptions
 func (s SubscriptionTable) GetAll() ([]Subscription, error) {
 	// Check that database is opened

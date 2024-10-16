@@ -9,12 +9,6 @@ type LogTable struct {
 	*Table
 }
 
-// sql : Get version
-const sqlLogInsert = `INSERT INTO Log (type, message, time) VALUES (?, ?, NOW());`
-const sqlLogGetLatest = `SELECT id, type, message FROM Log                 
-ORDER BY id desc
-LIMIT 50`
-
 // Insert : Insert a new video into the database
 func (l *LogTable) Insert(logType LogType, logMessage string) error {
 	// Check that database is opened

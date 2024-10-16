@@ -32,6 +32,10 @@ type Database struct {
 	Log           *LogTable
 }
 
+type Table struct {
+	*Database
+}
+
 // NewDatabase : Creates a new database object
 func NewDatabase(server string, port int, database, username, password string) *Database {
 	c := ConnectionInfo{Server: server, Port: port, Database: database, Username: username, Password: password}
