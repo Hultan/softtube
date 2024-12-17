@@ -133,7 +133,7 @@ func (p *popupMenu) SetupEvents() {
 					p.popupGetVideoID.SetSensitive(videoSelected)
 					p.popupGetThumbnail.SetSensitive(videoSelected)
 					p.popupDeleteAll.SetVisible(false)
-					p.popupUnwatch.SetSensitive(false)
+					p.popupUnwatch.SetSensitive(true)
 					p.popupUnwatch.SetLabel(constSetAsWatched)
 					p.popupSave.SetSensitive(true)
 					p.popupSave.SetLabel(constSetAsNotSaved)
