@@ -21,6 +21,8 @@ type menuBar struct {
 	menuViewSaved         *gtk.RadioMenuItem
 	menuViewToDelete      *gtk.RadioMenuItem
 
+	menuViewOpenSoftTube *gtk.MenuItem
+
 	menuViewLog       *gtk.MenuItem
 	menuViewUpdateLog *gtk.MenuItem
 }
@@ -41,6 +43,8 @@ func (m *menuBar) Init(builder *builder.Builder) error {
 	m.menuViewSaved.JoinGroup(m.menuViewSubscriptions)
 	m.menuViewToDelete.JoinGroup(m.menuViewSubscriptions)
 	m.menuViewSubscriptions.SetActive(true)
+
+	m.menuViewOpenSoftTube = builder.GetObject("menu_view_open_softtube").(*gtk.MenuItem)
 
 	m.menuViewLog = builder.GetObject("menu_view_log").(*gtk.MenuItem)
 	m.menuViewUpdateLog = builder.GetObject("menu_view_update_log").(*gtk.MenuItem)
@@ -87,6 +91,13 @@ func (m *menuBar) SetupEvents() {
 			m.parent.videoList.switchView(viewToDelete)
 		},
 	)
+
+	_ = m.menuViewOpenSoftTube.Connect(
+		"activate", func() {
+			m.openSoftTubeFolder()
+		},
+	)
+
 	_ = m.menuViewLog.Connect(
 		"activate", func() {
 			m.openLogFile("softtube.client.log")
@@ -100,10 +111,28 @@ func (m *menuBar) SetupEvents() {
 }
 
 func (m *menuBar) openLogFile(logFile string) {
-	// Start Video Player
 	go func() {
 		p := path.Join(m.parent.Config.ClientPaths.Log, logFile)
 		command := fmt.Sprintf("xed '%s' &", p)
+		cmd := exec.Command("/bin/bash", "-c", command)
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+			Pgid:    0,
+		}
+		// Starts a sub process (smplayer)
+		// Did not get this to work, but read the following, and maybe I can get
+		// this to work in the future
+		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
+		err := cmd.Run()
+		if err != nil {
+			m.parent.Logger.Error.Println(err)
+		}
+	}()
+}
+
+func (m *menuBar) openSoftTubeFolder() {
+	go func() {
+		command := "nemo '/softtube' &"
 		cmd := exec.Command("/bin/bash", "-c", command)
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			Setpgid: true,
