@@ -295,8 +295,8 @@ func (v *videoFunctions) getSelectedVideos(treeView *gtk.TreeView) []*database.V
 		for i := 0; i < len(videos); i++ {
 			video = videos[i]
 			if video.ID == videoID {
-				selectedVideos = append(selectedVideos, &database.Video{ID: videoID})
-				continue
+				selectedVideos = append(selectedVideos, &video)
+				break
 			}
 		}
 	})
