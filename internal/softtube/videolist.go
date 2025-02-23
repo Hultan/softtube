@@ -221,19 +221,22 @@ func (v *videoList) getProgress(status database.VideoStatusType) (int, string) {
 }
 
 func (v *videoList) rowActivated(treeView *gtk.TreeView) {
-	vid := v.videoFunctions.getSelected(treeView)
-	if vid == nil {
+	selectedVideos := v.videoFunctions.getSelectedVideos(treeView)
+	if selectedVideos == nil {
 		return
 	}
 
-	if vid.Status == constStatusDownloaded ||
-		vid.Status == constStatusWatched ||
-		vid.Status == constStatusSaved {
+	// We only allow playing or downloading one video at a time
+	selectedVideo := selectedVideos[0]
 
-		v.videoFunctions.play(vid)
+	if selectedVideo.Status == constStatusDownloaded ||
+		selectedVideo.Status == constStatusWatched ||
+		selectedVideo.Status == constStatusSaved {
 
-	} else if vid.Status == constStatusNotDownloaded {
-		err := v.videoFunctions.download(vid, true)
+		v.videoFunctions.play(selectedVideo)
+
+	} else if selectedVideo.Status == constStatusNotDownloaded {
+		err := v.videoFunctions.download(selectedVideo, true)
 		if err != nil {
 			v.parent.Logger.Error.Println(err)
 		}

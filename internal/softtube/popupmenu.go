@@ -1,6 +1,8 @@
 package softtube
 
 import (
+	"log"
+
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
@@ -57,10 +59,28 @@ func (p *popupMenu) Init(builder *builder.Builder) error {
 // SetupEvents : Set up the toolbar events
 func (p *popupMenu) SetupEvents() {
 	_ = p.parent.videoList.treeView.Connect(
-		"button-release-event", func(treeview *gtk.TreeView, event *gdk.Event) {
+		"button-press-event", func(treeview *gtk.TreeView, event *gdk.Event) bool {
+			// This code solves the problem with the last selected row
+			// getting deselected when you open the context menu
+			selection, err := treeview.GetSelection()
+			if err != nil {
+				log.Fatal("Unable to get TreeSelection:", err)
+			}
+
 			buttonEvent := gdk.EventButtonNewFromEvent(event)
 			if buttonEvent.Button() == gdk.BUTTON_SECONDARY {
-				videoSelected := p.parent.videoList.videoFunctions.getSelected(p.parent.videoList.treeView) != nil
+				// Check if the clicked row is already selected
+				path, _, _, _, _ := treeview.GetPathAtPos(int(buttonEvent.X()), int(buttonEvent.Y()))
+				if path != nil {
+					isSelected := selection.PathIsSelected(path)
+					if !isSelected {
+						selection.SelectPath(path) // Select the row if it’s not already selected
+					}
+				}
+				// END : This code solves the problem with the last selected row
+				// getting deselected when you open the context menu
+
+				videoSelected := p.parent.videoList.videoFunctions.getSelectedVideos(p.parent.videoList.treeView) != nil
 				view := func(subscription, download, toWatch, saved, toDelete bool) {
 					p.popupViewSubscriptions.SetSensitive(subscription)
 					p.popupViewDownloads.SetSensitive(download)
@@ -142,7 +162,14 @@ func (p *popupMenu) SetupEvents() {
 				}
 
 				p.popupMenu.PopupAtPointer(event)
+
+				// By returning true/false here we stop event propagation
+				// so that the row the user clicks does not get deselected
+				// by the right click.
+				return true
 			}
+
+			return false
 		},
 	)
 
@@ -155,18 +182,22 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupDownload.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
-				_ = p.parent.videoList.videoFunctions.download(vid, true)
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					_ = p.parent.videoList.videoFunctions.download(video, true)
+				}
 			}
 		},
 	)
 	_ = p.popupRedownloadVideo.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
-				_ = p.parent.videoList.videoFunctions.download(vid, false)
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					_ = p.parent.videoList.videoFunctions.download(video, false)
+				}
 			}
 		},
 	)
@@ -189,9 +220,10 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupPlay.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
-				p.parent.videoList.videoFunctions.play(vid)
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				// You can only play one video at the time so we only play the first
+				p.parent.videoList.videoFunctions.play(selectedVideos[0])
 			}
 		},
 	)
@@ -199,9 +231,11 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupGetDuration.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
-				p.parent.videoList.videoFunctions.downloadDuration(vid)
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					p.parent.videoList.videoFunctions.downloadDuration(video)
+				}
 			}
 		},
 	)
@@ -209,14 +243,15 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupGetVideoID.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				// We can only copy one ID at the time, so we only copy the first
 				clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
 				if err != nil {
 					p.parent.Logger.Error.Println(err)
 					return
 				}
-				clipboard.SetText(vid.ID)
+				clipboard.SetText(selectedVideos[0].ID)
 			}
 		},
 	)
@@ -224,9 +259,11 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupGetThumbnail.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
-				p.parent.videoList.videoFunctions.downloadThumbnail(vid)
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					p.parent.videoList.videoFunctions.downloadThumbnail(video)
+				}
 			}
 		},
 	)
@@ -240,10 +277,12 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupSave.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
-				mode := p.popupSave.GetLabel() == constSetAsSaved
-				p.parent.videoList.videoFunctions.setAsSaved(vid, mode)
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					mode := p.popupSave.GetLabel() == constSetAsSaved
+					p.parent.videoList.videoFunctions.setAsSaved(video, mode)
+				}
 			}
 		},
 	)
@@ -251,8 +290,8 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupUnwatch.Connect(
 		"activate", func() {
 			treeview := p.parent.videoList.treeView
-			vid := p.parent.videoList.videoFunctions.getSelected(treeview)
-			if vid != nil {
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
 				var mode int
 				switch p.popupUnwatch.GetLabel() {
 				case constSetAsNotDownloaded:
@@ -265,7 +304,9 @@ func (p *popupMenu) SetupEvents() {
 					mode = 2
 					break
 				}
-				p.parent.videoList.videoFunctions.setAsWatched(vid, mode)
+				for _, video := range selectedVideos {
+					p.parent.videoList.videoFunctions.setAsWatched(video, mode)
+				}
 			}
 		},
 	)

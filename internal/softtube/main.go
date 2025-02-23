@@ -171,14 +171,18 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 		case gdk.KEY_q: // Ctrl + q
 			gtk.MainQuit()
 		case gdk.KEY_d: // Ctrl + d
-			vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
-			if vid != nil {
-				s.videoList.videoFunctions.downloadDuration(vid)
+			selectedVideos := s.videoList.videoFunctions.getSelectedVideos(s.videoList.treeView)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					s.videoList.videoFunctions.downloadDuration(video)
+				}
 			}
 		case gdk.KEY_t: // Ctrl + t
-			vid := s.videoList.videoFunctions.getSelected(s.videoList.treeView)
-			if vid != nil {
-				s.videoList.videoFunctions.downloadThumbnail(vid)
+			selectedVideos := s.videoList.videoFunctions.getSelectedVideos(s.videoList.treeView)
+			if selectedVideos != nil {
+				for _, video := range selectedVideos {
+					s.videoList.videoFunctions.downloadThumbnail(video)
+				}
 			}
 		case gdk.KEY_Delete: // Ctrl + Del
 			s.searchBar.Clear()

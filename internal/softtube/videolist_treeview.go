@@ -1,6 +1,8 @@
 package softtube
 
 import (
+	"log"
+
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/gotk3/gotk3/pango"
 )
@@ -12,8 +14,18 @@ type treeViewHelper struct {
 
 // Setup : Set up the video list
 func (t *treeViewHelper) Setup() {
+	t.setupMultiSelection()
 	t.setupEvents()
 	t.setupColumns()
+}
+
+func (t *treeViewHelper) setupMultiSelection() {
+	// Enable multiple selection
+	selection, err := t.videoList.treeView.GetSelection()
+	if err != nil {
+		log.Fatal("Unable to get TreeSelection:", err)
+	}
+	selection.SetMode(gtk.SELECTION_MULTIPLE)
 }
 
 // setupEvents : Set up the list events

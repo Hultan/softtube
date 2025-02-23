@@ -215,7 +215,7 @@ func (v *videoFunctions) getPathForDeletion(videoID string) string {
 	return tryPath
 }
 
-// Download a youtube video
+// Download a YouTube video
 func (v *videoFunctions) download(video *database.Video, markAsDownloading bool) error {
 	// Set the video to be downloaded
 	err := v.videoList.parent.DB.Download.Insert(video.ID)
@@ -264,31 +264,66 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 	return nil
 }
 
-func (v *videoFunctions) getSelected(treeView *gtk.TreeView) *database.Video {
+func (v *videoFunctions) getSelectedVideos(treeView *gtk.TreeView) []*database.Video {
+	var selectedVideos []*database.Video
+
 	selection, err := treeView.GetSelection()
 	if err != nil {
-		return nil
-	}
-	model, iter, ok := selection.GetSelected()
-	if ok {
-		value, err := model.(*gtk.TreeModel).GetValue(iter, int(listStoreColumnVideoID))
-		if err != nil {
-			return nil
-		}
-		videoID, err := value.GetString()
-		if err != nil {
-			return nil
-		}
-		for i := 0; i < len(videos); i++ {
-			video := videos[i]
-			if video.ID == videoID {
-				return &video
-			}
-		}
+		// Failed to get selection
 		return nil
 	}
 
-	return nil
+	model, err := treeView.GetModel()
+	if err != nil {
+		// Failed to get model
+		return nil
+	}
+
+	paths := selection.GetSelectedRows(model)
+	if paths.Length() == 0 {
+		// No rows selected
+		return nil
+	}
+
+	var video database.Video
+
+	paths.Foreach(func(path interface{}) {
+		iter, _ := model.ToTreeModel().GetIter(path.(*gtk.TreePath))
+		value, _ := model.ToTreeModel().GetValue(iter, int(listStoreColumnVideoID))
+		videoID, err := value.GetString()
+		if err != nil {
+			return
+		}
+
+		for i := 0; i < len(videos); i++ {
+			video = videos[i]
+			if video.ID == videoID {
+				selectedVideos = append(selectedVideos, &database.Video{ID: videoID})
+				continue
+			}
+		}
+	})
+
+	//model, iter, ok := selection.GetSelected()
+	//if !ok {
+	//	// No rows where selected
+	//	return nil
+	//}
+	//value, err := model.(*gtk.TreeModel).GetValue(iter, int(listStoreColumnVideoID))
+	//if err != nil {
+	//	return nil
+	//}
+	//videoID, err := value.GetString()
+	//if err != nil {
+	//	return nil
+	//}
+	//for i := 0; i < len(videos); i++ {
+	//	video := videos[i]
+	//	if video.ID == videoID {
+	//		return &video
+	//	}
+	//}
+	return selectedVideos
 }
 
 func (v *videoFunctions) setAsWatched(video *database.Video, mode int) {
@@ -364,7 +399,7 @@ func (v *videoFunctions) getThumbnail(videoID string) *gdk.Pixbuf {
 	return thumbnail
 }
 
-// Download a youtube video
+// Download a YouTube video
 func (v *videoFunctions) downloadDuration(video *database.Video) {
 	if video == nil {
 		return
