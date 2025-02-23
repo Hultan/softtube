@@ -114,8 +114,6 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 }
 
 func (v *videoFunctions) play(video *database.Video) {
-	fmt.Println("Enter play!")
-
 	v.videoList.parent.activityLog.FillLog()
 
 	var wg sync.WaitGroup
@@ -178,7 +176,6 @@ func (v *videoFunctions) play(video *database.Video) {
 	wg.Wait()
 
 	v.videoList.Refresh("")
-	fmt.Println("Leaving play!")
 
 	// Try and set focus to SMPlayer
 	// This might not work because of this bug : https://github.com/smplayer-dev/smplayer/issues/580
