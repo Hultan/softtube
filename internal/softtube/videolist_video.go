@@ -282,8 +282,6 @@ func (v *videoFunctions) getSelectedVideos(treeView *gtk.TreeView) []*database.V
 		return nil
 	}
 
-	var video database.Video
-
 	paths.Foreach(func(path interface{}) {
 		iter, _ := model.ToTreeModel().GetIter(path.(*gtk.TreePath))
 		value, _ := model.ToTreeModel().GetValue(iter, int(listStoreColumnVideoID))
@@ -293,7 +291,7 @@ func (v *videoFunctions) getSelectedVideos(treeView *gtk.TreeView) []*database.V
 		}
 
 		for i := 0; i < len(videos); i++ {
-			video = videos[i]
+			video := videos[i]
 			if video.ID == videoID {
 				selectedVideos = append(selectedVideos, &video)
 				break
@@ -323,26 +321,28 @@ func (v *videoFunctions) getSelectedVideos(treeView *gtk.TreeView) []*database.V
 	return selectedVideos
 }
 
-func (v *videoFunctions) setAsWatched(video *database.Video, mode int) {
-	var status database.VideoStatusType
-	switch mode {
-	case 0:
-		status = constStatusNotDownloaded
-		break
-	case 1:
-		status = constStatusWatched
-		break
-	case 2:
-		status = constStatusDownloaded
-		break
-	}
-	err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, status)
-	if err != nil {
-		v.videoList.parent.Logger.Error.Printf("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
-		v.videoList.parent.Logger.Error.Println(err)
-	}
-	// v.videoList.setRowColor(v.videoList.Treeview, constColorSaved)
-	v.videoList.Refresh("")
+func (v *videoFunctions) setVideoStatus(video *database.Video, mode int, wg *sync.WaitGroup) {
+	go func() {
+		defer wg.Done()
+
+		var status database.VideoStatusType
+		switch mode {
+		case 0:
+			status = constStatusNotDownloaded
+			break
+		case 1:
+			status = constStatusWatched
+			break
+		case 2:
+			status = constStatusDownloaded
+			break
+		}
+		err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, status)
+		if err != nil {
+			v.videoList.parent.Logger.Error.Printf("Failed to set video as downloaded/watched/unwatched! %s", video.ID)
+			v.videoList.parent.Logger.Error.Println(err)
+		}
+	}()
 }
 
 func (v *videoFunctions) setAsSaved(video *database.Video, saved bool) {

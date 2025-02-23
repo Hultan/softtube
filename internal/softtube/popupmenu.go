@@ -2,6 +2,7 @@ package softtube
 
 import (
 	"log"
+	"sync"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -304,9 +305,14 @@ func (p *popupMenu) SetupEvents() {
 					mode = 2
 					break
 				}
+
+				var wg sync.WaitGroup
+				wg.Add(len(selectedVideos))
 				for _, video := range selectedVideos {
-					p.parent.videoList.videoFunctions.setAsWatched(video, mode)
+					p.parent.videoList.videoFunctions.setVideoStatus(video, mode, &wg)
 				}
+				wg.Wait()
+				p.parent.videoList.Refresh("")
 			}
 		},
 	)

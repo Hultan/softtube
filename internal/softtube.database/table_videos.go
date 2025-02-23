@@ -121,6 +121,11 @@ func (v VideosTable) UpdateStatus(id string, status VideoStatusType) error {
 		return errors.New("database not opened")
 	}
 
+	// Check if the connection is still valid
+	if err := v.Connection.Ping(); err != nil {
+		return fmt.Errorf("database connection lost: %v", err)
+	}
+
 	// Execute the update statement
 	_, err := v.Connection.Exec(sqlVideosUpdateStatus, status, id)
 	if err != nil {
