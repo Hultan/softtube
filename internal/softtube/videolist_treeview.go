@@ -3,6 +3,7 @@ package softtube
 import (
 	"log"
 
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/gotk3/gotk3/pango"
 )
@@ -30,7 +31,28 @@ func (t *treeViewHelper) setupMultiSelection() {
 
 // setupEvents : Set up the list events
 func (t *treeViewHelper) setupEvents() {
+	var tooltipEnabled bool // Track tooltip state
+
 	_ = t.videoList.treeView.Connect("row_activated", t.videoList.rowActivated)
+
+	// Below is for tooltips, when holding down SHIFT
+	t.videoList.treeView.AddEvents(int(gdk.POINTER_MOTION_MASK | gdk.KEY_PRESS_MASK)) // Enable motion + key events
+	t.videoList.treeView.Connect("motion-notify-event", func(tv *gtk.TreeView, event *gdk.Event) {
+		motion := gdk.EventMotionNewFromEvent(event) // Get motion event
+		state := motion.State()                      // Get key state (modifier keys)
+
+		if state&gdk.SHIFT_MASK != 0 { // Shift is held
+			if !tooltipEnabled {
+				t.videoList.treeView.SetTooltipColumn(int(listStoreColumnVideoID))
+				tooltipEnabled = true
+			}
+		} else { // Shift is NOT held
+			if tooltipEnabled {
+				t.videoList.treeView.SetTooltipColumn(-1) // Disable tooltip
+				tooltipEnabled = false
+			}
+		}
+	})
 }
 
 // setupColumns : Sets up the listview columns
