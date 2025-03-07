@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -116,37 +117,18 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 func (v *videoFunctions) play(video *database.Video) {
 	v.videoList.parent.activityLog.FillLog()
 
+	// Mark the selected video with watched color
+	v.videoList.color.setRowColor(v.videoList.treeView, constColorWatched)
+
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(5)
 
 	// Start Video Player
 	go func() {
-		videoPath := v.getPath(video.ID)
-		if videoPath == "" {
-			msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
-			v.videoList.parent.Logger.Error.Println(msg)
-			return
-		}
+		v.startSMPlayer(video)
 
-		command := fmt.Sprintf("smplayer '%s' &", videoPath)
-		cmd := exec.Command("/bin/bash", "-c", command)
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			Setpgid: true,
-			Pgid:    0,
-		}
-		// Starts a sub process (smplayer)
-		// Did not get this to work, but read the following, and maybe I can get
-		// this to work in the future
-		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
-		err := cmd.Run()
-		if err != nil {
-			v.videoList.parent.Logger.Error.Println(err)
-		}
 		wg.Done()
 	}()
-
-	// Mark the selected video with watched color
-	v.videoList.color.setRowColor(v.videoList.treeView, constColorWatched)
 
 	go func() {
 		// Log that the video has been deleted in the database
@@ -173,19 +155,66 @@ func (v *videoFunctions) play(video *database.Video) {
 		}
 		wg.Done()
 	}()
+
+	go func() {
+		v.setFocusBackToSoftPlan()
+
+		wg.Done()
+	}()
+
 	wg.Wait()
 
 	v.videoList.Refresh("")
+}
 
-	// Try and set focus to SMPlayer
-	// This might not work because of this bug : https://github.com/smplayer-dev/smplayer/issues/580
-	// go func() {
-	// 	cmd := exec.Command("xdotool", "windowactivate --name smplayer")
-	// 	err := cmd.Run()
-	// 	if err != nil {
-	// 		// Ignore errors
-	// 	}
-	// }()
+func (v *videoFunctions) startSMPlayer(video *database.Video) {
+	videoPath := v.getPath(video.ID)
+	if videoPath == "" {
+		msg := fmt.Sprintf("Failed to find video : %s (%s)", video.Title, video.ID)
+		v.videoList.parent.Logger.Error.Println(msg)
+		return
+	}
+
+	command := fmt.Sprintf("smplayer '%s' &", videoPath)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+		Pgid:    0,
+	}
+	// Starts a sub process (smplayer)
+	// Did not get this to work, but read the following, and maybe I can get
+	// this to work in the future
+	// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
+	err := cmd.Run()
+	if err != nil {
+		v.videoList.parent.Logger.Error.Println(err)
+	}
+}
+
+func (v *videoFunctions) setFocusBackToSoftPlan() {
+	// Try and set focus back to Softtube after a few seconds
+	time.Sleep(5 * time.Second) // Delay before refocusing
+
+	appClass := "Softtube"
+
+	// Get all matching window IDs
+	winIDBytes, err := exec.Command("xdotool", "search", "--class", appClass).Output()
+	if err != nil || len(winIDBytes) == 0 {
+		fmt.Println("No window found for class:", appClass)
+		return
+	}
+
+	// Extract valid window IDs
+	winIDs := strings.Fields(string(winIDBytes))
+	if len(winIDs) > 1 {
+		// Activate the second ID, since the first is likely a helper window
+		exec.Command("xdotool", "windowmap", winIDs[1]).Run()
+		exec.Command("xdotool", "windowactivate", winIDs[1]).Run()
+	} else if len(winIDs) == 1 {
+		// If only one window is found, activate it
+		exec.Command("xdotool", "windowmap", winIDs[0]).Run()
+		exec.Command("xdotool", "windowactivate", winIDs[0]).Run()
+	}
 }
 
 func (v *videoFunctions) getPath(videoID string) string {

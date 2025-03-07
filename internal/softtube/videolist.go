@@ -2,6 +2,8 @@ package softtube
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -134,6 +136,12 @@ func (v *videoList) Refresh(searchFor string) {
 	count := filter.IterNChildren(nil)
 	v.parent.statusBar.UpdateVideoCount(count)
 
+	err = v.setNextSelectedVideo()
+	if err != nil {
+		v.parent.Logger.Error.Println(err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
+	}
+
 	if v.keepScrollToEnd {
 		// For some reason, we can't scroll to end in the
 		// UI thread so create a goroutine that does the
@@ -161,6 +169,64 @@ func (v *videoList) Refresh(searchFor string) {
 			runtime.GC()
 		}
 	}()
+}
+
+func (v *videoList) setNextSelectedVideo() error {
+	path, err := v.getNextVideoPath()
+	if err != nil {
+		return err
+	}
+	if path != nil {
+		selection, err := v.treeView.GetSelection()
+		if err != nil {
+			return err
+		}
+		if selection == nil {
+			return errors.New("selection is nil")
+		}
+
+		// Set the selection
+		selection.SelectPath(path)
+		// Set the cursor to ensure it gets properly activated
+		v.treeView.SetCursor(path, nil, false)
+		// Ensure the TreeView is focused
+		v.treeView.GrabFocus()
+	}
+	return nil
+}
+
+func (v *videoList) getNextVideoPath() (*gtk.TreePath, error) {
+	var path *gtk.TreePath
+	var err error
+	var pathString string
+
+	if v.keepScrollToEnd {
+		// Select the last row
+		model, err := v.treeView.GetModel() // Get the model
+		if err != nil {
+			return nil, err
+		}
+		if model != nil {
+			iter, ok := model.ToTreeModel().GetIterFirst()
+			if ok { // Ensure there's at least one row
+				count := 1
+				for model.ToTreeModel().IterNext(iter) { // Count the rows
+					count++
+				}
+				// Get path string to the last row
+				pathString = fmt.Sprintf("%d", count-1)
+			}
+		}
+	} else {
+		// Get path string to the first row
+		pathString = "0"
+	}
+	path, err = gtk.TreePathNewFromString(pathString)
+	if err != nil {
+		return nil, err
+	}
+
+	return path, nil
 }
 
 //
