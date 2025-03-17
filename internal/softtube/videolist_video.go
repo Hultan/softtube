@@ -426,62 +426,53 @@ func (v *videoFunctions) getThumbnail(videoID string) *gdk.Pixbuf {
 }
 
 // Download a YouTube video
-func (v *videoFunctions) downloadDuration(video *database.Video) {
-	if video == nil {
+func (v *videoFunctions) downloadDuration(videoId string) {
+	command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, videoId)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		v.parent.Logger.Error.Println("Failed to get duration:")
+		v.parent.Logger.Error.Println(string(output))
+		v.parent.Logger.Error.Println(err)
 		return
 	}
 
-	go func() {
-		command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, video.ID)
+	duration := strings.Trim(string(output), " \n")
+	if isWarning(duration) {
+		i := strings.Index(duration, "\n")
+		duration = duration[i+1:]
+	}
+	if isLive(duration) {
+		duration = "LIVE"
+	}
+	if isError(duration) {
+		duration = "ERROR"
+	}
+	if isMember(duration) {
+		duration = "MEMBER"
+	}
+
+	_ = v.videoList.parent.DB.Videos.UpdateDuration(videoId, duration)
+}
+
+// Get the thumbnail of a YouTube video
+func (v *videoFunctions) downloadThumbnail(videoId string) {
+	// %s/%s.jpg
+	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, videoId)
+
+	// Don't download thumbnail if it already exists
+	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
+		command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, videoId)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
-		if err != nil {
-			v.parent.Logger.Error.Println("Failed to get duration:")
+		if len(output) == 0 && err != nil {
+			v.parent.Logger.Error.Println("Failed to download thumbnail:")
 			v.parent.Logger.Error.Println(string(output))
 			v.parent.Logger.Error.Println(err)
 			return
 		}
 
-		duration := strings.Trim(string(output), " \n")
-		if isWarning(duration) {
-			i := strings.Index(duration, "\n")
-			duration = duration[i+1:]
-		}
-		if isLive(duration) {
-			duration = "LIVE"
-		}
-		if isError(duration) {
-			duration = "ERROR"
-		}
-		if isMember(duration) {
-			duration = "MEMBER"
-		}
-
-		_ = v.videoList.parent.DB.Videos.UpdateDuration(video.ID, duration)
-	}()
-}
-
-// Get the thumbnail of a YouTube video
-func (v *videoFunctions) downloadThumbnail(video *database.Video) {
-	// %s/%s.jpg
-	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, video.ID)
-
-	go func() {
-		// Don't download thumbnail if it already exists
-		if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-			command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, video.ID)
-			cmd := exec.Command("/bin/bash", "-c", command)
-			output, err := cmd.CombinedOutput()
-			if len(output) == 0 && err != nil {
-				v.parent.Logger.Error.Println("Failed to download thumbnail:")
-				v.parent.Logger.Error.Println(string(output))
-				v.parent.Logger.Error.Println(err)
-				return
-			}
-
-		}
-	}()
-	return
+	}
 }
 
 func isWarning(duration string) bool {

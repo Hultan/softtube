@@ -174,14 +174,14 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 			selectedVideos := s.videoList.videoFunctions.getSelectedVideos(s.videoList.treeView)
 			if selectedVideos != nil {
 				for _, video := range selectedVideos {
-					s.videoList.videoFunctions.downloadDuration(video)
+					go func() { s.videoList.videoFunctions.downloadDuration(video.ID) }()
 				}
 			}
 		case gdk.KEY_t: // Ctrl + t
 			selectedVideos := s.videoList.videoFunctions.getSelectedVideos(s.videoList.treeView)
 			if selectedVideos != nil {
 				for _, video := range selectedVideos {
-					s.videoList.videoFunctions.downloadThumbnail(video)
+					go func() { s.videoList.videoFunctions.downloadThumbnail(video.ID) }()
 				}
 			}
 		case gdk.KEY_Delete: // Ctrl + Del
