@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -121,15 +120,11 @@ func (v *videoFunctions) play(video *database.Video) {
 	// Mark the selected video with watched color
 	v.videoList.color.setRowColor(v.videoList.treeView, constColorWatched)
 
-	var wg sync.WaitGroup
-	wg.Add(5)
-
 	// Start Video Player
-	go func() {
-		v.startSMPlayer(video)
+	v.startSMPlayer(video)
 
-		wg.Done()
-	}()
+	var wg sync.WaitGroup
+	wg.Add(3)
 
 	go func() {
 		// Log that the video has been deleted in the database
@@ -157,15 +152,11 @@ func (v *videoFunctions) play(video *database.Video) {
 		wg.Done()
 	}()
 
-	go func() {
-		v.setFocusBackToSoftPlan()
-
-		wg.Done()
-	}()
-
 	wg.Wait()
 
 	v.videoList.Refresh("")
+
+	v.setFocusBackToSoftPlan()
 }
 
 func (v *videoFunctions) startSMPlayer(video *database.Video) {
@@ -193,9 +184,6 @@ func (v *videoFunctions) startSMPlayer(video *database.Video) {
 }
 
 func (v *videoFunctions) setFocusBackToSoftPlan() {
-	// Try and set focus back to Softtube after a few seconds
-	time.Sleep(5 * time.Second) // Delay before refocusing
-
 	appClass := "Softtube"
 
 	// Get all matching window IDs
