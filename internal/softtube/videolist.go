@@ -176,22 +176,30 @@ func (v *videoList) setNextSelectedVideo() error {
 	if err != nil {
 		return err
 	}
-	if path != nil {
-		selection, err := v.treeView.GetSelection()
-		if err != nil {
-			return err
-		}
-		if selection == nil {
-			return errors.New("selection is nil")
-		}
+	if path == nil {
+		return errors.New("path is nil")
+	}
 
+	selection, err := v.treeView.GetSelection()
+	if err != nil {
+		return err
+	}
+	if selection == nil {
+		return errors.New("selection is nil")
+	}
+
+	// This is to make sure that this code is called
+	// from the main thread, when this function is executed
+	// from a goroutine.
+	glib.IdleAdd(func() {
 		// Set the selection
 		selection.SelectPath(path)
 		// Set the cursor to ensure it gets properly activated
 		v.treeView.SetCursor(path, nil, false)
 		// Ensure the TreeView is focused
 		v.treeView.GrabFocus()
-	}
+	})
+
 	return nil
 }
 
