@@ -5,6 +5,7 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
+	"github.com/hultan/dialog"
 	"github.com/hultan/softtube/internal/logger"
 
 	"github.com/hultan/softtube/internal/builder"
@@ -173,16 +174,12 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 		case gdk.KEY_d: // Ctrl + d
 			selectedVideos := s.videoList.videoFunctions.getSelectedVideos(s.videoList.treeView)
 			if selectedVideos != nil {
-				for _, video := range selectedVideos {
-					go func() { s.videoList.videoFunctions.downloadDuration(video.ID) }()
-				}
+				s.downloadDurations(selectedVideos)
 			}
 		case gdk.KEY_t: // Ctrl + t
 			selectedVideos := s.videoList.videoFunctions.getSelectedVideos(s.videoList.treeView)
 			if selectedVideos != nil {
-				for _, video := range selectedVideos {
-					go func() { s.videoList.videoFunctions.downloadThumbnail(video.ID) }()
-				}
+				s.downloadThumbnails(selectedVideos)
 			}
 		case gdk.KEY_Delete: // Ctrl + Del
 			s.searchBar.Clear()
@@ -211,4 +208,48 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 			s.videoList.scroll.toEnd()
 		}
 	}
+}
+
+func (s *SoftTube) downloadDurations(selectedVideos []*database.Video) {
+	errorChan := make(chan error, len(selectedVideos)) // Buffered channel for errors
+
+	for _, video := range selectedVideos {
+		go func() { s.videoList.videoFunctions.downloadDuration(video.ID, errorChan) }()
+	}
+
+	// Collect errors from all goroutines
+	for i := 0; i < len(selectedVideos); i++ {
+		if err := <-errorChan; err != nil {
+			_, _ = dialog.Title("Failed to get duration").
+				Text("An error occurred while trying to get duration of the video").
+				ExtraExpand(err.Error()).ExtraHeight(100).
+				Width(500).ErrorIcon().OkButton().Show()
+		}
+	}
+
+	close(errorChan) // Close the channel when done
+}
+
+func (s *SoftTube) downloadThumbnails(selectedVideos []*database.Video) {
+	errorChan := make(chan error, len(selectedVideos)) // Buffered channel for errors
+
+	for _, video := range selectedVideos {
+		go func() { s.videoList.videoFunctions.downloadThumbnail(video.ID, errorChan) }()
+	}
+
+	// Collect errors from all goroutines
+	for i := 0; i < len(selectedVideos); i++ {
+		if err := <-errorChan; err != nil {
+			_, _ = dialog.Title("Failed to get thumbnail").
+				Text("An error occurred while trying to get the thumbnail of the video").
+				ExtraExpand(err.Error()).ExtraHeight(100).
+				Width(500).ErrorIcon().OkButton().Show()
+		}
+	}
+
+	close(errorChan) // Close the channel when done
+}
+
+func (s *SoftTube) onWindowDestroy() {
+	s.DB.Close()
 }

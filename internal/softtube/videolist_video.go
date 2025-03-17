@@ -1,6 +1,7 @@
 package softtube
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -426,14 +427,14 @@ func (v *videoFunctions) getThumbnail(videoID string) *gdk.Pixbuf {
 }
 
 // Download a YouTube video
-func (v *videoFunctions) downloadDuration(videoId string) {
+func (v *videoFunctions) downloadDuration(videoId string, errorChan chan<- error) {
 	command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, videoId)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		v.parent.Logger.Error.Println("Failed to get duration:")
-		v.parent.Logger.Error.Println(string(output))
-		v.parent.Logger.Error.Println(err)
+		msg := fmt.Sprintf("Failed to get duration! Reason:\n\n%s\n%s\n", string(output), err)
+		v.parent.Logger.Error.Println(msg)
+		errorChan <- errors.New(msg)
 		return
 	}
 
@@ -452,27 +453,37 @@ func (v *videoFunctions) downloadDuration(videoId string) {
 		duration = "MEMBER"
 	}
 
-	_ = v.videoList.parent.DB.Videos.UpdateDuration(videoId, duration)
+	err = v.videoList.parent.DB.Videos.UpdateDuration(videoId, duration)
+	if err != nil {
+		v.videoList.parent.Logger.Error.Println(err.Error())
+		errorChan <- err
+		return
+	}
+	errorChan <- nil
 }
 
 // Get the thumbnail of a YouTube video
-func (v *videoFunctions) downloadThumbnail(videoId string) {
+func (v *videoFunctions) downloadThumbnail(videoId string, errorChan chan<- error) {
 	// %s/%s.jpg
 	thumbPath := fmt.Sprintf(constThumbnailLocation, v.videoList.parent.Config.ServerPaths.Thumbnails, videoId)
 
 	// Don't download thumbnail if it already exists
-	if _, err := os.Stat(thumbPath); os.IsNotExist(err) {
-		command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, videoId)
-		cmd := exec.Command("/bin/bash", "-c", command)
-		output, err := cmd.CombinedOutput()
-		if len(output) == 0 && err != nil {
-			v.parent.Logger.Error.Println("Failed to download thumbnail:")
-			v.parent.Logger.Error.Println(string(output))
-			v.parent.Logger.Error.Println(err)
-			return
-		}
-
+	if _, err := os.Stat(thumbPath); os.IsExist(err) {
+		errorChan <- nil
+		return
 	}
+
+	command := fmt.Sprintf(constThumbnailCommand, youtubeDLPath, thumbPath, videoId)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		msg := fmt.Sprintf("Failed to download thumbnail! Reason:\n\n%s\n%s\n", string(output), err)
+		v.parent.Logger.Error.Println(msg)
+		errorChan <- errors.New(msg)
+		return
+	}
+
+	errorChan <- nil
 }
 
 func isWarning(duration string) bool {

@@ -234,9 +234,7 @@ func (p *popupMenu) SetupEvents() {
 			treeview := p.parent.videoList.treeView
 			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
 			if selectedVideos != nil {
-				for _, video := range selectedVideos {
-					go func() { p.parent.videoList.videoFunctions.downloadDuration(video.ID) }()
-				}
+				p.parent.downloadDurations(selectedVideos)
 			}
 		},
 	)
@@ -262,9 +260,7 @@ func (p *popupMenu) SetupEvents() {
 			treeview := p.parent.videoList.treeView
 			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
 			if selectedVideos != nil {
-				for _, video := range selectedVideos {
-					go func() { p.parent.videoList.videoFunctions.downloadThumbnail(video.ID) }()
-				}
+				p.parent.downloadThumbnails(selectedVideos)
 			}
 		},
 	)
