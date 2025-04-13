@@ -22,6 +22,10 @@ const sqlVideosSearch = `SELECT Videos.id, Videos.subscription_id, Videos.title,
 									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
 									ORDER BY Videos.Added DESC`
 
+const sqlVideosGetStats = `SELECT Videos.id
+									FROM Videos 
+									WHERE Videos.status NOT IN (0,4) OR Videos.save=1`
+
 const sqlVideosGetLatest = `SELECT * FROM 
 									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
 									FROM Videos 

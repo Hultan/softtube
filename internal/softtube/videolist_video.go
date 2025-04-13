@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -184,26 +185,30 @@ func (v *videoFunctions) startSMPlayer(video *database.Video) {
 }
 
 func (v *videoFunctions) setFocusBackToSoftPlan() {
-	appClass := "Softtube"
+	go func() {
+		time.Sleep(5 * time.Second)
 
-	// Get all matching window IDs
-	winIDBytes, err := exec.Command("xdotool", "search", "--class", appClass).Output()
-	if err != nil || len(winIDBytes) == 0 {
-		fmt.Println("No window found for class:", appClass)
-		return
-	}
+		appClass := "Softtube"
 
-	// Extract valid window IDs
-	winIDs := strings.Fields(string(winIDBytes))
-	if len(winIDs) > 1 {
-		// Activate the second ID, since the first is likely a helper window
-		exec.Command("xdotool", "windowmap", winIDs[1]).Run()
-		exec.Command("xdotool", "windowactivate", winIDs[1]).Run()
-	} else if len(winIDs) == 1 {
-		// If only one window is found, activate it
-		exec.Command("xdotool", "windowmap", winIDs[0]).Run()
-		exec.Command("xdotool", "windowactivate", winIDs[0]).Run()
-	}
+		// Get all matching window IDs
+		winIDBytes, err := exec.Command("xdotool", "search", "--class", appClass).Output()
+		if err != nil || len(winIDBytes) == 0 {
+			fmt.Println("No window found for class:", appClass)
+			return
+		}
+
+		// Extract valid window IDs
+		winIDs := strings.Fields(string(winIDBytes))
+		if len(winIDs) > 1 {
+			// Activate the second ID, since the first is likely a helper window
+			exec.Command("xdotool", "windowmap", winIDs[1]).Run()
+			exec.Command("xdotool", "windowactivate", winIDs[1]).Run()
+		} else if len(winIDs) == 1 {
+			// If only one window is found, activate it
+			exec.Command("xdotool", "windowmap", winIDs[0]).Run()
+			exec.Command("xdotool", "windowactivate", winIDs[0]).Run()
+		}
+	}()
 }
 
 func (v *videoFunctions) getPath(videoID string) string {

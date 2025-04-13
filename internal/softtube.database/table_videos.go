@@ -334,3 +334,33 @@ func (v VideosTable) getSeconds(duration string) int {
 		return 0
 	}
 }
+
+// GetStats : Gets a list of the videos in DB
+func (v VideosTable) GetStats() ([]string, error) {
+	// Check that database is opened
+	if v.Connection == nil {
+		return nil, errors.New("database not opened")
+	}
+
+	var sqlString = sqlVideosGetStats
+
+	rows, err := v.Connection.Query(sqlString)
+	if err != nil {
+		return []string{}, err
+	}
+
+	var videos []string
+
+	for rows.Next() {
+		video := ""
+		err = rows.Scan(&video)
+		if err != nil {
+			return []string{}, err
+		}
+		videos = append(videos, video)
+	}
+
+	_ = rows.Close()
+
+	return videos, nil
+}

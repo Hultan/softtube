@@ -78,6 +78,13 @@ func (s *SoftTube) StartApplication() error {
 
 	// Show the Window and all of its components.
 	win.ShowAll()
+
+	go func() {
+		s.videoList.Refresh("")
+	}()
+
+	s.showStats()
+
 	gtk.Main()
 
 	return nil
@@ -146,10 +153,6 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 		s.Logger.Error.Println(err)
 		panic(err)
 	}
-
-	go func() {
-		s.videoList.Refresh("")
-	}()
 }
 
 func (s *SoftTube) getWindowTitle() string {
@@ -165,6 +168,8 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 	// Control + key
 	if ctrl {
 		switch k.KeyVal() {
+		case gdk.KEY_s: // Ctrl + s
+			s.showStats()
 		case gdk.KEY_f: // Ctrl + f
 			s.searchBar.searchEntry.GrabFocus()
 		case gdk.KEY_l: // Ctrl + l
