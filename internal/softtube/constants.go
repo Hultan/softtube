@@ -5,7 +5,7 @@ import (
 )
 
 const constAppTitle = "SoftTube"
-const constAppVersion = "3.0.5"
+const constAppVersion = "3.0.6"
 const constDateLayout = "2006-01-02"
 
 type listStoreColumnType int
@@ -42,7 +42,6 @@ const (
 	constStatusDownloaded
 	constStatusWatched
 	constStatusDeleted
-	constStatusSaved
 )
 
 type viewType int

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"strconv"
@@ -342,9 +343,7 @@ func (v VideosTable) GetStats() ([]string, error) {
 		return nil, errors.New("database not opened")
 	}
 
-	var sqlString = sqlVideosGetStats
-
-	rows, err := v.Connection.Query(sqlString)
+	rows, err := v.Connection.Query(sqlVideosGetStats)
 	if err != nil {
 		return []string{}, err
 	}
@@ -363,4 +362,22 @@ func (v VideosTable) GetStats() ([]string, error) {
 	_ = rows.Close()
 
 	return videos, nil
+}
+
+// HasVideosToDelete : Returns true if there are videos to delete
+func (v VideosTable) HasVideosToDelete() bool {
+	// Check that database is opened
+	if v.Connection == nil {
+		return false
+	}
+
+	var sqlString = "SELECT 1 FROM softtube.Videos WHERE Videos.status IN (3) AND Videos.save=0 order by Videos.Added;"
+	var exists int
+	err := v.Connection.QueryRow(sqlString).Scan(&exists)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false
+	} else if err != nil {
+		return false
+	}
+	return true
 }

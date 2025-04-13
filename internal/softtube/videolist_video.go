@@ -128,7 +128,7 @@ func (v *videoFunctions) play(video *database.Video) {
 	wg.Add(3)
 
 	go func() {
-		// Log that the video has been deleted in the database
+		// Log that the video has been watched in the database
 		err := v.videoList.parent.DB.Log.Insert(constLogPlay, video.Title)
 		if err != nil {
 			v.videoList.parent.Logger.Error.Println("Failed to log video as watched!")
@@ -138,7 +138,7 @@ func (v *videoFunctions) play(video *database.Video) {
 	}()
 
 	go func() {
-		// Log that the video has been deleted in the GUI
+		// Log that the video has been watched in the GUI
 		v.videoList.parent.activityLog.AddLog(constLogPlay, video.Title)
 		wg.Done()
 	}()

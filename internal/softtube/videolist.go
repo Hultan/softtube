@@ -169,6 +169,15 @@ func (v *videoList) Refresh(searchFor string) {
 			runtime.GC()
 		}
 	}()
+
+	go func() {
+		del := v.parent.DB.Videos.HasVideosToDelete()
+		if del {
+			v.parent.toolbar.toolbarToDelete.SetLabel("* To delete *")
+		} else {
+			v.parent.toolbar.toolbarToDelete.SetLabel("To delete")
+		}
+	}()
 }
 
 func (v *videoList) setNextSelectedVideo() error {
@@ -305,7 +314,7 @@ func (v *videoList) rowActivated(treeView *gtk.TreeView) {
 
 	if selectedVideo.Status == constStatusDownloaded ||
 		selectedVideo.Status == constStatusWatched ||
-		selectedVideo.Status == constStatusSaved {
+		selectedVideo.Saved {
 
 		v.videoFunctions.play(selectedVideo)
 
