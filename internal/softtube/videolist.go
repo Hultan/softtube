@@ -20,7 +20,7 @@ import (
 
 const constVideoDurationCommand = "%s --get-duration -- '%s'"
 
-// videoList : The SoftTube video list
+// videoList is the SoftTube video list
 type videoList struct {
 	parent          *SoftTube
 	treeView        *gtk.TreeView
@@ -37,7 +37,7 @@ type videoList struct {
 var videos []database.Video
 var listStore *gtk.ListStore
 
-// Init : Loads the toolbar from the glade file
+// Init initializes the toolbar from the glade file
 func (v *videoList) Init(builder *builder.Builder) error {
 	v.currentView = viewSubscriptions
 	v.lastViewSwitch = time.Now()
@@ -66,17 +66,17 @@ func (v *videoList) Init(builder *builder.Builder) error {
 	return nil
 }
 
-// Search : Searches for a video
+// Search searches for a video
 func (v *videoList) Search(text string) {
 	v.Refresh(text)
 }
 
-// DeleteWatchedVideos : Deletes all watched videos from disk
+// DeleteWatchedVideos deletes all watched videos from disk
 func (v *videoList) DeleteWatchedVideos() {
 	for i := 0; i < len(videos); i++ {
 		vid := videos[i]
 		if vid.Status == constStatusWatched && !vid.Saved {
-			// Delete the video from disk
+			// Delete the video from the disk
 			v.videoFunctions.delete(&vid)
 		}
 	}
@@ -84,7 +84,7 @@ func (v *videoList) DeleteWatchedVideos() {
 	v.Refresh("")
 }
 
-// Refresh : Refreshes the video list
+// Refresh refreshes the video list
 func (v *videoList) Refresh(searchFor string) {
 	var err error
 
@@ -162,7 +162,7 @@ func (v *videoList) Refresh(searchFor string) {
 		}()
 	}
 
-	// Run garbage collect after refreshing list
+	// Run garbage collect after refreshing the list
 	go func() {
 		select {
 		case <-time.After(50 * time.Millisecond):
@@ -198,7 +198,7 @@ func (v *videoList) setNextSelectedVideo() error {
 	}
 
 	// This is to make sure that this code is called
-	// from the main thread, when this function is executed
+	// from the main thread when this function is executed
 	// from a goroutine.
 	glib.IdleAdd(func() {
 		// Set the selection
