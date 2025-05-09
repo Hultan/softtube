@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-// VideosTable : VideosTable in the SoftTube database
+// VideosTable in the SoftTube database
 type VideosTable struct {
 	*Table
 }
 
-// Get : Returns a subscription
+// Get a subscription
 func (v VideosTable) Get(id string) (Video, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return Video{}, errors.New("database not opened")
 	}
@@ -36,9 +36,9 @@ func (v VideosTable) Get(id string) (Video, error) {
 	return video, err
 }
 
-// Exists : Does a video already exist in the database?
+// Exists returns true if a video already exists in the database
 func (v VideosTable) Exists(videoID string) (bool, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return false, errors.New("database not opened")
 	}
@@ -63,9 +63,9 @@ func (v VideosTable) Exists(videoID string) (bool, error) {
 	return false, fmt.Errorf("failed to check if video '%s' exists", videoID)
 }
 
-// GetStatus : Get the video status
+// GetStatus gets the video status
 func (v VideosTable) GetStatus(videoID string) (int, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return -1, errors.New("database not opened")
 	}
@@ -90,11 +90,11 @@ func (v VideosTable) GetStatus(videoID string) (int, error) {
 	return -1, fmt.Errorf("failed to check if video '%s' exists", videoID)
 }
 
-// Insert : Insert a new video into the database
+// Insert a new video into the database
 func (v VideosTable) Insert(
 	id string, subscriptionID string, title string, duration string, published time.Time,
 ) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -115,9 +115,9 @@ func (v VideosTable) Insert(
 	return nil
 }
 
-// UpdateStatus : Update the status for a video
+// UpdateStatus updates the status for a video
 func (v VideosTable) UpdateStatus(id string, status VideoStatusType) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -136,9 +136,9 @@ func (v VideosTable) UpdateStatus(id string, status VideoStatusType) error {
 	return nil
 }
 
-// UpdateSave : Update saved flag for a video
+// UpdateSave updates the saved flag for a video
 func (v VideosTable) UpdateSave(id string, saved bool) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -152,9 +152,9 @@ func (v VideosTable) UpdateSave(id string, saved bool) error {
 	return nil
 }
 
-// UpdateDuration : Update duration for a video
+// UpdateDuration updates duration for a video
 func (v VideosTable) UpdateDuration(videoID string, duration string) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -168,9 +168,9 @@ func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 	return nil
 }
 
-// Delete : Delete a video from the database
+// Delete deletes a video from the database
 func (v VideosTable) Delete(id string) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -184,9 +184,9 @@ func (v VideosTable) Delete(id string) error {
 	return nil
 }
 
-// Search : Searches for videos
+// Search searches for videos
 func (v VideosTable) Search(text string) ([]Video, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return nil, errors.New("database not opened")
 	}
@@ -220,9 +220,9 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 	return videos, nil
 }
 
-// GetVideos : Gets a list of the latest videos
+// GetVideos gets a list of the latest videos
 func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return nil, errors.New("database not opened")
 	}
@@ -302,9 +302,9 @@ func (v VideosTable) getSeconds(duration string) int {
 	}
 }
 
-// GetStats : Gets a list of the videos in DB
+// GetStats gets a list of the videos in DB
 func (v VideosTable) GetStats() ([]string, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return nil, errors.New("database not opened")
 	}
@@ -330,9 +330,9 @@ func (v VideosTable) GetStats() ([]string, error) {
 	return videos, nil
 }
 
-// HasVideosToDelete : Returns true if there are videos to delete
+// HasVideosToDelete returns true if there are videos to delete
 func (v VideosTable) HasVideosToDelete() bool {
-	// Check that database is opened
+	// Check that the database is opened
 	if v.Connection == nil {
 		return false
 	}
