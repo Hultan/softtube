@@ -268,13 +268,7 @@ func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
 }
 
 func (v VideosTable) getSeconds(duration string) int {
-	fmt.Println("Duration: " + duration)
-	if duration == "" {
-		fmt.Println("No duration : cause empty")
-		return 0
-	}
-	if duration == "LIVE" || duration == "MEMBER" || duration == "ERROR" {
-		fmt.Println("No duration : cause '" + duration + "'")
+	if duration == "" || duration == "LIVE" || duration == "MEMBER" || duration == "ERROR" {
 		return 0
 	}
 
@@ -285,53 +279,25 @@ func (v VideosTable) getSeconds(duration string) int {
 	switch len(parts) {
 	case 1:
 		// Format: SS or S
-		seconds, err := strconv.Atoi(parts[0])
-		if err != nil {
-			fmt.Println("No duration : cause '" + err.Error() + "'")
-			return 0
-		}
-		fmt.Printf("Duration : %d seconds\n", seconds)
+		seconds, _ := strconv.Atoi(parts[0])
 		return seconds
 
 	case 2:
 		// Format: MM:SS or M:SS
-		minutes, err := strconv.Atoi(parts[0])
-		if err != nil {
-			fmt.Println("No duration : cause '" + err.Error() + "'")
-			return 0
-		}
-		seconds, err := strconv.Atoi(parts[1])
-		if err != nil {
-			fmt.Println("No duration : cause '" + err.Error() + "'")
-			return 0
-		}
+		minutes, _ := strconv.Atoi(parts[0])
+		seconds, _ := strconv.Atoi(parts[1])
 		seconds = minutes*60 + seconds
-		fmt.Printf("Duration : %d seconds\n", seconds)
 		return seconds
 
 	case 3:
 		// Format: HH:MM:SS or H:MM:SS
-		hours, err := strconv.Atoi(parts[0])
-		if err != nil {
-			fmt.Println("No duration : cause '" + err.Error() + "'")
-			return 0
-		}
-		minutes, err := strconv.Atoi(parts[1])
-		if err != nil {
-			fmt.Println("No duration : cause '" + err.Error() + "'")
-			return 0
-		}
-		seconds, err := strconv.Atoi(parts[2])
-		if err != nil {
-			fmt.Println("No duration : cause '" + err.Error() + "'")
-			return 0
-		}
+		hours, _ := strconv.Atoi(parts[0])
+		minutes, _ := strconv.Atoi(parts[1])
+		seconds, _ := strconv.Atoi(parts[2])
 		seconds = hours*3600 + minutes*60 + seconds
-		fmt.Printf("Duration : %d seconds\n", seconds)
 		return seconds
 
 	default:
-		fmt.Println("No duration : cause invalid length")
 		return 0
 	}
 }
