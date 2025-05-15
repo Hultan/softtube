@@ -26,8 +26,8 @@ func (v VideosTable) Get(id string) (Video, error) {
 	video := Video{}
 	var saved uint8
 	err := row.Scan(
-		&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added, &video.Status,
-		&saved,
+		&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published,
+		&video.Added, &video.Status, &saved, &video.Seconds,
 	)
 	if saved == 1 {
 		video.Saved = true
@@ -204,7 +204,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 		video := new(Video)
 		err = rows.Scan(
 			&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added,
-			&video.Status, &video.SubscriptionName, &saved,
+			&video.Status, &video.SubscriptionName, &saved, &video.Seconds,
 		)
 		if err != nil {
 			return nil, err
@@ -251,7 +251,7 @@ func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
 		video := new(Video)
 		err = rows.Scan(
 			&video.ID, &video.SubscriptionID, &video.Title, &video.Duration, &video.Published, &video.Added,
-			&video.Status, &video.SubscriptionName, &saved,
+			&video.Status, &video.SubscriptionName, &saved, &video.Seconds,
 		)
 		if err != nil {
 			return []Video{}, err

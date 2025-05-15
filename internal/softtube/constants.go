@@ -5,7 +5,7 @@ import (
 )
 
 const constAppTitle = "SoftTube"
-const constAppVersion = "3.0.6"
+const constAppVersion = "3.0.7"
 const constDateLayout = "2006-01-02"
 
 type listStoreColumnType int
@@ -21,6 +21,7 @@ const (
 	listStoreColumnDuration
 	listStoreColumnProgressText
 	listStoreColumnForeground
+	listStoreColumnSeconds
 )
 
 type colorType string

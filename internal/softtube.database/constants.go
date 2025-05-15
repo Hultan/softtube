@@ -9,14 +9,15 @@ const constDateLayout = "2006-01-02 15:04:05"
 
 const sqlVideosExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
 const sqlVideosGetStatus = "SELECT status FROM Videos WHERE id=?"
-const sqlVideosGet = "SELECT id, subscription_id, title, duration, published, added, status, save FROM Videos WHERE id=?"
+const sqlVideosGet = "SELECT id, subscription_id, title, duration, published, added, status, save, seconds " +
+	"FROM Videos WHERE id=?"
 const sqlVideosDelete = "DELETE FROM Videos WHERE id=? AND save=0"
 const sqlVideosUpdateStatus = "UPDATE Videos SET status=? WHERE id=?"
 const sqlVideosUpdateSave = "UPDATE Videos SET save=? WHERE id=?"
 const sqlVideosUpdateDuration = "UPDATE Videos SET duration=?, seconds=? WHERE id=?"
 
 const sqlVideosSearch = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, 
-									Videos.status, Subscriptions.name , Videos.save
+									Videos.status, Subscriptions.name , Videos.save, Videos.seconds
 									FROM Videos 
 									INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id 
 									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
@@ -27,7 +28,7 @@ const sqlVideosGetStats = `SELECT Videos.id
 									WHERE Videos.status IN (2,3) OR Videos.save=1`
 
 const sqlVideosGetLatest = `SELECT * FROM 
-									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
+									(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save, Videos.seconds 
 									FROM Videos 
 									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
 									ORDER BY $ORDER$
@@ -36,7 +37,7 @@ const sqlVideosGetLatest = `SELECT * FROM
 									UNION
 
 									SELECT * FROM
-										(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
+										(SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save, Videos.seconds 
 										FROM Videos 
 										INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id 
 										WHERE Videos.status NOT IN (0,4) OR Videos.save=1) as Downloaded
@@ -44,7 +45,8 @@ const sqlVideosGetLatest = `SELECT * FROM
 									ORDER BY $ORDER$`
 
 const sqlVideosGetFailed = `SELECT Videos.id, Videos.subscription_id, Videos.title, Videos.duration, 
-										Videos.published, Videos.added, Videos.status, Subscriptions.name, Videos.save 
+										Videos.published, Videos.added, Videos.status, Subscriptions.name, 
+Videos.save, Videos.seconds 
 									FROM Videos 
 									INNER JOIN Subscriptions ON Videos.subscription_id = Subscriptions.id
 									WHERE Videos.status = 1

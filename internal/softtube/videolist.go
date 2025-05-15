@@ -36,6 +36,7 @@ type videoList struct {
 
 var videos []database.Video
 var listStore *gtk.ListStore
+var totalDuration int64
 
 // Init initializes the toolbar from the glade file
 func (v *videoList) Init(builder *builder.Builder) error {
@@ -88,6 +89,8 @@ func (v *videoList) DeleteWatchedVideos() {
 func (v *videoList) Refresh(searchFor string) {
 	var err error
 
+	totalDuration = 0
+
 	if searchFor == "" {
 		videos, err = v.parent.DB.Videos.GetVideos(false, v.currentView == viewSaved)
 	} else {
@@ -113,8 +116,9 @@ func (v *videoList) Refresh(searchFor string) {
 		glib.TYPE_STRING,    // Video ID
 		glib.TYPE_STRING,    // Duration
 		glib.TYPE_STRING,    // Progress text
-		glib.TYPE_STRING,
-	) // Foreground color
+		glib.TYPE_STRING,    // Foreground color
+		glib.TYPE_INT64,     // Seconds
+	)
 	if err != nil {
 		v.parent.Logger.Error.Println(err)
 		panic(err)
@@ -135,6 +139,7 @@ func (v *videoList) Refresh(searchFor string) {
 
 	count := filter.IterNChildren(nil)
 	v.parent.statusBar.UpdateVideoCount(count)
+	v.parent.statusBar.UpdateVideoDuration(totalDuration)
 
 	err = v.setNextSelectedVideo()
 	if err != nil {
@@ -251,6 +256,7 @@ func (v *videoList) getNextVideoPath() (*gtk.TreePath, error) {
 //
 
 func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
+	// Get background color
 	value, err := model.GetValue(iter, int(listStoreColumnBackground))
 	if err != nil {
 		v.parent.Logger.Error.Println(err)
@@ -260,30 +266,45 @@ func (v *videoList) filterFunc(model *gtk.TreeModel, iter *gtk.TreeIter) bool {
 		v.parent.Logger.Error.Println(err)
 	}
 
+	// Get duration
+	durationValue, err := model.GetValue(iter, int(listStoreColumnSeconds))
+	if err != nil {
+		v.parent.Logger.Error.Println(err)
+	}
+	durationString, err := durationValue.GoValue()
+	if err != nil {
+		v.parent.Logger.Error.Println(err)
+	}
+	duration := durationString.(int64)
+	include := false
 	switch v.currentView {
 	case viewSubscriptions:
-		return true
+		include = true
 	case viewDownloads:
 		if col == constColorDownloading {
-			return true
+			include = true
 		}
 	case viewToWatch:
 		if col == constColorDownloaded {
-			return true
+			include = true
 		}
 	case viewToDelete:
 		if col == constColorWatched {
-			return true
+			include = true
 		}
 	case viewSaved:
 		if col == constColorSaved {
-			return true
+			include = true
 		}
 	default:
 		panic("unhandled default case")
 	}
 
-	return false
+	if include {
+		totalDuration += duration
+	}
+
+	return include
 }
 
 func (v *videoList) removeInvalidDurations(duration sql.NullString) string {

@@ -94,7 +94,7 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 	// Append video to list
 	iter := listStore.Append()
 	err := listStore.Set(
-		iter, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+		iter, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		[]interface{}{
 			thumbnail,
 			video.SubscriptionName,
@@ -106,6 +106,7 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 			duration,
 			progressText,
 			string(foregroundColor),
+			video.Seconds,
 		},
 	)
 

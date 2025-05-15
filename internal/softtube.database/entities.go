@@ -48,4 +48,5 @@ type Video struct {
 	Duration         sql.NullString
 	Status           VideoStatusType
 	Saved            bool
+	Seconds          int
 }
