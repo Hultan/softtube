@@ -52,18 +52,6 @@ type SoftTube struct {
 
 var builder *gtk.Builder
 
-func GetObject[T glib.IObject](name string) T {
-	obj, err := builder.GetObject(name)
-	if err != nil {
-		panic(fmt.Sprintf("GetObject(%q) failed: %v", name, err))
-	}
-	casted, ok := obj.(T)
-	if !ok {
-		panic(fmt.Sprintf("Object %q is not of expected type %T", name, casted))
-	}
-	return casted
-}
-
 // StartApplication starts the SoftTube application
 func (s *SoftTube) StartApplication() error {
 	s.Logger.Info.Println("SoftTube client startup")
@@ -71,9 +59,9 @@ func (s *SoftTube) StartApplication() error {
 
 	gtk.Init(nil)
 
-	// Create a new builder
 	b, err := gtk.BuilderNewFromString(mainGlade)
 	if err != nil {
+		s.Logger.Error.Println("Failed to load glade file!")
 		panic(err)
 	}
 	builder = b
@@ -81,6 +69,8 @@ func (s *SoftTube) StartApplication() error {
 	win := GetObject[*gtk.Window]("main_window")
 	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
+	win.SetIconName("video-display")
+
 	_ = win.Connect(
 		"destroy", func() {
 			gtk.MainQuit()
@@ -92,20 +82,15 @@ func (s *SoftTube) StartApplication() error {
 			s.onKeyPressed(e)
 		},
 	)
-	win.SetIconName("video-display")
 
 	s.setupControls()
-
-	// Show the Window and all of its components.
 	win.ShowAll()
 
 	go func() {
 		s.videoList.Refresh("")
 	}()
 
-	// Collect statistics from DB and disk
 	s.showStats()
-
 	gtk.Main()
 
 	return nil
@@ -278,4 +263,16 @@ func (s *SoftTube) downloadThumbnails(selectedVideos []*database.Video) {
 
 func (s *SoftTube) onWindowDestroy() {
 	s.DB.Close()
+}
+
+func GetObject[T glib.IObject](name string) T {
+	obj, err := builder.GetObject(name)
+	if err != nil {
+		panic(fmt.Sprintf("GetObject(%q) failed: %v", name, err))
+	}
+	casted, ok := obj.(T)
+	if !ok {
+		panic(fmt.Sprintf("Object %q is not of expected type %T", name, casted))
+	}
+	return casted
 }
