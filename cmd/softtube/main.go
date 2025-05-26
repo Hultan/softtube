@@ -55,12 +55,12 @@ func startLogging() {
 }
 
 func stopLogging() {
-	// Close log file
+	// Close the log file
 	log.Close()
 }
 
 func openDatabase() *database.Database {
-	// Create the database object, and get all subscriptions
+	// Create the database object and get all subscriptions
 	conn := config.Connection
 	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
