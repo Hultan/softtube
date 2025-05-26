@@ -49,14 +49,12 @@ func (t *toolbar) SetupEvents() {
 	)
 	_ = t.toolbarRefresh.Connect(
 		"clicked", func() {
-			s := t.parent
-			s.videoList.Refresh("")
+			t.parent.videoList.Refresh("")
 		},
 	)
 	_ = t.toolbarDeleteAll.Connect(
 		"clicked", func() {
-			s := t.parent
-			s.videoList.DeleteWatchedVideos()
+			t.parent.videoList.DeleteWatchedVideos()
 		},
 	)
 	_ = t.toolbarSubscriptions.Connect(
@@ -86,26 +84,22 @@ func (t *toolbar) SetupEvents() {
 	)
 	_ = t.toolbarScrollToStart.Connect(
 		"clicked", func() {
-			s := t.parent
-			s.videoList.scroll.toStart()
+			t.parent.videoList.scroll.toStart()
 		},
 	)
 	_ = t.toolbarScrollToEnd.Connect(
 		"clicked", func() {
-			s := t.parent
-			s.videoList.scroll.toEnd()
+			t.parent.videoList.scroll.toEnd()
 		},
 	)
 	_ = t.toolbarKeepScrollToEnd.Connect(
 		"clicked", func() {
 			if t.toolbarKeepScrollToEnd.GetActive() {
-				s := t.parent
-				s.videoList.keepScrollToEnd = true
-				s.videoList.scroll.toEnd()
+				t.parent.videoList.keepScrollToEnd = true
+				t.parent.videoList.scroll.toEnd()
 			} else {
-				s := t.parent
-				s.videoList.keepScrollToEnd = false
-				s.videoList.scroll.toStart()
+				t.parent.videoList.keepScrollToEnd = false
+				t.parent.videoList.scroll.toStart()
 			}
 		},
 	)
