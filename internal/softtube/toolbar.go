@@ -2,11 +2,9 @@ package softtube
 
 import (
 	"github.com/gotk3/gotk3/gtk"
-
-	"github.com/hultan/softtube/internal/builder"
 )
 
-// toolbar : The toolbar for SoftTube application
+// toolbar is the toolbar for SoftTube application
 type toolbar struct {
 	parent                 *SoftTube
 	toolbarSubscriptions   *gtk.ToggleToolButton
@@ -24,25 +22,25 @@ type toolbar struct {
 }
 
 // Init initiates the toolbar
-func (t *toolbar) Init(builder *builder.Builder) error {
-	t.toolbarSubscriptions = builder.GetObject("toolbar_subscriptions").(*gtk.ToggleToolButton)
-	t.toolbarDownloads = builder.GetObject("toolbar_downloads").(*gtk.ToggleToolButton)
-	t.toolbarToWatch = builder.GetObject("toolbar_to_watch").(*gtk.ToggleToolButton)
-	t.toolbarSaved = builder.GetObject("toolbar_saved").(*gtk.ToggleToolButton)
-	t.toolbarToDelete = builder.GetObject("toolbar_to_delete").(*gtk.ToggleToolButton)
-	t.toolbarScrollToStart = builder.GetObject("toolbar_scroll_to_start").(*gtk.ToolButton)
-	t.toolbarScrollToEnd = builder.GetObject("toolbar_scroll_to_end").(*gtk.ToolButton)
-	t.toolbarKeepScrollToEnd = builder.GetObject("toolbar_keep_scroll_to_end").(*gtk.ToggleToolButton)
-	t.toolbarRefresh = builder.GetObject("toolbar_refresh_button").(*gtk.ToolButton)
-	t.toolbarDeleteAll = builder.GetObject("toolbar_delete_all_button").(*gtk.ToolButton)
-	t.toolbarQuit = builder.GetObject("toolbar_quit_button").(*gtk.ToolButton)
+func (t *toolbar) Init() error {
+	t.toolbarSubscriptions = GetObject[*gtk.ToggleToolButton]("toolbar_subscriptions")
+	t.toolbarDownloads = GetObject[*gtk.ToggleToolButton]("toolbar_downloads")
+	t.toolbarToWatch = GetObject[*gtk.ToggleToolButton]("toolbar_to_watch")
+	t.toolbarSaved = GetObject[*gtk.ToggleToolButton]("toolbar_saved")
+	t.toolbarToDelete = GetObject[*gtk.ToggleToolButton]("toolbar_to_delete")
+	t.toolbarScrollToStart = GetObject[*gtk.ToolButton]("toolbar_scroll_to_start")
+	t.toolbarScrollToEnd = GetObject[*gtk.ToolButton]("toolbar_scroll_to_end")
+	t.toolbarKeepScrollToEnd = GetObject[*gtk.ToggleToolButton]("toolbar_keep_scroll_to_end")
+	t.toolbarRefresh = GetObject[*gtk.ToolButton]("toolbar_refresh_button")
+	t.toolbarDeleteAll = GetObject[*gtk.ToolButton]("toolbar_delete_all_button")
+	t.toolbarQuit = GetObject[*gtk.ToolButton]("toolbar_quit_button")
 
 	t.SetupEvents()
 
 	return nil
 }
 
-// SetupEvents : Set up the toolbar events
+// SetupEvents sets up the toolbar events
 func (t *toolbar) SetupEvents() {
 	_ = t.toolbarQuit.Connect(
 		"clicked", func() {

@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.database"
 
 	"github.com/gotk3/gotk3/gdk"
@@ -39,17 +38,13 @@ var listStore *gtk.ListStore
 var totalDuration int64
 
 // Init initializes the toolbar from the glade file
-func (v *videoList) Init(builder *builder.Builder) error {
+func (v *videoList) Init() error {
 	v.currentView = viewSubscriptions
 	v.lastViewSwitch = time.Now()
 
 	// Get the tree view
-	treeView := builder.GetObject("video_treeview").(*gtk.TreeView)
-	v.treeView = treeView
-
-	// Get the scrolled window surrounding the treeview
-	s := builder.GetObject("scrolled_window").(*gtk.ScrolledWindow)
-	v.scroll = &scroll{s}
+	v.treeView = GetObject[*gtk.TreeView]("video_treeview")
+	v.scroll = &scroll{GetObject[*gtk.ScrolledWindow]("scrolled_window")}
 
 	v.videoFunctions = &videoFunctions{parent: v.parent, videoList: v}
 	v.color = &color{v}
@@ -60,8 +55,7 @@ func (v *videoList) Init(builder *builder.Builder) error {
 	// LOG PANEL
 
 	// Get the scrolled window surrounding the treeview
-	logPanel := builder.GetObject("log_scrolled_window").(*gtk.ScrolledWindow)
-	v.logPanel = logPanel
+	v.logPanel = GetObject[*gtk.ScrolledWindow]("log_scrolled_window")
 	v.isLogExpanded = true
 
 	return nil

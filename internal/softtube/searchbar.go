@@ -2,11 +2,9 @@ package softtube
 
 import (
 	"github.com/gotk3/gotk3/gtk"
-
-	"github.com/hultan/softtube/internal/builder"
 )
 
-// searchBar : The SoftTube search bar
+// searchBar is the SoftTube search bar
 type searchBar struct {
 	parent      *SoftTube
 	clearButton *gtk.Button
@@ -14,19 +12,16 @@ type searchBar struct {
 }
 
 // Init initializes the searchBar
-func (s *searchBar) Init(builder *builder.Builder) error {
-	clearButton := builder.GetObject("clear_search_button").(*gtk.Button)
-	s.clearButton = clearButton
-
-	searchEntry := builder.GetObject("search_entry").(*gtk.Entry)
-	s.searchEntry = searchEntry
+func (s *searchBar) Init() error {
+	s.clearButton = GetObject[*gtk.Button]("clear_search_button")
+	s.searchEntry = GetObject[*gtk.Entry]("search_entry")
 
 	s.SetupEvents()
 
 	return nil
 }
 
-// SetupEvents : Set up the toolbar events
+// SetupEvents sets up the toolbar events
 func (s *searchBar) SetupEvents() {
 	_ = s.clearButton.Connect(
 		"clicked", func() {

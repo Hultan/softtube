@@ -7,7 +7,6 @@ import (
 	"syscall"
 
 	"github.com/gotk3/gotk3/gtk"
-	"github.com/hultan/softtube/internal/builder"
 )
 
 // menuBar : The SoftTube menu bar
@@ -28,15 +27,14 @@ type menuBar struct {
 }
 
 // Init initiates the menu bar
-func (m *menuBar) Init(builder *builder.Builder) error {
-	m.menuFileQuit = builder.GetObject("menu_file_quit").(*gtk.MenuItem)
-	m.menuHelpAbout = builder.GetObject("menu_help_about").(*gtk.MenuItem)
-
-	m.menuViewSubscriptions = builder.GetObject("menu_view_subscriptions").(*gtk.RadioMenuItem)
-	m.menuViewDownloads = builder.GetObject("menu_view_downloads").(*gtk.RadioMenuItem)
-	m.menuViewToWatch = builder.GetObject("menu_view_to_watch").(*gtk.RadioMenuItem)
-	m.menuViewSaved = builder.GetObject("menu_view_saved").(*gtk.RadioMenuItem)
-	m.menuViewToDelete = builder.GetObject("menu_view_to_delete").(*gtk.RadioMenuItem)
+func (m *menuBar) Init() error {
+	m.menuFileQuit = GetObject[*gtk.MenuItem]("menu_file_quit")
+	m.menuHelpAbout = GetObject[*gtk.MenuItem]("menu_help_about")
+	m.menuViewSubscriptions = GetObject[*gtk.RadioMenuItem]("menu_view_subscriptions")
+	m.menuViewDownloads = GetObject[*gtk.RadioMenuItem]("menu_view_downloads")
+	m.menuViewToWatch = GetObject[*gtk.RadioMenuItem]("menu_view_to_watch")
+	m.menuViewSaved = GetObject[*gtk.RadioMenuItem]("menu_view_saved")
+	m.menuViewToDelete = GetObject[*gtk.RadioMenuItem]("menu_view_to_delete")
 
 	m.menuViewDownloads.JoinGroup(m.menuViewSubscriptions)
 	m.menuViewToWatch.JoinGroup(m.menuViewSubscriptions)
@@ -44,10 +42,9 @@ func (m *menuBar) Init(builder *builder.Builder) error {
 	m.menuViewToDelete.JoinGroup(m.menuViewSubscriptions)
 	m.menuViewSubscriptions.SetActive(true)
 
-	m.menuViewOpenSoftTube = builder.GetObject("menu_view_open_softtube").(*gtk.MenuItem)
-
-	m.menuViewLog = builder.GetObject("menu_view_log").(*gtk.MenuItem)
-	m.menuViewUpdateLog = builder.GetObject("menu_view_update_log").(*gtk.MenuItem)
+	m.menuViewOpenSoftTube = GetObject[*gtk.MenuItem]("menu_view_open_softtube")
+	m.menuViewLog = GetObject[*gtk.MenuItem]("menu_view_log")
+	m.menuViewUpdateLog = GetObject[*gtk.MenuItem]("menu_view_update_log")
 
 	m.SetupEvents()
 
@@ -119,7 +116,7 @@ func (m *menuBar) openLogFile(logFile string) {
 			Setpgid: true,
 			Pgid:    0,
 		}
-		// Starts a sub process (smplayer)
+		// Starts a subprocess (smplayer)
 		// Did not get this to work, but read the following, and maybe I can get
 		// this to work in the future
 		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
@@ -138,7 +135,7 @@ func (m *menuBar) openSoftTubeFolder() {
 			Setpgid: true,
 			Pgid:    0,
 		}
-		// Starts a sub process (smplayer)
+		// Starts a subprocess (smplayer)
 		// Did not get this to work, but read the following, and maybe I can get
 		// this to work in the future
 		// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956

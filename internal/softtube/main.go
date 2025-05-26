@@ -2,13 +2,14 @@ package softtube
 
 import (
 	_ "embed"
+	"fmt"
 
 	"github.com/gotk3/gotk3/gdk"
+	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 	"github.com/hultan/dialog"
 	"github.com/hultan/softtube/internal/logger"
 
-	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.core"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
@@ -49,6 +50,20 @@ type SoftTube struct {
 	activityLog *activityLog
 }
 
+var builder *gtk.Builder
+
+func GetObject[T glib.IObject](name string) T {
+	obj, err := builder.GetObject(name)
+	if err != nil {
+		panic(fmt.Sprintf("GetObject(%q) failed: %v", name, err))
+	}
+	casted, ok := obj.(T)
+	if !ok {
+		panic(fmt.Sprintf("Object %q is not of expected type %T", name, casted))
+	}
+	return casted
+}
+
 // StartApplication starts the SoftTube application
 func (s *SoftTube) StartApplication() error {
 	s.Logger.Info.Println("SoftTube client startup")
@@ -56,9 +71,14 @@ func (s *SoftTube) StartApplication() error {
 
 	gtk.Init(nil)
 
-	b := builder.NewBuilder(mainGlade)
+	// Create a new builder
+	b, err := gtk.BuilderNewFromString(mainGlade)
+	if err != nil {
+		panic(err)
+	}
+	builder = b
 
-	win := b.GetObject("main_window").(*gtk.Window)
+	win := GetObject[*gtk.Window]("main_window")
 	win.SetTitle(s.getWindowTitle())
 	win.Maximize()
 	_ = win.Connect(
@@ -74,7 +94,7 @@ func (s *SoftTube) StartApplication() error {
 	)
 	win.SetIconName("video-display")
 
-	s.setupControls(b)
+	s.setupControls()
 
 	// Show the Window and all of its components.
 	win.ShowAll()
@@ -91,10 +111,10 @@ func (s *SoftTube) StartApplication() error {
 	return nil
 }
 
-func (s *SoftTube) setupControls(builder *builder.Builder) {
+func (s *SoftTube) setupControls() {
 	// Init toolbar
 	s.toolbar = &toolbar{parent: s}
-	err := s.toolbar.Init(builder)
+	err := s.toolbar.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : toolbar failed!")
 		s.Logger.Error.Println(err)
@@ -103,7 +123,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 	// Init status bar
 	s.statusBar = &statusBar{parent: s}
-	err = s.statusBar.Init(builder)
+	err = s.statusBar.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : statusbar failed!")
 		s.Logger.Error.Println(err)
@@ -112,7 +132,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 	// Init menu bar
 	s.menuBar = &menuBar{parent: s}
-	err = s.menuBar.Init(builder)
+	err = s.menuBar.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : menubar failed!")
 		s.Logger.Error.Println(err)
@@ -121,7 +141,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 	// Init search bar
 	s.searchBar = &searchBar{parent: s}
-	err = s.searchBar.Init(builder)
+	err = s.searchBar.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : searchbar failed!")
 		s.Logger.Error.Println(err)
@@ -130,7 +150,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 	// Init video list
 	s.videoList = &videoList{parent: s}
-	err = s.videoList.Init(builder)
+	err = s.videoList.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : videolist failed!")
 		s.Logger.Error.Println(err)
@@ -139,7 +159,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 	// Init popup menu bar
 	s.popupMenu = &popupMenu{parent: s}
-	err = s.popupMenu.Init(builder)
+	err = s.popupMenu.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : popupmenu failed!")
 		s.Logger.Error.Println(err)
@@ -148,7 +168,7 @@ func (s *SoftTube) setupControls(builder *builder.Builder) {
 
 	// Init log
 	s.activityLog = &activityLog{parent: s, treeView: s.videoList.treeView}
-	err = s.activityLog.Init(builder)
+	err = s.activityLog.Init()
 	if err != nil {
 		s.Logger.Error.Println("setupControls : activitylog failed!")
 		s.Logger.Error.Println(err)

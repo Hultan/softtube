@@ -6,11 +6,9 @@ import (
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
-
-	"github.com/hultan/softtube/internal/builder"
 )
 
-// popupMenu : Handler the video list popupmenu
+// popupMenu handles of the video list popupmenu
 type popupMenu struct {
 	parent                 *SoftTube
 	popupMenu              *gtk.Menu
@@ -32,32 +30,32 @@ type popupMenu struct {
 	popupViewSaved         *gtk.MenuItem
 }
 
-// Init : Loads the popup menu
-func (p *popupMenu) Init(builder *builder.Builder) error {
-	p.popupMenu = builder.GetObject("popupmenu").(*gtk.Menu)
-	p.popupRefresh = builder.GetObject("popup_refresh").(*gtk.MenuItem)
-	p.popupDownload = builder.GetObject("popup_download").(*gtk.MenuItem)
-	p.popupRedownloadVideo = builder.GetObject("popup_redownload_failedvideo").(*gtk.MenuItem)
-	p.popupRedownloadVideos = builder.GetObject("popup_redownload_failedvideos").(*gtk.MenuItem)
-	p.popupPlay = builder.GetObject("popup_play").(*gtk.MenuItem)
-	p.popupGetDuration = builder.GetObject("popup_get_duration").(*gtk.MenuItem)
-	p.popupGetVideoID = builder.GetObject("popup_get_videoid").(*gtk.MenuItem)
-	p.popupGetThumbnail = builder.GetObject("popup_get_thumbnail").(*gtk.MenuItem)
-	p.popupDeleteAll = builder.GetObject("popup_delete_all").(*gtk.MenuItem)
-	p.popupUnwatch = builder.GetObject("popup_unwatch").(*gtk.MenuItem)
-	p.popupSave = builder.GetObject("popup_save").(*gtk.MenuItem)
-	p.popupViewSubscriptions = builder.GetObject("popup_view_subscriptions").(*gtk.MenuItem)
-	p.popupViewDownloads = builder.GetObject("popup_view_downloads").(*gtk.MenuItem)
-	p.popupViewToWatch = builder.GetObject("popup_view_to_watch").(*gtk.MenuItem)
-	p.popupViewSaved = builder.GetObject("popup_view_saved").(*gtk.MenuItem)
-	p.popupViewToDelete = builder.GetObject("popup_view_to_delete").(*gtk.MenuItem)
+// Init loads the popup menu
+func (p *popupMenu) Init() error {
+	p.popupMenu = GetObject[*gtk.Menu]("popupmenu")
+	p.popupRefresh = GetObject[*gtk.MenuItem]("popup_refresh")
+	p.popupDownload = GetObject[*gtk.MenuItem]("popup_download")
+	p.popupRedownloadVideo = GetObject[*gtk.MenuItem]("popup_redownload_failedvideo")
+	p.popupRedownloadVideos = GetObject[*gtk.MenuItem]("popup_redownload_failedvideos")
+	p.popupPlay = GetObject[*gtk.MenuItem]("popup_play")
+	p.popupGetDuration = GetObject[*gtk.MenuItem]("popup_get_duration")
+	p.popupGetVideoID = GetObject[*gtk.MenuItem]("popup_get_videoid")
+	p.popupGetThumbnail = GetObject[*gtk.MenuItem]("popup_get_thumbnail")
+	p.popupDeleteAll = GetObject[*gtk.MenuItem]("popup_delete_all")
+	p.popupUnwatch = GetObject[*gtk.MenuItem]("popup_unwatch")
+	p.popupSave = GetObject[*gtk.MenuItem]("popup_save")
+	p.popupViewSubscriptions = GetObject[*gtk.MenuItem]("popup_view_subscriptions")
+	p.popupViewDownloads = GetObject[*gtk.MenuItem]("popup_view_downloads")
+	p.popupViewToWatch = GetObject[*gtk.MenuItem]("popup_view_to_watch")
+	p.popupViewSaved = GetObject[*gtk.MenuItem]("popup_view_saved")
+	p.popupViewToDelete = GetObject[*gtk.MenuItem]("popup_view_to_delete")
 
 	p.SetupEvents()
 
 	return nil
 }
 
-// SetupEvents : Set up the toolbar events
+// SetupEvents sets up the toolbar events
 func (p *popupMenu) SetupEvents() {
 	_ = p.parent.videoList.treeView.Connect(
 		"button-press-event", func(treeview *gtk.TreeView, event *gdk.Event) bool {
@@ -78,7 +76,7 @@ func (p *popupMenu) SetupEvents() {
 						selection.SelectPath(path) // Select the row if it’s not already selected
 					}
 				}
-				// END : This code solves the problem with the last selected row
+				// END: This code solves the problem with the last selected row
 				// getting deselected when you open the context menu
 
 				videoSelected := p.parent.videoList.videoFunctions.getSelectedVideos(p.parent.videoList.treeView) != nil
@@ -164,7 +162,7 @@ func (p *popupMenu) SetupEvents() {
 
 				p.popupMenu.PopupAtPointer(event)
 
-				// By returning true/false here we stop event propagation
+				// By returning true/false here, we stop event propagation
 				// so that the row the user clicks does not get deselected
 				// by the right click.
 				return true
@@ -244,7 +242,7 @@ func (p *popupMenu) SetupEvents() {
 			treeview := p.parent.videoList.treeView
 			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
 			if selectedVideos != nil {
-				// We can only copy one ID at the time, so we only copy the first
+				// We can only copy one ID at a time, so we only copy the first
 				clipboard, err := gtk.ClipboardGet(gdk.SELECTION_CLIPBOARD)
 				if err != nil {
 					p.parent.Logger.Error.Println(err)

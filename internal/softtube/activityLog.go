@@ -7,11 +7,10 @@ import (
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 
-	"github.com/hultan/softtube/internal/builder"
 	"github.com/hultan/softtube/internal/softtube.database"
 )
 
-// activityLog : Handles the SoftTube activity log
+// activityLog handles the SoftTube activity log
 type activityLog struct {
 	parent      *SoftTube
 	treeView    *gtk.TreeView
@@ -19,10 +18,9 @@ type activityLog struct {
 	imageBuffer [6]*gdk.Pixbuf // Images for download, play, delete, set watched/unwatched and error
 }
 
-// Init : Loads the log
-func (al *activityLog) Init(builder *builder.Builder) error {
-	tree := builder.GetObject("log_treeview").(*gtk.TreeView)
-	al.treeView = tree
+// Init initiates the log
+func (al *activityLog) Init() error {
+	al.treeView = GetObject[*gtk.TreeView]("log_treeview")
 
 	store, err := gtk.ListStoreNew(gdk.PixbufGetType(), glib.TYPE_STRING, glib.TYPE_STRING)
 	if err != nil {
@@ -36,7 +34,7 @@ func (al *activityLog) Init(builder *builder.Builder) error {
 	return nil
 }
 
-// FillLog : Fills the log with the last n logs
+// FillLog fills the log with the last n logs
 func (al *activityLog) FillLog() {
 	logs := al.getLogs()
 
@@ -47,7 +45,7 @@ func (al *activityLog) FillLog() {
 	al.treeView.SetModel(al.listStore)
 }
 
-// AddLog : Adds a log to the GUI log
+// AddLog adds a log to the GUI log
 func (al *activityLog) AddLog(logType database.LogType, logMessage string) {
 	// Insert into the gui log
 	al.treeView.SetModel(nil)

@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -19,15 +18,15 @@ func NewBuilder(glade string) *Builder {
 	return &Builder{b}
 }
 
-// GetObject gets a gtk object by name
-func (b *Builder) GetObject(name string) glib.IObject {
-	if b.builder == nil {
-		panic("missing builder")
-	}
-	obj, err := b.builder.GetObject(name)
-	if err != nil {
-		panic(err)
-	}
-
-	return obj
-}
+//// GetObject gets a gtk object by name
+//func (b *Builder) GetObject(name string) glib.IObject {
+//	if b.builder == nil {
+//		panic("missing builder")
+//	}
+//	obj, err := b.builder.GetObject(name)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return obj
+//}

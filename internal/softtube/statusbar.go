@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gotk3/gotk3/gtk"
-
-	"github.com/hultan/softtube/internal/builder"
 )
 
-// statusBar : The status bar of SoftTube
+// statusBar is the status bar of SoftTube
 type statusBar struct {
 	parent        *SoftTube
 	videoCount    *gtk.Label
@@ -16,21 +14,19 @@ type statusBar struct {
 }
 
 // Init initializes the status bar
-func (s *statusBar) Init(builder *builder.Builder) error {
-	label := builder.GetObject("statusbar_number_of_videos").(*gtk.Label)
-	s.videoCount = label
-	label = builder.GetObject("statusbar_total_duration").(*gtk.Label)
-	s.totalDuration = label
+func (s *statusBar) Init() error {
+	s.videoCount = GetObject[*gtk.Label]("statusbar_number_of_videos")
+	s.totalDuration = GetObject[*gtk.Label]("statusbar_total_duration")
 
 	return nil
 }
 
-// UpdateVideoCount : Update the video count in the status bar
+// UpdateVideoCount updates the video count in the status bar
 func (s *statusBar) UpdateVideoCount(numberOfVideos int) {
 	s.videoCount.SetText(fmt.Sprintf("Number of videos : %d", numberOfVideos))
 }
 
-// UpdateVideoDuration : Update the total duration of videos in the status bar
+// UpdateVideoDuration updates the total duration of videos in the status bar
 func (s *statusBar) UpdateVideoDuration(duration int64) {
 	durationString := formatTime(duration)
 	if durationString == "00:00:00" {
