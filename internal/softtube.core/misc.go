@@ -5,7 +5,7 @@ import (
 	"os/user"
 )
 
-// Get current users home directory
+// Get the current users home directory
 func getHomeDirectory() string {
 	u, err := user.Current()
 	if err != nil {

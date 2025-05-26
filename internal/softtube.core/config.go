@@ -45,7 +45,7 @@ type Config struct {
 	} `json:"intervals"`
 }
 
-// Load : Loads a SoftTube configuration file
+// Load the SoftTube configuration file
 func (config *Config) Load(mode string) error {
 	// Get the path to the config file
 	configPath := config.getConfigPath(mode)
@@ -56,7 +56,7 @@ func (config *Config) Load(mode string) error {
 		return errors.New(errorMessage)
 	}
 
-	// Open config file
+	// Open the config file
 	configFile, err := os.Open(configPath)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -72,12 +72,12 @@ func (config *Config) Load(mode string) error {
 	return nil
 }
 
-// Save : Saves a SoftTube configuration file
+// Save the SoftTube configuration file
 func (config *Config) Save(mode string) {
 	// Get the path to the config file
 	configPath := config.getConfigPath(mode)
 
-	// Open config file
+	// Open the config file
 	configFile, err := os.OpenFile(configPath, os.O_TRUNC|os.O_WRONLY, 0644)
 
 	// Handle errors
@@ -86,7 +86,7 @@ func (config *Config) Save(mode string) {
 		return
 	}
 
-	// Create JSON from config object
+	// Create JSON from the config object
 	data, err := json.MarshalIndent(config, "", "\t")
 
 	// Handle errors
@@ -101,9 +101,9 @@ func (config *Config) Save(mode string) {
 	_ = configFile.Close()
 }
 
-// Get path to the config file
+// Get the path to the config file
 // Mode = "test" returns test config path
-// otherwise returns normal config path
+// otherwise returns the normal config path
 func (config *Config) getConfigPath(mode string) string {
 	home := getHomeDirectory()
 
