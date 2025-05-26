@@ -287,6 +287,7 @@ func (p *popupMenu) SetupEvents() {
 			treeview := p.parent.videoList.treeView
 			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
 			if selectedVideos != nil {
+				// TODO : Change to a map?
 				var mode int
 				switch p.popupUnwatch.GetLabel() {
 				case constSetAsNotDownloaded:

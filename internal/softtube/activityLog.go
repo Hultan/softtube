@@ -29,13 +29,13 @@ func (al *activityLog) Init() error {
 	al.listStore = store
 	al.setupColumns()
 	al.loadResources()
-	al.FillLog()
+	al.fillLog()
 
 	return nil
 }
 
-// FillLog fills the log with the last n logs
-func (al *activityLog) FillLog() {
+// fillLog fills the log with the last n logs
+func (al *activityLog) fillLog() {
 	logs := al.getLogs()
 
 	al.treeView.SetModel(nil)
@@ -45,8 +45,8 @@ func (al *activityLog) FillLog() {
 	al.treeView.SetModel(al.listStore)
 }
 
-// AddLog adds a log to the GUI log
-func (al *activityLog) AddLog(logType database.LogType, logMessage string) {
+// addLog adds a log to the GUI log
+func (al *activityLog) addLog(logType database.LogType, logMessage string) {
 	// Insert into the gui log
 	al.treeView.SetModel(nil)
 	al.insertLog(logType, logMessage, true)
@@ -71,9 +71,6 @@ func (al *activityLog) shortenString(text string) string {
 		r := []rune(text)
 		return string(r[:47]) + "..."
 	}
-	//if len(text) > 50 {
-	//	return text[:47] + "..."
-	//}
 	return text
 }
 
@@ -127,6 +124,7 @@ func (al *activityLog) createPixbuf(bytes []byte) *gdk.Pixbuf {
 }
 
 func (al *activityLog) getColor(logType database.LogType) string {
+	// TODO : Change to a map
 	col := constColorNotDownloaded
 
 	switch logType {

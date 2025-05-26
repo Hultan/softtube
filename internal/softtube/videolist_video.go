@@ -63,7 +63,7 @@ func (v *videoFunctions) delete(video *database.Video) {
 
 	go func() {
 		// Log that the video has been deleted in the GUI
-		v.videoList.parent.activityLog.AddLog(constLogDelete, video.Title)
+		v.videoList.parent.activityLog.addLog(constLogDelete, video.Title)
 		wg.Done()
 	}()
 
@@ -117,7 +117,7 @@ func (v *videoFunctions) addToVideoList(video *database.Video, listStore *gtk.Li
 }
 
 func (v *videoFunctions) play(video *database.Video) {
-	v.videoList.parent.activityLog.FillLog()
+	v.videoList.parent.activityLog.fillLog()
 
 	// Mark the selected video with watched color
 	v.videoList.color.setRowColor(v.videoList.treeView, constColorWatched)
@@ -140,7 +140,7 @@ func (v *videoFunctions) play(video *database.Video) {
 
 	go func() {
 		// Log that the video has been watched in the GUI
-		v.videoList.parent.activityLog.AddLog(constLogPlay, video.Title)
+		v.videoList.parent.activityLog.addLog(constLogPlay, video.Title)
 		wg.Done()
 	}()
 
@@ -266,7 +266,7 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 
 	go func() {
 		// Log that the video has been deleted in the GUI
-		v.videoList.parent.activityLog.AddLog(constLogDownload, video.Title)
+		v.videoList.parent.activityLog.addLog(constLogDownload, video.Title)
 		wg.Done()
 	}()
 
