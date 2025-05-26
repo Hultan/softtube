@@ -3,7 +3,9 @@ package softtube
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/hultan/dialog"
 )
@@ -29,11 +31,10 @@ func (s *SoftTube) showStats() {
 			Width(500).ErrorIcon().OkButton().Show()
 	}
 
-	if len(onDisk) == len(inDb) {
+	diff := getDiff(onDisk, inDb)
+	if diff == nil {
 		return
 	}
-
-	diff := getDiff(onDisk, inDb)
 
 	stats := fmt.Sprintf("Files that differ:\n")
 	stats += fmt.Sprintf("============\n")
@@ -62,7 +63,8 @@ func (s *SoftTube) collectDiskStats() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return files, nil
+
+	return removeExtensions(files), nil
 }
 
 func (s *SoftTube) collectDBStats() ([]string, error) {
@@ -86,4 +88,13 @@ func getDiff(disk []string, db []string) []string {
 		}
 	}
 	return missing
+}
+
+func removeExtensions(files []string) []string {
+	result := make([]string, len(files))
+	for i, name := range files {
+		ext := filepath.Ext(name)
+		result[i] = strings.TrimSuffix(name, ext)
+	}
+	return result
 }
