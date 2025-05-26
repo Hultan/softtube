@@ -9,9 +9,9 @@ type LogTable struct {
 	*Table
 }
 
-// Insert : Insert a new video into the database
+// Insert a new video into the database
 func (l *LogTable) Insert(logType LogType, logMessage string) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if l.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -25,15 +25,15 @@ func (l *LogTable) Insert(logType LogType, logMessage string) error {
 	return nil
 }
 
-// GetLatest : Get the version number of a SoftTube database
+// GetLatest returns the version number of a SoftTube database
 func (l *LogTable) GetLatest() ([]Log, error) {
 
-	// Check that database is opened
+	// Check that the database is opened
 	if l.Connection == nil {
 		return nil, errors.New("database not opened")
 	}
 
-	// Get rows from database
+	// Get rows from the database
 	rows, err := l.Connection.Query(sqlLogGetLatest)
 	if err != nil {
 		return nil, err

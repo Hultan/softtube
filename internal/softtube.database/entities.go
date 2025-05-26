@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-// Download : Represents a download request
+// Download represents a download request
 type Download struct {
 	ID string
 }
 
-// Version : Represents the SoftTube database version
+// Version represents the SoftTube database version
 type Version struct {
 	Major    int
 	Minor    int
@@ -19,14 +19,14 @@ type Version struct {
 
 type LogType int
 
-// Log : Represents a SoftTube log entry
+// Log represents a SoftTube log entry
 type Log struct {
 	ID      int
 	Message string
 	Type    LogType
 }
 
-// Subscription : Represents a YouTube subscription in SoftTube
+// Subscription represents a YouTube subscription in SoftTube
 type Subscription struct {
 	ID          string
 	Name        string
@@ -37,7 +37,7 @@ type Subscription struct {
 
 type VideoStatusType int
 
-// Video : Represents a YouTube video in SoftTube
+// Video represents a YouTube video in SoftTube
 type Video struct {
 	ID               string
 	SubscriptionID   string

@@ -6,14 +6,14 @@ import (
 	"time"
 )
 
-// SubscriptionTable : SubscriptionTable in the SoftTube database
+// SubscriptionTable in the SoftTube database
 type SubscriptionTable struct {
 	*Table
 }
 
-// GetAll : Returns all subscriptions
+// GetAll returns all subscriptions
 func (s SubscriptionTable) GetAll() ([]Subscription, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if s.Connection == nil {
 		return nil, errors.New("database not opened")
 	}
@@ -39,9 +39,9 @@ func (s SubscriptionTable) GetAll() ([]Subscription, error) {
 	return subs, nil
 }
 
-// Get : Returns a subscription
+// Get returns a subscription
 func (s SubscriptionTable) Get(id string) (Subscription, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if s.Connection == nil {
 		return Subscription{}, errors.New("database not opened")
 	}
@@ -55,16 +55,17 @@ func (s SubscriptionTable) Get(id string) (Subscription, error) {
 	return sub, err
 }
 
-// UpdateLastChecked : Update last_checked and next_update for a subscription
+// UpdateLastChecked updates last_checked and next_update for a subscription
 func (s SubscriptionTable) UpdateLastChecked(subscription *Subscription, interval int) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if s.Connection == nil {
 		return errors.New("database not opened")
 	}
 
-	rand.Seed(time.Now().UnixNano())
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	next := int(float32(interval)*0.5 + (float32(interval) * rng.Float32()))
+
 	now := time.Now().UTC().Format(constDateLayout) // last_checked
-	next := int(float32(interval)*0.5 + (float32(interval) * rand.Float32()))
 
 	// Execute insert statement
 	_, err := s.Connection.Exec(sqlSubscriptionsUpdateLastChecked, now, next, subscription.ID)
@@ -75,9 +76,9 @@ func (s SubscriptionTable) UpdateLastChecked(subscription *Subscription, interva
 	return nil
 }
 
-// NeedsUpdate : Does the subscription need an update?
+// NeedsUpdate returns true if the subscription needs an update
 func (s Subscription) NeedsUpdate() bool {
-	// If the fields is null, we must update
+	// If the field is null, we must update
 	if !s.LastChecked.Valid {
 		return true
 	}

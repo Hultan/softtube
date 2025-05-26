@@ -4,14 +4,14 @@ import (
 	"errors"
 )
 
-// DownloadTable : VideosTable in the SoftTube database
+// DownloadTable in the SoftTube database
 type DownloadTable struct {
 	*Table
 }
 
-// Insert : Insert a new download request into the database
+// Insert a new download request into the database
 func (d DownloadTable) Insert(id string) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if d.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -25,9 +25,9 @@ func (d DownloadTable) Insert(id string) error {
 	return nil
 }
 
-// Delete : Deletes the row from the downloaded list
+// Delete the row from the downloaded list
 func (d DownloadTable) Delete(id string) error {
-	// Check that database is opened
+	// Check that the database is opened
 	if d.Connection == nil {
 		return errors.New("database not opened")
 	}
@@ -41,9 +41,9 @@ func (d DownloadTable) Delete(id string) error {
 	return nil
 }
 
-// GetAll : Returns all download requests
+// GetAll returns all download requests
 func (d DownloadTable) GetAll() ([]Download, error) {
-	// Check that database is opened
+	// Check that the database is opened
 	if d.Connection == nil {
 		return nil, errors.New("database not opened")
 	}

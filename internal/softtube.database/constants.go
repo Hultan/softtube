@@ -4,7 +4,7 @@ const constDriverName = "mysql"
 const constDateLayout = "2006-01-02 15:04:05"
 
 //
-// Videos table
+// Video table
 //
 
 const sqlVideosExists = "SELECT EXISTS(SELECT 1 FROM Videos WHERE id=?);"
@@ -57,7 +57,7 @@ save, seconds)
 								VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?);`
 
 //
-// Downloads table
+// Download table
 //
 
 // TODO : Make max downloads a setting
@@ -75,7 +75,7 @@ ORDER BY id desc
 LIMIT 50`
 
 //
-// Subscriptions table
+// Subscription table
 //
 
 const sqlSubscriptionsGetAll = "SELECT id, name, frequency, last_checked, next_update FROM Subscriptions"

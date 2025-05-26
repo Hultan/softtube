@@ -7,11 +7,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// TODO : Testa att byta ut databas drivern mot
-// gorm.io/driver/mysql
-// samt
-// gorm.io/gorm
-// Se video : https://www.youtube.com/watch?v=zTnkskp-xWs
+// TODO : Try to exchange the MySQL driver with
+// 		gorm.io/driver/mysql
+// and
+// 		gorm.io/gorm
+// Check video : https://www.youtube.com/watch?v=zTnkskp-xWs
 
 type ConnectionInfo struct {
 	Server   string
@@ -21,7 +21,7 @@ type ConnectionInfo struct {
 	Password string
 }
 
-// Database : A connection to the SoftTube database
+// Database represents connection to the SoftTube database
 type Database struct {
 	ConnectionInfo
 
@@ -36,13 +36,13 @@ type Table struct {
 	*Database
 }
 
-// NewDatabase : Creates a new database object
+// NewDatabase creates a new database object
 func NewDatabase(server string, port int, database, username, password string) *Database {
 	c := ConnectionInfo{Server: server, Port: port, Database: database, Username: username, Password: password}
 	return &Database{ConnectionInfo: c}
 }
 
-// Open : Open the database
+// Open the database
 func (d *Database) Open() error {
 	// Open database
 	conn, err := sql.Open(constDriverName, d.ConnectionInfo.String())
@@ -59,14 +59,14 @@ func (d *Database) Open() error {
 	return nil
 }
 
-// Close : Close the database
+// Close the database
 func (d *Database) Close() {
 	if d.Connection != nil {
 		_ = d.Connection.Close()
 	}
 }
 
-// getConnectionString : Returns the connections string
+// getConnectionString returns the connection string
 func (c *ConnectionInfo) String() string {
 	// "user:pwd@tcp(server:port)/database"
 	return fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", c.Username, c.Password, c.Server, c.Port, c.Database)
