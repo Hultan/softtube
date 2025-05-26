@@ -34,7 +34,7 @@ var setWatchedIcon []byte
 //go:embed assets/set_unwatched.png
 var setUnwatchedIcon []byte
 
-// SoftTube : The SoftTube application object
+// SoftTube is the main application object
 type SoftTube struct {
 	Config *core.Config
 	Logger *logger.Logger
@@ -49,7 +49,7 @@ type SoftTube struct {
 	activityLog *activityLog
 }
 
-// StartApplication : Starts the SoftTube application
+// StartApplication starts the SoftTube application
 func (s *SoftTube) StartApplication() error {
 	s.Logger.Info.Println("SoftTube client startup")
 	defer s.Logger.Info.Println("SoftTube client shutdown")
@@ -83,6 +83,7 @@ func (s *SoftTube) StartApplication() error {
 		s.videoList.Refresh("")
 	}()
 
+	// Collect statistics from DB and disk
 	s.showStats()
 
 	gtk.Main()
@@ -163,7 +164,7 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 	k := gdk.EventKeyNewFromEvent(e)
 
 	ctrl := (k.State() & gdk.CONTROL_MASK) != 0
-	special := (k.State() & gdk.MOD2_MASK) != 0 // Used for special keys like F5, DELETE, HOME in X11 etc
+	special := (k.State() & gdk.MOD2_MASK) != 0 // Used for special keys like F5, DELETE, HOME in X11, etc.
 
 	// Control + key
 	if ctrl {
