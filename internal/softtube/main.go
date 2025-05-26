@@ -251,8 +251,9 @@ func (s *SoftTube) downloadThumbnails(selectedVideos []*database.Video) {
 	// Collect errors from all goroutines
 	for i := 0; i < len(selectedVideos); i++ {
 		if err := <-errorChan; err != nil {
-			_, _ = dialog.Title("Failed to get thumbnail").
-				Text("An error occurred while trying to get the thumbnail of the video").
+			video := selectedVideos[i]
+			_, _ = dialog.Title("Failed to get thumbnail for video!").
+				Text("An error occurred while trying to get the thumbnail of the video %s (%s).", video.Title, video.ID).
 				ExtraExpand(err.Error()).ExtraHeight(100).
 				Width(500).ErrorIcon().OkButton().Show()
 		}
