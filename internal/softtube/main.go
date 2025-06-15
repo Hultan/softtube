@@ -41,6 +41,10 @@ type SoftTube struct {
 	Logger *logger.Logger
 	DB     *database.Database
 
+	gui
+}
+
+type gui struct {
 	toolbar     *toolbar
 	statusBar   *statusBar
 	menuBar     *menuBar
@@ -253,7 +257,7 @@ func (s *SoftTube) downloadThumbnails(selectedVideos []*database.Video) {
 		if err := <-errorChan; err != nil {
 			video := selectedVideos[i]
 			_, _ = dialog.Title("Failed to get thumbnail for video!").
-				Text("An error occurred while trying to get the thumbnail of the video %s (%s).", video.Title, video.ID).
+				Textf("An error occurred while trying to get the thumbnail of the video %s (%s).", video.Title, video.ID).
 				ExtraExpand(err.Error()).ExtraHeight(100).
 				Width(500).ErrorIcon().OkButton().Show()
 		}

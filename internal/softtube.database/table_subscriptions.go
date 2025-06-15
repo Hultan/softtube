@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"math/rand"
 	"time"
 )
@@ -15,7 +14,7 @@ type SubscriptionTable struct {
 func (s SubscriptionTable) GetAll() ([]Subscription, error) {
 	// Check that the database is opened
 	if s.Connection == nil {
-		return nil, errors.New("database not opened")
+		return nil, ErrDatabaseNotOpened
 	}
 
 	rows, err := s.Connection.Query(sqlSubscriptionsGetAll)
@@ -43,7 +42,7 @@ func (s SubscriptionTable) GetAll() ([]Subscription, error) {
 func (s SubscriptionTable) Get(id string) (Subscription, error) {
 	// Check that the database is opened
 	if s.Connection == nil {
-		return Subscription{}, errors.New("database not opened")
+		return Subscription{}, ErrDatabaseNotOpened
 	}
 
 	row := s.Connection.QueryRow(sqlSubscriptionsGet, id)
@@ -59,7 +58,7 @@ func (s SubscriptionTable) Get(id string) (Subscription, error) {
 func (s SubscriptionTable) UpdateLastChecked(subscription *Subscription, interval int) error {
 	// Check that the database is opened
 	if s.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))

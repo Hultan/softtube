@@ -1,7 +1,6 @@
 package softtube
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -37,7 +36,7 @@ func (v *videoFunctions) delete(video *database.Video) {
 		// Remove the actual video file
 		command := fmt.Sprintf("rm %s", pathForDeletion)
 		cmd := exec.Command("/bin/bash", "-c", command)
-		// Starts a sub process that deletes the video
+		// Starts a subprocess that deletes the video
 		err := cmd.Start()
 		if err != nil {
 			v.videoList.parent.Logger.Error.Printf("Error deleting video : %v\n", err)
@@ -175,7 +174,7 @@ func (v *videoFunctions) startSMPlayer(video *database.Video) {
 		Setpgid: true,
 		Pgid:    0,
 	}
-	// Starts a sub process (smplayer)
+	// Starts a subprocess (smplayer)
 	// Did not get this to work, but read the following, and maybe I can get
 	// this to work in the future
 	// https://forum.golangbridge.org/t/starting-new-processes-with-exec-command/24956
@@ -198,16 +197,14 @@ func (v *videoFunctions) setFocusBackToSoftPlan() {
 			return
 		}
 
-		// Extract valid window IDs
+		// Extract valid window IDs and pick the last one
 		winIDs := strings.Fields(string(winIDBytes))
-		if len(winIDs) > 1 {
-			// Activate the second ID, since the first is likely a helper window
-			exec.Command("xdotool", "windowmap", winIDs[1]).Run()
-			exec.Command("xdotool", "windowactivate", winIDs[1]).Run()
-		} else if len(winIDs) == 1 {
-			// If only one window is found, activate it
-			exec.Command("xdotool", "windowmap", winIDs[0]).Run()
-			exec.Command("xdotool", "windowactivate", winIDs[0]).Run()
+		winID := winIDs[len(winIDs)-1]
+		if err = exec.Command("xdotool", "windowmap", winID).Run(); err != nil {
+			return
+		}
+		if err = exec.Command("xdotool", "windowactivate", winID).Run(); err != nil {
+			return
 		}
 	}()
 }
@@ -426,9 +423,9 @@ func (v *videoFunctions) downloadDuration(videoId string, errorChan chan<- error
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		msg := fmt.Sprintf("Failed to get duration! Reason:\n\n%s\n%s\n", string(output), err)
-		v.parent.Logger.Error.Println(msg)
-		errorChan <- errors.New(msg)
+		errYtdlp := newErrYtdlp("failed to get duration", string(output), err)
+		v.parent.Logger.Error.Println(errYtdlp)
+		errorChan <- errYtdlp
 		return
 	}
 
@@ -471,9 +468,9 @@ func (v *videoFunctions) downloadThumbnail(videoId string, errorChan chan<- erro
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		msg := fmt.Sprintf("Failed to download thumbnail! Reason:\n\n%s\n%s\n", string(output), err)
-		v.parent.Logger.Error.Println(msg)
-		errorChan <- errors.New(msg)
+		errYtdlp := newErrYtdlp("failed to download thumbnail", string(output), err)
+		v.parent.Logger.Error.Println(errYtdlp)
+		errorChan <- errYtdlp
 		return
 	}
 

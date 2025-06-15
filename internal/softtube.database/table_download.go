@@ -1,9 +1,5 @@
 package database
 
-import (
-	"errors"
-)
-
 // DownloadTable in the SoftTube database
 type DownloadTable struct {
 	*Table
@@ -13,7 +9,7 @@ type DownloadTable struct {
 func (d DownloadTable) Insert(id string) error {
 	// Check that the database is opened
 	if d.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute insert statement
@@ -29,7 +25,7 @@ func (d DownloadTable) Insert(id string) error {
 func (d DownloadTable) Delete(id string) error {
 	// Check that the database is opened
 	if d.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute statement
@@ -45,7 +41,7 @@ func (d DownloadTable) Delete(id string) error {
 func (d DownloadTable) GetAll() ([]Download, error) {
 	// Check that the database is opened
 	if d.Connection == nil {
-		return nil, errors.New("database not opened")
+		return nil, ErrDatabaseNotOpened
 	}
 
 	rows, err := d.Connection.Query(sqlDownloadsGetAll)

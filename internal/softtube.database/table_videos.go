@@ -18,7 +18,7 @@ type VideosTable struct {
 func (v VideosTable) Get(id string) (Video, error) {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return Video{}, errors.New("database not opened")
+		return Video{}, ErrDatabaseNotOpened
 	}
 
 	row := v.Connection.QueryRow(sqlVideosGet, id)
@@ -40,7 +40,7 @@ func (v VideosTable) Get(id string) (Video, error) {
 func (v VideosTable) Exists(videoID string) (bool, error) {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return false, errors.New("database not opened")
+		return false, ErrDatabaseNotOpened
 	}
 
 	// Execute select query
@@ -60,14 +60,14 @@ func (v VideosTable) Exists(videoID string) (bool, error) {
 
 	_ = rows.Close()
 
-	return false, fmt.Errorf("failed to check if video '%s' exists", videoID)
+	return false, newErrVideo("failed to check if video exists", videoID)
 }
 
 // GetStatus gets the video status
 func (v VideosTable) GetStatus(videoID string) (int, error) {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return -1, errors.New("database not opened")
+		return -1, ErrDatabaseNotOpened
 	}
 
 	// Execute select query
@@ -87,7 +87,7 @@ func (v VideosTable) GetStatus(videoID string) (int, error) {
 
 	_ = rows.Close()
 
-	return -1, fmt.Errorf("failed to check if video '%s' exists", videoID)
+	return -1, newErrVideo("failed to check if video exists", videoID)
 }
 
 // Insert a new video into the database
@@ -96,7 +96,7 @@ func (v VideosTable) Insert(
 ) error {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	if !strings.HasPrefix(subscriptionID, "UC") {
@@ -119,12 +119,12 @@ func (v VideosTable) Insert(
 func (v VideosTable) UpdateStatus(id string, status VideoStatusType) error {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Check if the connection is still valid
 	if err := v.Connection.Ping(); err != nil {
-		return fmt.Errorf("database connection lost: %v", err)
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute the update statement
@@ -140,7 +140,7 @@ func (v VideosTable) UpdateStatus(id string, status VideoStatusType) error {
 func (v VideosTable) UpdateSave(id string, saved bool) error {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute the update statement
@@ -156,7 +156,7 @@ func (v VideosTable) UpdateSave(id string, saved bool) error {
 func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute insert statement
@@ -172,7 +172,7 @@ func (v VideosTable) UpdateDuration(videoID string, duration string) error {
 func (v VideosTable) Delete(id string) error {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute delete query
@@ -188,7 +188,7 @@ func (v VideosTable) Delete(id string) error {
 func (v VideosTable) Search(text string) ([]Video, error) {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return nil, errors.New("database not opened")
+		return nil, ErrDatabaseNotOpened
 	}
 
 	search := fmt.Sprintf("%%%s%%", text)
@@ -224,7 +224,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 func (v VideosTable) GetVideos(failed, savedView bool) ([]Video, error) {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return nil, errors.New("database not opened")
+		return nil, ErrDatabaseNotOpened
 	}
 
 	var sqlString string
@@ -306,7 +306,7 @@ func (v VideosTable) getSeconds(duration string) int {
 func (v VideosTable) GetStats() ([]string, error) {
 	// Check that the database is opened
 	if v.Connection == nil {
-		return nil, errors.New("database not opened")
+		return nil, ErrDatabaseNotOpened
 	}
 
 	rows, err := v.Connection.Query(sqlVideosGetStats)

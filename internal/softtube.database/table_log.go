@@ -1,10 +1,6 @@
 package database
 
-import (
-	"errors"
-)
-
-// LogTable : The version table in the database
+// LogTable is the log table in the database
 type LogTable struct {
 	*Table
 }
@@ -13,7 +9,7 @@ type LogTable struct {
 func (l *LogTable) Insert(logType LogType, logMessage string) error {
 	// Check that the database is opened
 	if l.Connection == nil {
-		return errors.New("database not opened")
+		return ErrDatabaseNotOpened
 	}
 
 	// Execute insert statement
@@ -30,7 +26,7 @@ func (l *LogTable) GetLatest() ([]Log, error) {
 
 	// Check that the database is opened
 	if l.Connection == nil {
-		return nil, errors.New("database not opened")
+		return nil, ErrDatabaseNotOpened
 	}
 
 	// Get rows from the database
