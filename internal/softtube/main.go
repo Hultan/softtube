@@ -243,6 +243,8 @@ func (s *SoftTube) downloadDurations(selectedVideos []*database.Video) {
 	}
 
 	close(errorChan) // Close the channel when done
+
+	s.videoList.Refresh("")
 }
 
 func (s *SoftTube) downloadThumbnails(selectedVideos []*database.Video) {

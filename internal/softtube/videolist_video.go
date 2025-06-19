@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"strings"
 	"sync"
 	"syscall"
@@ -419,29 +420,48 @@ func (v *videoFunctions) getThumbnail(videoID string) *gdk.Pixbuf {
 
 // Download a YouTube video
 func (v *videoFunctions) downloadDuration(videoId string, errorChan chan<- error) {
-	command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, videoId)
-	cmd := exec.Command("/bin/bash", "-c", command)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		errYtdlp := newErrYtdlp("failed to get duration", string(output), err)
-		v.parent.Logger.Error.Println(errYtdlp)
-		errorChan <- errYtdlp
+	if videoId == "" {
+		errEmpty := fmt.Errorf("getDurationInternal: videoID cannot be empty")
+		v.parent.Logger.Error.Println(errEmpty)
+		errorChan <- errEmpty
 		return
 	}
 
-	duration := strings.Trim(string(output), " \n")
-	if isWarning(duration) {
-		i := strings.Index(duration, "\n")
-		duration = duration[i+1:]
-	}
+	command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, videoId)
+	cmd := exec.Command("/bin/bash", "-c", command)
+	output, err := cmd.CombinedOutput()
+	duration := string(output)
+
+	var durationUpdated bool
 	if isLive(duration) {
 		duration = "LIVE"
-	}
-	if isError(duration) {
+		durationUpdated = true
+	} else if isError(duration) {
 		duration = "ERROR"
-	}
-	if isMember(duration) {
+		durationUpdated = true
+	} else if isMember(duration) {
 		duration = "MEMBER"
+		durationUpdated = true
+	}
+
+	if !durationUpdated {
+		// This regex matches:
+		// - hh:mm:ss
+		// - mm:ss
+		// - ss (only if it appears at the end, and optionally surrounded by parentheses or whitespace)
+		re := regexp.MustCompile(`(?m)(\d{1,2}:)?\d{1,2}(:\d{2})?$`)
+
+		if match := re.FindString(duration); match != "" {
+			duration = match
+			durationUpdated = true
+		}
+	}
+
+	if err != nil && !durationUpdated {
+		errYtdlp := newErrYtdlp("failed to get duration", duration, err)
+		v.parent.Logger.Error.Println(errYtdlp)
+		errorChan <- errYtdlp
+		return
 	}
 
 	err = v.videoList.parent.DB.Videos.UpdateDuration(videoId, duration)
@@ -450,6 +470,7 @@ func (v *videoFunctions) downloadDuration(videoId string, errorChan chan<- error
 		errorChan <- err
 		return
 	}
+
 	errorChan <- nil
 }
 
@@ -477,24 +498,13 @@ func (v *videoFunctions) downloadThumbnail(videoId string, errorChan chan<- erro
 	errorChan <- nil
 }
 
-func isWarning(duration string) bool {
-	if strings.HasPrefix(duration, "WARNING: ") {
-		return true
-	}
-
-	return false
-}
-
 func isLive(duration string) bool {
-	if duration == "" || duration == "0" {
+	upper := strings.ToUpper(duration)
+	if strings.Contains(upper, "PREMIERES") {
 		return true
 	}
 
-	if strings.Contains(duration, "Premieres") {
-		return true
-	}
-
-	if strings.Contains(duration, "This live event") {
+	if strings.Contains(upper, "LIVE EVENT") {
 		return true
 	}
 
@@ -503,6 +513,9 @@ func isLive(duration string) bool {
 
 func isError(duration string) bool {
 	if strings.Contains(duration, "uploader has not") {
+		return true
+	}
+	if strings.Contains(duration, "This video has been removed by the uploader") {
 		return true
 	}
 
