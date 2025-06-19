@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -111,13 +113,27 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	// Wait for the command to be executed (video to be downloaded)
 	err = cmd.Run()
 	if err != nil {
+		// Check if it's an ExitError to get the exit code
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			exitError := fmt.Sprintf("Command failed with exit code: %d", exitErr.ExitCode())
+			logger.Error.Println(exitError)
+		}
+
 		logger.Error.Println("Failed to download video!")
 		msg := fmt.Sprintf("Command : %s", command)
 		logger.Error.Println(msg)
 		logger.Error.Println(err)
+		stdoutString, stderrString := "STDOUT:"+stdout.String(), "STDERR:"+stderr.String()
+		logger.Error.Println(stdoutString)
+		logger.Error.Println(stderrString)
+
 		wait.Done()
 		return
 	}
