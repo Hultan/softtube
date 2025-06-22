@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"sync"
 
 	"github.com/hultan/crypto"
@@ -82,14 +83,15 @@ func main() {
 	waitGroup.Wait()
 }
 
-// Download a youtube video
+// Download a YouTube video
 func downloadVideo(videoID string, wait *sync.WaitGroup) {
+	defer wait.Done()
+
 	// Set video status as downloading
 	err := db.Videos.UpdateStatus(videoID, constStatusDownloading)
 	if err != nil {
 		logger.Error.Println("Failed to set video status to downloading before download!")
 		logger.Error.Println(err)
-		wait.Done()
 		return
 	}
 
@@ -101,7 +103,6 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	if err != nil {
 		logger.Error.Println("Failed to delete video from table download after download!")
 		logger.Error.Println(err)
-		wait.Done()
 		return
 	}
 
@@ -113,12 +114,11 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	// command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
 	fmt.Println(command)
 	cmd := exec.Command("/bin/bash", "-c", command)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
+	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	// Wait for the command to be executed (video to be downloaded)
 	err = cmd.Run()
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "fragment") {
 		// Check if it's an ExitError to get the exit code
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
@@ -130,11 +130,8 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 		msg := fmt.Sprintf("Command : %s", command)
 		logger.Error.Println(msg)
 		logger.Error.Println(err)
-		stdoutString, stderrString := "STDOUT:"+stdout.String(), "STDERR:"+stderr.String()
-		logger.Error.Println(stdoutString)
+		stderrString := "STDERR:" + stderr.String()
 		logger.Error.Println(stderrString)
-
-		wait.Done()
 		return
 	}
 
@@ -143,11 +140,9 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	if err != nil {
 		logger.Error.Println("Failed to set video status to downloaded after download!")
 		logger.Error.Println(err)
-		wait.Done()
 		return
 	}
 
-	wait.Done()
 	return
 }
 
