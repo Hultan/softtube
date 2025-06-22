@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,6 +15,8 @@ import (
 
 	core "github.com/hultan/softtube/internal/softtube.core"
 )
+
+const constDownloadCommand = "%s -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'"
 
 var (
 	logger *log.Logger
@@ -106,32 +107,19 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 		return
 	}
 
-	// Download the video
-	command := fmt.Sprintf(
-		"%s -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'",
-		getYoutubePath(), config.ServerPaths.Videos, videoID,
-	)
-	// command := fmt.Sprintf("%s -f best --no-overwrites -o '%s/%%(id)s.%%(ext)s' -- '%s'", getYoutubePath(), config.ServerPaths.Videos, videoID)
-	fmt.Println(command)
+	// Create download command
+	command := fmt.Sprintf(constDownloadCommand, getYoutubePath(), config.ServerPaths.Videos, videoID)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	// Wait for the command to be executed (video to be downloaded)
 	err = cmd.Run()
 	if err != nil && !strings.Contains(stderr.String(), "fragment") {
-		// Check if it's an ExitError to get the exit code
-		var exitErr *exec.ExitError
-		if errors.As(err, &exitErr) {
-			exitError := fmt.Sprintf("Command failed with exit code: %d", exitErr.ExitCode())
-			logger.Error.Println(exitError)
-		}
-
 		logger.Error.Println("Failed to download video!")
 		msg := fmt.Sprintf("Command : %s", command)
 		logger.Error.Println(msg)
 		logger.Error.Println(err)
-		stderrString := "STDERR:" + stderr.String()
-		logger.Error.Println(stderrString)
+		logger.Error.Println("STDERR: \n" + stderr.String())
 		return
 	}
 
