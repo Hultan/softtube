@@ -17,7 +17,13 @@ import (
 	"github.com/gotk3/gotk3/gtk"
 )
 
-const constVideoDurationCommand = "%s --get-duration -- '%s'"
+// [youtube] WX-NxWCB_XY: Sign in to confirm you’re not a bot. Use --cookies-from-browser
+// or --cookies for the authentication.
+// See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp for how to
+// manually pass cookies.
+// Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for
+// tips on effectively exporting YouTube cookies
+const constVideoDurationCommand = "%s --get-duration --cookies-from-browser firefox -- '%s'"
 
 // videoList is the SoftTube video list
 type videoList struct {

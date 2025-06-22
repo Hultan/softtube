@@ -433,8 +433,8 @@ func (v *videoFunctions) downloadDuration(videoId string, errorChan chan<- error
 	command := fmt.Sprintf(constVideoDurationCommand, youtubeDLPath, videoId)
 	cmd := exec.Command("/bin/bash", "-c", command)
 	output, err := cmd.CombinedOutput()
-	duration := string(output)
 
+	duration := string(output)
 	var durationUpdated bool
 	if isLive(duration) {
 		duration = "LIVE"
