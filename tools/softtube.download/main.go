@@ -118,7 +118,7 @@ func downloadVideo(videoID string, wait *sync.WaitGroup) {
 	cmd.Stderr = &stderr
 	// Wait for the command to be executed (video to be downloaded)
 	err = cmd.Run()
-	if err != nil && !strings.Contains(err.Error(), "fragment") {
+	if err != nil && !strings.Contains(stderr.String(), "fragment") {
 		// Check if it's an ExitError to get the exit code
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
