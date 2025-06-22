@@ -73,7 +73,9 @@ func (y youtube) getDurationInternal(videoId string) (string, error) {
 
 	// Trying to avoid ERROR: fragment 1 not found, unable to continue
 	// Problem on YouTube:s or yt-dlp:s side?
-	if err != nil && !strings.Contains(err.Error(), "fragment") {
+	// Note that the fragment error string is in the durationString (output)
+	// and not in the error (err).
+	if err != nil && !strings.Contains(durationString, "fragment") {
 		return durationString, fmt.Errorf("getDurationInternal: get duration failed: %s", err)
 	}
 
