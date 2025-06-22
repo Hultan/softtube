@@ -34,8 +34,10 @@ func (v *videoFunctions) delete(video *database.Video) {
 	wg.Add(4)
 
 	go func() {
+		defer wg.Done()
+
 		// Remove the actual video file
-		command := fmt.Sprintf("rm %s", pathForDeletion)
+		command := fmt.Sprintf("rm -f %s", pathForDeletion)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		// Starts a subprocess that deletes the video
 		err := cmd.Start()
@@ -48,33 +50,34 @@ func (v *videoFunctions) delete(video *database.Video) {
 			v.videoList.parent.Logger.Error.Printf("Error waiting for process to stop : %v\n", err)
 			return
 		}
-		wg.Done()
 	}()
 
 	go func() {
+		defer wg.Done()
+
 		// Log that the video has been deleted in the database
 		err := v.videoList.parent.DB.Log.Insert(constLogDelete, video.Title)
 		if err != nil {
 			v.videoList.parent.Logger.Error.Println("Failed to log video as watched!")
 			v.videoList.parent.Logger.Error.Println(err)
 		}
-		wg.Done()
 	}()
 
 	go func() {
+		defer wg.Done()
 		// Log that the video has been deleted in the GUI
 		v.videoList.parent.activityLog.addLog(constLogDelete, video.Title)
-		wg.Done()
 	}()
 
 	go func() {
+		defer wg.Done()
+
 		// Set video status as deleted
 		err := v.videoList.parent.DB.Videos.UpdateStatus(video.ID, constStatusDeleted)
 		if err != nil {
 			v.videoList.parent.Logger.Error.Println("Failed to set video status to deleted!")
 			v.videoList.parent.Logger.Error.Println(err)
 		}
-		wg.Done()
 	}()
 
 	wg.Wait()
