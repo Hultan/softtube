@@ -139,8 +139,10 @@ func (y youtube) getThumbnailInternal(videoId string) (string, error) {
 		command := fmt.Sprintf(constThumbnailCommand, y.getYoutubePath(), thumbPath, videoId)
 		cmd := exec.Command("/bin/bash", "-c", command)
 		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return string(output), err
+		outputString := string(output)
+
+		if err != nil && !strings.Contains(outputString, "fragment") {
+			return outputString, err
 		}
 	}
 

@@ -2,7 +2,7 @@ package main
 
 // See https://github.com/ytdl-org/youtube-dl/issues/22641
 // It might help adding --user-agent "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-const constVideoDurationCommand = "%s --get-duration -- '%s'"
+const constVideoDurationCommand = "%s --get-duration --cookies-from-browser firefox -- '%s'"
 
 const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'"
 const constThumbnailLocation string = "%s/%s"
