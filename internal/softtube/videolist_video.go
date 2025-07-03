@@ -259,7 +259,7 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 		// Log that the video has been requested to be downloaded in the database
 		err = v.videoList.parent.DB.Log.Insert(constLogDownload, video.Title)
 		if err != nil {
-			v.videoList.parent.Logger.Error.Println("Failed to log video as watched!")
+			v.videoList.parent.Logger.Error.Println("Failed to log video as downloaded!")
 			v.videoList.parent.Logger.Error.Println(err)
 		}
 		wg.Done()
