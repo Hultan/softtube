@@ -177,11 +177,15 @@ func (v *videoList) Refresh(searchFor string) {
 
 	go func() {
 		del := v.parent.DB.Videos.HasVideosToDelete()
+
+		label := "To delete"
 		if del {
-			v.parent.toolbar.toolbarToDelete.SetLabel("* To delete *")
-		} else {
-			v.parent.toolbar.toolbarToDelete.SetLabel("To delete")
+			label = "* " + label + " *"
 		}
+
+		glib.IdleAdd(func() {
+			v.parent.toolbar.toolbarToDelete.SetLabel(label)
+		})
 	}()
 }
 

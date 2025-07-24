@@ -202,8 +202,10 @@ func isLive(duration string) bool {
 	if strings.Contains(upper, "PREMIERES") {
 		return true
 	}
-
 	if strings.Contains(upper, "LIVE EVENT") {
+		return true
+	}
+	if upper == "" {
 		return true
 	}
 

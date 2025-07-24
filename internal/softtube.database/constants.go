@@ -20,7 +20,7 @@ const sqlVideosSearch = `SELECT Videos.id, Videos.subscription_id, Videos.title,
 									Videos.status, Subscriptions.name , Videos.save, Videos.seconds
 									FROM Videos 
 									INNER JOIN Subscriptions ON Subscriptions.id = Videos.subscription_id 
-									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? 
+									WHERE Videos.title LIKE ? OR Subscriptions.name LIKE ? OR Videos.ID LIKE ? 
 									ORDER BY Videos.Added DESC`
 
 const sqlVideosGetStats = `SELECT Videos.id

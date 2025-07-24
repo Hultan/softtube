@@ -192,7 +192,7 @@ func (v VideosTable) Search(text string) ([]Video, error) {
 	}
 
 	search := fmt.Sprintf("%%%s%%", text)
-	rows, err := v.Connection.Query(sqlVideosSearch, search, search)
+	rows, err := v.Connection.Query(sqlVideosSearch, search, search, search)
 	if err != nil {
 		return nil, err
 	}
