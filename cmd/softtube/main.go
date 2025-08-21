@@ -25,11 +25,18 @@ func main() {
 	loadConfig()
 
 	// Set up the client logging
-	startLogging()
+	err := startLogging()
+	if err != nil {
+		msg := "Failed to start logging: " + err.Error()
+		panic(msg)
+	}
 	defer stopLogging()
 
 	// Open the SoftTube database
-	_ = openDatabase()
+	_, err = openDatabase()
+	if err != nil {
+		panic(err)
+	}
 	defer closeDatabase()
 
 	startApplication()
@@ -44,14 +51,15 @@ func loadConfig() {
 	}
 }
 
-func startLogging() {
+func startLogging() error {
 	var err error
 
 	// Start logging
 	log, err = logger.NewStandardLogger(path.Join(config.ServerPaths.Log, config.Logs.SoftTube))
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
 func stopLogging() {
@@ -59,22 +67,22 @@ func stopLogging() {
 	log.Close()
 }
 
-func openDatabase() *database.Database {
+func openDatabase() (*database.Database, error) {
 	// Create the database object and get all subscriptions
 	conn := config.Connection
 	password, err := crypto.Decrypt(conn.Password)
 	if err != nil {
 		log.Info.Println("Failed to decrypt MySQL password!")
-		log.Info.Println(err)
-		panic(err)
+		return nil, err
 	}
 
 	db = database.NewDatabase(conn.Server, conn.Port, conn.Database, conn.Username, password)
 	err = db.Open()
 	if err != nil {
-		return nil
+		log.Info.Println("Failed to open database!")
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
 func closeDatabase() {
