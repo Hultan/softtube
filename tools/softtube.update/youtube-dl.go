@@ -63,7 +63,9 @@ func (y youtube) getDurationInternal(videoId string) (string, error) {
 	// error here, because checking the duration of a live/error/member
 	// event DOES fail and returns an error.
 	durationString := string(output)
-	if isLive(durationString) {
+	if isEmpty(durationString) {
+		return "EMPTY", nil
+	} else if isLive(durationString) {
 		return "LIVE", nil
 	} else if isError(durationString) {
 		return "ERROR", nil
@@ -229,4 +231,8 @@ func isMember(duration string) bool {
 	}
 
 	return false
+}
+
+func isEmpty(durationString string) bool {
+	return strings.TrimSpace(durationString) == ""
 }
