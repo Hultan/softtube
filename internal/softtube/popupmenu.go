@@ -28,6 +28,8 @@ type popupMenu struct {
 	popupViewToWatch       *gtk.MenuItem
 	popupViewToDelete      *gtk.MenuItem
 	popupViewSaved         *gtk.MenuItem
+	popupSearchChannel     *gtk.MenuItem
+	popupSearchVideo       *gtk.MenuItem
 }
 
 // Init loads the popup menu
@@ -49,6 +51,8 @@ func (p *popupMenu) Init() error {
 	p.popupViewToWatch = GetObject[*gtk.MenuItem]("popup_view_to_watch")
 	p.popupViewSaved = GetObject[*gtk.MenuItem]("popup_view_saved")
 	p.popupViewToDelete = GetObject[*gtk.MenuItem]("popup_view_to_delete")
+	p.popupSearchChannel = GetObject[*gtk.MenuItem]("popup_search_channel_name")
+	p.popupSearchVideo = GetObject[*gtk.MenuItem]("popup_search_video_title")
 
 	p.SetupEvents()
 
@@ -334,6 +338,26 @@ func (p *popupMenu) SetupEvents() {
 	_ = p.popupViewToDelete.Connect(
 		"activate", func() {
 			p.parent.videoList.switchView(viewToDelete)
+		},
+	)
+	_ = p.popupSearchChannel.Connect(
+		"activate", func() {
+			treeview := p.parent.videoList.treeView
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				p.parent.searchBar.searchEntry.SetText(selectedVideos[0].SubscriptionName)
+				p.parent.videoList.Search(selectedVideos[0].SubscriptionName)
+			}
+		},
+	)
+	_ = p.popupSearchVideo.Connect(
+		"activate", func() {
+			treeview := p.parent.videoList.treeView
+			selectedVideos := p.parent.videoList.videoFunctions.getSelectedVideos(treeview)
+			if selectedVideos != nil {
+				p.parent.searchBar.searchEntry.SetText(selectedVideos[0].Title)
+				p.parent.videoList.Search(selectedVideos[0].Title)
+			}
 		},
 	)
 }
