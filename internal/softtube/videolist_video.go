@@ -266,7 +266,7 @@ func (v *videoFunctions) download(video *database.Video, markAsDownloading bool)
 	}()
 
 	go func() {
-		// Log that the video has been deleted in the GUI
+		// Log that the video is being downloaded in the GUI
 		v.videoList.parent.activityLog.addLog(constLogDownload, video.Title)
 		wg.Done()
 	}()
