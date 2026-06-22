@@ -218,9 +218,13 @@ func (s *SoftTube) onKeyPressed(e *gdk.Event) {
 				s.videoList.DeleteWatchedVideos()
 			}
 		case gdk.KEY_Home: // Home
-			s.videoList.scroll.toStart()
+			glib.IdleAdd(func() {
+				s.videoList.scroll.toStart()
+			})
 		case gdk.KEY_End: // End
-			s.videoList.scroll.toEnd()
+			glib.IdleAdd(func() {
+				s.videoList.scroll.toEnd()
+			})
 		}
 	}
 }

@@ -147,25 +147,28 @@ func (v *videoList) Refresh(searchFor string) {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 	}
 
-	if v.keepScrollToEnd {
-		// For some reason, we can't scroll to end in the
-		// UI thread so create a goroutine that does the
-		// scrolling down 50 milliseconds later
-		go func() {
-			// We occasionally get an exception here:
-			// fatal error: unexpected signal during runtime execution
-			// [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x0]
-			// Tried to switch from time.Sleep() to time.After()
-			// This did not work either.
-			select {
-			case <-time.After(50 * time.Millisecond):
-				v.scroll.toEnd()
-			}
+	glib.IdleAdd(func() {
 
-			// time.Sleep(50 * time.Millisecond)
-			// v.scroll.toEnd()
-		}()
-	}
+		if v.keepScrollToEnd {
+			// For some reason, we can't scroll to end in the
+			// UI thread so create a goroutine that does the
+			// scrolling down 50 milliseconds later
+			go func() {
+				// We occasionally get an exception here:
+				// fatal error: unexpected signal during runtime execution
+				// [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x0]
+				// Tried to switch from time.Sleep() to time.After()
+				// This did not work either.
+				select {
+				case <-time.After(100 * time.Millisecond):
+					v.scroll.toEnd()
+				}
+
+				// time.Sleep(50 * time.Millisecond)
+				// v.scroll.toEnd()
+			}()
+		}
+	})
 
 	// Run garbage collect after refreshing the list
 	go func() {

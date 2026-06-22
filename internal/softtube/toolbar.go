@@ -1,6 +1,7 @@
 package softtube
 
 import (
+	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
 
@@ -84,23 +85,29 @@ func (t *toolbar) SetupEvents() {
 	)
 	_ = t.toolbarScrollToStart.Connect(
 		"clicked", func() {
-			t.parent.videoList.scroll.toStart()
+			glib.IdleAdd(func() {
+				t.parent.videoList.scroll.toStart()
+			})
 		},
 	)
 	_ = t.toolbarScrollToEnd.Connect(
 		"clicked", func() {
-			t.parent.videoList.scroll.toEnd()
+			glib.IdleAdd(func() {
+				t.parent.videoList.scroll.toEnd()
+			})
 		},
 	)
 	_ = t.toolbarKeepScrollToEnd.Connect(
 		"clicked", func() {
-			if t.toolbarKeepScrollToEnd.GetActive() {
-				t.parent.videoList.keepScrollToEnd = true
-				t.parent.videoList.scroll.toEnd()
-			} else {
-				t.parent.videoList.keepScrollToEnd = false
-				t.parent.videoList.scroll.toStart()
-			}
+			glib.IdleAdd(func() {
+				if t.toolbarKeepScrollToEnd.GetActive() {
+					t.parent.videoList.keepScrollToEnd = true
+					t.parent.videoList.scroll.toEnd()
+				} else {
+					t.parent.videoList.keepScrollToEnd = false
+					t.parent.videoList.scroll.toStart()
+				}
+			})
 		},
 	)
 }

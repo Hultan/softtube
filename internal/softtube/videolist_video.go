@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 	"syscall"
-	"time"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -161,7 +160,7 @@ func (v *videoFunctions) play(video *database.Video) {
 
 	v.videoList.Refresh("")
 
-	v.setFocusBackToSoftPlan()
+	//v.setFocusBackToSoftPlan()
 }
 
 func (v *videoFunctions) startSMPlayer(video *database.Video) {
@@ -188,30 +187,31 @@ func (v *videoFunctions) startSMPlayer(video *database.Video) {
 	}
 }
 
-func (v *videoFunctions) setFocusBackToSoftPlan() {
-	go func() {
-		time.Sleep(5 * time.Second)
-
-		appClass := "Softtube"
-
-		// Get all matching window IDs
-		winIDBytes, err := exec.Command("xdotool", "search", "--class", appClass).Output()
-		if err != nil || len(winIDBytes) == 0 {
-			fmt.Println("No window found for class:", appClass)
-			return
-		}
-
-		// Extract valid window IDs and pick the last one
-		winIDs := strings.Fields(string(winIDBytes))
-		winID := winIDs[len(winIDs)-1]
-		if err = exec.Command("xdotool", "windowmap", winID).Run(); err != nil {
-			return
-		}
-		if err = exec.Command("xdotool", "windowactivate", winID).Run(); err != nil {
-			return
-		}
-	}()
-}
+//
+//func (v *videoFunctions) setFocusBackToSoftPlan() {
+//	go func() {
+//		time.Sleep(5 * time.Second)
+//
+//		appClass := "Softtube"
+//
+//		// Get all matching window IDs
+//		winIDBytes, err := exec.Command("xdotool", "search", "--class", appClass).Output()
+//		if err != nil || len(winIDBytes) == 0 {
+//			fmt.Println("No window found for class:", appClass)
+//			return
+//		}
+//
+//		// Extract valid window IDs and pick the last one
+//		winIDs := strings.Fields(string(winIDBytes))
+//		winID := winIDs[len(winIDs)-1]
+//		if err = exec.Command("xdotool", "windowmap", winID).Run(); err != nil {
+//			return
+//		}
+//		if err = exec.Command("xdotool", "windowactivate", winID).Run(); err != nil {
+//			return
+//		}
+//	}()
+//}
 
 func (v *videoFunctions) getPath(videoID string) string {
 	tryPath := path.Join(v.videoList.parent.Config.ClientPaths.Videos, videoID+".mkv")
