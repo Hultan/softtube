@@ -59,6 +59,13 @@ func (s *SoftTube) collectDiskStats() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer func(dir *os.File) {
+		err := dir.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(dir)
+
 	files, err := dir.Readdirnames(0)
 	if err != nil {
 		return nil, err
@@ -77,6 +84,7 @@ func (s *SoftTube) collectDBStats() ([]string, error) {
 
 func (s *SoftTube) getDiff(disk []string, db []string) []string {
 	var missing []string
+
 	for _, file := range disk {
 		if !slices.Contains(db, file) {
 			missing = append(missing, fmt.Sprintf("%s (not in DB)", file))
@@ -85,16 +93,6 @@ func (s *SoftTube) getDiff(disk []string, db []string) []string {
 
 	for _, id := range db {
 		if !slices.Contains(disk, id) {
-			// Attempt to automatically download missing files
-			//
-			//err := s.DB.Download.Insert(id)
-			//if err != nil {
-			//	panic(err)
-			//}
-			//err := s.DB.Videos.UpdateStatus(id, constStatusDeleted)
-			//if err != nil {
-			//	panic(err)
-			//}
 			missing = append(missing, fmt.Sprintf("%s (not on disk)", id))
 		}
 	}
