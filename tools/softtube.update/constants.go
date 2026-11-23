@@ -4,7 +4,7 @@ package main
 // It might help adding --user-agent "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 const constVideoDurationCommand = "%s --get-duration --cookies-from-browser firefox -- '%s'"
 
-const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'"
+const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites --cookies-from-browser firefox -o '%s' -- '%s'"
 const constThumbnailLocation string = "%s/%s"
 
 const constSubscriptionRSSURL = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"

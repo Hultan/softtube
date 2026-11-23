@@ -5,7 +5,7 @@ import (
 )
 
 const constAppTitle = "SoftTube"
-const constAppVersion = "3.1.4"
+const constAppVersion = "3.1.5"
 const constDateLayout = "2006-01-02"
 
 type listStoreColumnType int
@@ -72,5 +72,5 @@ const (
 	constSetAsNotDownloaded = "Set as not downloaded"
 )
 
-const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites -o '%s' -- '%s'"
+const constThumbnailCommand string = "%s --write-thumbnail --skip-download --no-overwrites --cookies-from-browser firefox -o '%s' -- '%s'"
 const constThumbnailLocation string = "%s/%s"
